@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Authentications\AuthController;
+use App\Http\Controllers\TahunAjaranController;
+use App\Http\Controllers\Users\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +17,30 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// ? User routes
+Route::controller(UserController::class)
+        ->prefix('/users')
+        ->middleware('auth.jwt')
+        ->group(function () {
+            Route::post('/', 'addNewUser')->withoutMiddleware('auth.jwt'); // buat nyoba
+            Route::get('/me', 'getMyProfile');
+        });
+
+
+// ? Auth routes
+Route::controller(AuthController::class)
+        ->prefix('authentications')
+        ->middleware('auth.jwt')
+        ->group(function() {
+            Route::post('/', 'userLogin')->withoutMiddleware('auth.jwt');
+            Route::delete('/', 'userLogout');
+            Route::get('/', 'getNewToken');
+        });
+
+// ? Tahun ajaran routes
+Route::controller(TahunAjaranController::class)
+        ->prefix('tahun-ajaran')
+        ->middleware('auth.jwt')
+        ->group(function() {
+            Route::get('/', 'getTahunAjaran');
+        });
