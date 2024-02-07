@@ -16,7 +16,7 @@ class UserView extends Authenticatable implements JWTSubject
      * Model ini digunakan untuk view dosen
      * hanya digunakan untuk get data (SELECT).
      *
-     * Koneksi database terhubung ke 'simak_stmikbdg' view dosen.
+     * Koneksi database terhubung ke 'simak_stmikbdg' view users.
      *
      * Saat ini masih menggunakan dua database berbeda sehingga
      * belum mendukung relasi antar view users->dosen.

@@ -11,7 +11,7 @@ class DosenView extends Model
      * Model ini digunakan untuk view dosen
      * hanya digunakan untuk get data (SELECT).
      *
-     * Koneksi database terhubung ke 'simak_stmikbdg' view dosen.
+     * Koneksi database terhubung ke 'stmikbdg_dummy' view dosen.
      *
      * Saat ini masih menggunakan dua database berbeda sehingga
      * belum mendukung relasi antar view dosen->mahasiswa.

@@ -11,10 +11,11 @@ use App\Models\Users\MahasiswaView;
 
 class TahunAjaranController extends Controller
 {
-    public function getTahunAjaran(Request $request) {
+    public function getTahunAjaran(Request $request)
+    {
         try {
             $isDosen = auth()->user()->is_dosen;
-            $userIdentifier = explode('-', auth()->user()->kd_user)[1];
+            $user = $this->getUserAuth();
 
             // validasi
             $validatedData = $request->validate([
@@ -26,7 +27,7 @@ class TahunAjaranController extends Controller
             }
 
             // user adalah mahasiswa
-            $mahasiswa = MahasiswaView::where('nim', $userIdentifier)->first();
+            $mahasiswa = $user;
             $tahunAjaran = TahunAjaranView::getTahunAjaran($mahasiswa, $validatedData['tahun_ajaran']);
 
             return $this->successfulResponseJSON([

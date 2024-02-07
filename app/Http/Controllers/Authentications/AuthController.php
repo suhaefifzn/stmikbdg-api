@@ -13,7 +13,8 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function userLogin(Request $request) {
+    public function userLogin(Request $request)
+    {
         try {
             $request->validate([
                 'email' => 'required|email:dns',
@@ -23,7 +24,7 @@ class AuthController extends Controller
             $credentials = $request->only('email', 'password');
             $platform = $request->query('platform');
 
-            if (!$token = auth()->attempt($credentials)) {
+            if (!auth()->attempt($credentials)) {
                 return response()->json([
                     'status' => 'fail',
                     'message' => 'Kredensial yang Anda berikan tidak sesuai',
@@ -38,12 +39,14 @@ class AuthController extends Controller
 
         $ttl = self::setExpirationToken($platform);
         $token = auth()->setTTL($ttl)->attempt($credentials);
+        $expirationDate = \Carbon\Carbon::createFromTimestamp(auth()->payload()->get('exp'));
 
         $data = [
             'token' => [
                 'access_token' => $token,
                 'token_type' => 'bearer',
-                'expires_in' => is_null($ttl) ? null : "$ttl minutes",
+                // 'expires_in' => is_null($ttl) ? null : "$ttl minutes",
+                'expires_in' => $expirationDate->toDateTimeString(),
             ],
             'platform' => $platform,
         ];
@@ -51,7 +54,8 @@ class AuthController extends Controller
         return $this->successfulResponseJSON($data, null, 201);
     }
 
-    public function userLogout() {
+    public function userLogout()
+    {
         $token = JWTAuth::getToken()->get();
 
         if ($token) {
@@ -66,7 +70,8 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function getNewToken(Request $request) {
+    public function getNewToken(Request $request)
+    {
         try {
             $platform = $request->query('platform');
 
@@ -114,7 +119,8 @@ class AuthController extends Controller
      * Jika 'android', maka tidak memiliki kadaluarsa.
      * Jika 'web', maka memiliki waktu kadaluarsa selama 6 jam
      */
-    private function setExpirationToken(string $platform) {
+    private function setExpirationToken(string $platform)
+    {
         if ($platform === 'android') return null; // permanent
         else if ($platform === 'web') return 60 * 6; // 6 hours
     }

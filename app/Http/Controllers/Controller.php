@@ -6,6 +6,13 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 
+// ? Exception
+use App\Exceptions\ErrorHandler;
+
+// ? Models - view
+use App\Models\Users\MahasiswaView;
+use App\Models\Users\DosenView;
+
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
@@ -34,6 +41,31 @@ class Controller extends BaseController
                 'message' => $message,
                 'data' => $data,
             ], $statusCode);
+        }
+    }
+
+    /**
+     * Digunakan untuk mendapatkan data user yang telah terautentikasi
+     * Data diambil dari view dosen atau view mahasiswa dari database 'stmikbdg_dummy'
+     */
+    public function getUserAuth()
+    {
+        try {
+            $isDosen = auth()->user()->is_dosen;
+            $kdUserArr = explode('-', auth()->user()->kd_user);
+            $userIdentifier = $kdUserArr[1]; // bisa berisi kd_dosen atau nim
+
+            if ($isDosen) {
+                $dosen = DosenView::where('kd_dosen', $userIdentifier)->first();
+
+                return $dosen;
+            }
+
+            $mahasiswa = MahasiswaView::where('nim', $userIdentifier)->first();
+
+            return $mahasiswa;
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
         }
     }
 }

@@ -1,23 +1,22 @@
 <?php
 
-namespace App\Models\Users;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MahasiswaView extends Model
+class KurikulumView extends Model
 {
     /**
      * Model ini digunakan untuk view dosen
      * hanya digunakan untuk get data (SELECT).
      *
-     * Koneksi database terhubung ke 'stmikbdg_dummy' view mahasiswa.
+     * Koneksi database terhubung ke 'stmikbdg_dummy' view kurikulum.
      *
      * Saat ini masih menggunakan dua database berbeda sehingga
-     * belum mendukung relasi antar view mahasiswa->users.
      */
     use HasFactory;
 
-    public $table = 'vmahasiswa';
-    public $connection = 'second_pgsql'; // database 'stmikbdg_dummy'
+    public $table = 'kurikulum'; // belum ada viewnya jadi ke tabel dulu
+    public $connection = 'second_pgsql';
 }

@@ -12,12 +12,12 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Users\User;
 
 // ? Models - View
-use App\Models\Users\MahasiswaView;
-use App\Models\Users\DosenView;
+use App\Models\Users\UserView;
 
 class UserController extends Controller
 {
-    public function addNewUser(Request $request) {
+    public function addNewUser(Request $request)
+    {
         try {
             $validatedData = $request->validate([
                 'kd_user' => 'required|string',
@@ -27,9 +27,8 @@ class UserController extends Controller
             ]);
 
             $tempKdUser = $validatedData['is_dosen']
-                            ? 'DSN-' . $validatedData['kd_user']
-                            : 'MHS-' . $validatedData['kd_user']
-                        ;
+                ? 'DSN-' . $validatedData['kd_user']
+                : 'MHS-' . $validatedData['kd_user'];
 
             $hashPassword = Hash::make($validatedData['password']);
             $validatedData['kd_user'] = $tempKdUser;
@@ -38,7 +37,7 @@ class UserController extends Controller
             $validatedData['updated_at'] = now();
 
             // validate kd_user lagi
-            Validator::make([ 'kd_user' => $tempKdUser ], [
+            Validator::make(['kd_user' => $tempKdUser], [
                 'kd_user' => 'unique:users,kd_user'
             ])->validate();
 
@@ -55,25 +54,16 @@ class UserController extends Controller
         }
     }
 
-    public function getMyProfile() {
+    public function getMyProfile()
+    {
         try {
-            $kdUserArr = explode('-', auth()->user()->kd_user);
-            $isDosen = auth()->user()->is_dosen;
-            $userIdentifier = $kdUserArr[1]; // bisa berisi kd_dosen atau nim
-
-            if ($isDosen) {
-                $dosen = DosenView::where('kd_dosen', $userIdentifier)->first();
-
-                return $this->successfulResponseJSON([
-                    'user' => $dosen,
-                ], null, 200);
-            }
-
-            $mahasiswa = MahasiswaView::where('nim', $userIdentifier)->first();
+            $user = $this->getUserAuth();
+            $account = auth()->user();
 
             return $this->successfulResponseJSON([
-                'user' => $mahasiswa,
-            ], null, 200);
+                'user_info' => $user,
+                'account_info' => $account,
+            ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
