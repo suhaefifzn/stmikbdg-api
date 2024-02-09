@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class KurikulumView extends Model
 {
     /**
-     * Model ini digunakan untuk view dosen
+     * Model ini digunakan untuk view kurikulum
      * hanya digunakan untuk get data (SELECT).
      *
      * Koneksi database terhubung ke 'stmikbdg_dummy' view kurikulum.
      *
-     * Saat ini masih menggunakan dua database berbeda sehingga
+     * Saat ini masih menggunakan dua database berbeda
      */
     use HasFactory;
 

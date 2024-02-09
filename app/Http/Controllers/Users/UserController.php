@@ -23,7 +23,8 @@ class UserController extends Controller
                 'kd_user' => 'required|string',
                 'is_dosen' => 'required|boolean',
                 'email' => 'required|string|email:dns|unique:users',
-                'password' => 'required|string|min:8|max:64|regex:/^\S*$/u'
+                'password' => 'required|string|min:8|max:64|regex:/^\S*$/u',
+                'is_admin' => 'nullable|boolean'
             ]);
 
             $tempKdUser = $validatedData['is_dosen']
@@ -35,6 +36,7 @@ class UserController extends Controller
             $validatedData['password'] = $hashPassword;
             $validatedData['created_at'] = now();
             $validatedData['updated_at'] = now();
+            $validatedData['is_admin'] = $request->is_admin ?? false;
 
             // validate kd_user lagi
             Validator::make(['kd_user' => $tempKdUser], [

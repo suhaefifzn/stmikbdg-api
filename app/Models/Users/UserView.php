@@ -13,7 +13,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class UserView extends Authenticatable implements JWTSubject
 {
     /**
-     * Model ini digunakan untuk view dosen
+     * Model ini digunakan untuk view users
      * hanya digunakan untuk get data (SELECT).
      *
      * Koneksi database terhubung ke 'simak_stmikbdg' view users.

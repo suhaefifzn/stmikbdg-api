@@ -2,7 +2,8 @@
 
 // ? Controller
 use App\Http\Controllers\Authentications\AuthController;
-use App\Http\Controllers\MatKul\MatKulController;
+use App\Http\Controllers\KRS\KRSController;
+use App\Http\Controllers\KRS\MatKulController;
 use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\Users\UserController;
 
@@ -48,10 +49,13 @@ Route::controller(TahunAjaranController::class)
         Route::get('/', 'getTahunAjaran');
     });
 
-// ? Mata Kuliah routes
-Route::controller(MatKulController::class)
-    ->prefix('mata-kuliah')
+// ? KRS routes
+Route::prefix('krs')
     ->middleware('auth.jwt')
     ->group(function () {
-        Route::get('/', 'getMataKuliah');
+        // * MatKul Controller
+        Route::get('/mata-kuliah', [MatKulController::class, 'getMataKuliah']); // get list mata kuliah
+
+        // * KRS controller
+        Route::get('/', [KRSController::class, 'addKRSMahasiswa'])->middleware('auth.mahasiswa');
     });

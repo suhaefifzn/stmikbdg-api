@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 // ? Models - view
 use App\Models\TahunAjaranView;
-use App\Models\Users\MahasiswaView;
 
 class TahunAjaranController extends Controller
 {
@@ -17,24 +16,31 @@ class TahunAjaranController extends Controller
             $isDosen = auth()->user()->is_dosen;
             $user = $this->getUserAuth();
 
-            // validasi
-            $validatedData = $request->validate([
-                'tahun_ajaran' => 'required',
-            ]);
-
             if ($isDosen) {
                 // TODO: jika user adalah dosen
+                return response()->json([
+                    'message' => 'Belum difungsikan'
+                ], 200);
             }
 
             // user adalah mahasiswa
             $mahasiswa = $user;
-            $tahunAjaran = TahunAjaranView::getTahunAjaran($mahasiswa, $validatedData['tahun_ajaran']);
+
+            // ada query tahun dan smt
+            if ((!is_null($request->query('tahun'))) and (!is_null($request->query('smt')))) {
+                $tahun = $request->query('tahun');
+                $smt = $request->query('smt');
+                $tahunAjaran = TahunAjaranView::getTahunAjaran($mahasiswa, $tahun, $smt);
+
+                return $this->successfulResponseJSON([
+                    'tahun_ajaran' => $tahunAjaran,
+                ]);
+            }
+
+            // tanpa query
+            $tahunAjaran = TahunAjaranView::getTahunAjaran($mahasiswa);
 
             return $this->successfulResponseJSON([
-                'mahasiswa' => [
-                    'nim' => $mahasiswa['nim'],
-                    'nama' => $mahasiswa['nm_mhs'],
-                ],
                 'tahun_ajaran' => $tahunAjaran,
             ]);
         } catch (\Exception $e) {

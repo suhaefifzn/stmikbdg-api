@@ -23,8 +23,22 @@ class AuthController extends Controller
 
             $credentials = $request->only('email', 'password');
             $platform = $request->query('platform');
+            $token = auth()->attempt($credentials);
+            $ttl = self::setExpirationToken($platform);
+            $token = auth()->setTTL($ttl)->attempt($credentials);
 
-            if (!auth()->attempt($credentials)) {
+            if ($token) {
+                $data = [
+                    'token' => [
+                        'access_token' => $token,
+                        'token_type' => 'bearer',
+                        'expires_in' => $platform === 'android' ?
+                                        null
+                                        : "$ttl minutes",
+                    ],
+                    'platform' => $platform,
+                ];
+            } else {
                 return response()->json([
                     'status' => 'fail',
                     'message' => 'Kredensial yang Anda berikan tidak sesuai',
@@ -36,20 +50,6 @@ class AuthController extends Controller
                 'message' => 'Gagal generate token',
             ], 500);
         }
-
-        $ttl = self::setExpirationToken($platform);
-        $token = auth()->setTTL($ttl)->attempt($credentials);
-        $expirationDate = \Carbon\Carbon::createFromTimestamp(auth()->payload()->get('exp'));
-
-        $data = [
-            'token' => [
-                'access_token' => $token,
-                'token_type' => 'bearer',
-                // 'expires_in' => is_null($ttl) ? null : "$ttl minutes",
-                'expires_in' => $expirationDate->toDateTimeString(),
-            ],
-            'platform' => $platform,
-        ];
 
         return $this->successfulResponseJSON($data, null, 201);
     }
@@ -121,7 +121,7 @@ class AuthController extends Controller
      */
     private function setExpirationToken(string $platform)
     {
-        if ($platform === 'android') return null; // permanent
+        if ($platform === 'android') return 60 * 24 * 30 * 12 * 1000; // kurang lebih 1000 tahun
         else if ($platform === 'web') return 60 * 6; // 6 hours
     }
 }
