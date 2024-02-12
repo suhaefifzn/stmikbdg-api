@@ -34,7 +34,7 @@ class TahunAjaranView extends Model
      * @return mixed
      */
     function scopeGetTahunAjaran(
-        Builder $query, object $user, string $tahun, $smt = null
+        Builder $query, object $user, string $tahun = null, $smt = null
     ) {
         if (!is_null($smt)) {
             return $query->where('jur_id', $user['jur_id'])

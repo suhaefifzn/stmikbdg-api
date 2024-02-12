@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 
 // ? Models - Table
 use App\Models\Users\User;
@@ -14,11 +16,31 @@ use App\Models\Users\User;
 // ? Models - View
 use App\Models\Users\UserView;
 
+// ? Excel
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ImportUser;
+use App\Exceptions\ExcelImportException;
+
 class UserController extends Controller
 {
     public function addNewUser(Request $request)
     {
         try {
+            if ($request->query('import')) {
+                if ($request->query('import') === 'excel') {
+                    $request->validate([
+                        'file' => 'required|mimes:xlsx,xls|max:2048'
+                    ]);
+                    $excel = $request->file('file');
+                    return self::importUserFromExcel($excel);
+                } else {
+                    return response()->json([
+                        'status' => 'fail',
+                        'message' => 'Metode import yang tersedia saat ini adalah menggunakan file excel'
+                    ], 400);
+                }
+            }
+
             $validatedData = $request->validate([
                 'kd_user' => 'required|string',
                 'is_dosen' => 'required|boolean',
@@ -56,6 +78,29 @@ class UserController extends Controller
         }
     }
 
+    private function importUserFromExcel($excel) {
+        try {
+            $fileName = $excel->hashName();
+            $path = $excel->storeAs('public/excel/', $fileName);
+
+            Excel::import(new ImportUser, storage_path('app/public/excel/' . $fileName));
+
+            Storage::delete($path);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data user pada file excel berhasil ditambahkan'
+            ], 201);
+        } catch (ExcelImportException $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
     public function getMyProfile()
     {
         try {
@@ -63,8 +108,91 @@ class UserController extends Controller
             $account = auth()->user();
 
             return $this->successfulResponseJSON([
-                'user_info' => $user,
-                'account_info' => $account,
+                'mahasiswa' => $user,
+                'account' => [
+                    'email' => $account['email'],
+                    'is_dosen' => $account['is_dosen'],
+                    'is_admin' => $account['is_admin'],
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function putMyEmail(Request $request) {
+        try {
+            $validatedData = $request->validate([
+                'email' =>[
+                    'required',
+                    'email:dns',
+                    Rule::unique('users')->ignore(auth()->user()->id),
+                ]
+            ]);
+            $user = auth()->user()->kd_user;
+
+            User::where('kd_user', $user)->update([
+                'email' => $validatedData['email'],
+                'updated_at' => now(),
+            ]);
+
+            return $this->successfulResponseJSON([
+                'email' => $validatedData['email']
+            ], 'Email berhasil diperbaharui');
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function putMyPassword(Request $request) {
+        try {
+            $validatedData = $request->validate([
+                'current_password' => 'required',
+                'new_password' => 'required|min:8|max:64|regex:/^\S*$/u'
+            ]);
+
+            if (!Hash::check($validatedData['current_password'], auth()->user()->password)) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Password sekarang tidak sesuai'
+                ], 404);
+            }
+
+            $newPassword = Hash::make($validatedData['new_password']);
+
+            User::where('kd_user', auth()->user()->kd_user)
+                    ->update([
+                        'password'=> $newPassword,
+                        'updated_at' => now(),
+                    ]);
+
+            return $this->successfulResponseJSON([
+                'email' => auth()->user()->email,
+            ], 'Password berhasil diperbaharui');
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function getUserList(Request $request) {
+        try {
+            if ($request->query('is_dosen') or $request->query('is_admin')) {
+                $isDosen = $request->query('is_dosen')
+                            ? filter_var($request->query('is_dosen'), FILTER_VALIDATE_BOOLEAN)
+                            : null;
+                $isAdmin = $request->query('is_admin')
+                            ? filter_var($request->query('is_admin'), FILTER_VALIDATE_BOOLEAN)
+                            : null;
+                $filter = [
+                    'is_dosen' => $isDosen,
+                    'is_admin' => $isAdmin,
+                ];
+            }
+
+            $users = UserView::getAllUsers($filter);
+
+            return $this->successfulResponseJSON([
+                'users' => $users,
             ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);

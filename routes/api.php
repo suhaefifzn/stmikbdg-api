@@ -26,8 +26,13 @@ Route::controller(UserController::class)
     ->prefix('/users')
     ->middleware('auth.jwt')
     ->group(function () {
-        Route::post('/', 'addNewUser')->withoutMiddleware('auth.jwt'); // buat nyoba
+        Route::post('/', 'addNewUser')->withoutMiddleware('auth.jwt'); // buat awalan
         Route::get('/me', 'getMyProfile');
+        Route::put('/me', 'putMyEmail');
+        Route::put('/me/password', 'putMyPassword');
+
+        // route untuk admin
+        Route::get('/', 'getUserList')->middleware('auth.admin');
     });
 
 
@@ -57,5 +62,5 @@ Route::prefix('krs')
         Route::get('/mata-kuliah', [MatKulController::class, 'getMataKuliah']); // get list mata kuliah
 
         // * KRS controller
-        Route::get('/', [KRSController::class, 'addKRSMahasiswa'])->middleware('auth.mahasiswa');
+        Route::post('/', [KRSController::class, 'addKRSMahasiswa'])->middleware('auth.mahasiswa');
     });

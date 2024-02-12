@@ -160,6 +160,7 @@ return [
          * Package Service Providers...
          */
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class, // JWT
+        Maatwebsite\Excel\ExcelServiceProvider::class, // Excel
 
         /*
          * Application Service Providers...
@@ -186,6 +187,7 @@ return [
         // 'Example' => App\Facades\Example::class,
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ])->toArray(),
 
 ];

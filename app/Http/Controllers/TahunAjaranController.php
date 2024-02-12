@@ -27,7 +27,7 @@ class TahunAjaranController extends Controller
             $mahasiswa = $user;
 
             // ada query tahun dan smt
-            if ((!is_null($request->query('tahun'))) and (!is_null($request->query('smt')))) {
+            if ($request->query('tahun') and $request->query('smt')) {
                 $tahun = $request->query('tahun');
                 $smt = $request->query('smt');
                 $tahunAjaran = TahunAjaranView::getTahunAjaran($mahasiswa, $tahun, $smt);
