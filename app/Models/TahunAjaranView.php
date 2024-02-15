@@ -21,32 +21,19 @@ class TahunAjaranView extends Model
      */
     use HasFactory;
 
-    public $table = 'vta_aktif';
-    public $connection = 'second_pgsql'; // database 'stmikbdg_dummy'
+    protected $table = 'vta_aktif';
+    protected $connection;
 
-    /**
-     * getTahunAjaranByTahunAndSmt
-     * Digunakan untuk get tahun ajaran berdasarkan:
-     *
-     * @param tahun - tahun ajaran aktif;
-     * @param smt - berupa nilai 1 = ganjil; 2 = genap;
-     *
-     * @return mixed
-     */
-    function scopeGetTahunAjaran(
-        Builder $query, object $user, string $tahun = null, $smt = null
-    ) {
-        if (!is_null($smt)) {
-            return $query->where('jur_id', $user['jur_id'])
-                        ->where('jns_mhs', $user['jns_mhs'])
-                        ->where('tahun', $tahun)
-                        ->where('smt', $smt)
-                        ->get();
-        }
+    public function __construct() {
+        $this->connection = config('myconfig.database.second_connection');
+    }
 
+    public function scopeGetTahunAjaran(Builder $query, object $user) {
         return $query->where('jur_id', $user['jur_id'])
                     ->where('jns_mhs', $user['jns_mhs'])
-                    ->get();
+                    ->where('kd_kampus', $user['kd_kampus'])
+                    ->orderBy('tahun_id', 'DESC')
+                    ->first();
     }
 
     /**

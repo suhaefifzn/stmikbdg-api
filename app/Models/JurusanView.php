@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 // ? Models - view
 use App\Models\TahunAjaranView;
@@ -21,8 +22,16 @@ class JurusanView extends Model
      */
     use HasFactory;
 
-    public $table = 'vjurusan';
-    public $connection = 'second_pgsql';
+    protected $table = 'vjurusan';
+    protected $connection;
+
+    public function __construct() {
+        $this->connection = config('myconfig.database.second_connection');
+    }
+
+    public function scopeGetJurusanAktif(Builder $query) {
+        return $query->where('k_aktif', true)->get();
+    }
 
     /**
      * Relasi vjurusan ke vta_aktif, one to many

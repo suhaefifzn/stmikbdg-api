@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class KurikulumView extends Model
 {
@@ -17,6 +18,17 @@ class KurikulumView extends Model
      */
     use HasFactory;
 
-    public $table = 'kurikulum'; // belum ada viewnya jadi ke tabel dulu
-    public $connection = 'second_pgsql';
+    protected $table = 'kurikulum'; // belum ada viewnya jadi ke tabel dulu
+    protected $connection;
+
+    public function __construct() {
+        $this->connection = config('myconfig.database.second_connection');
+    }
+
+    public function scopeGetKurikulumMahasiswa(Builder $query, array $filter) {
+        return $query->where('jur_id', $filter['jur_id'])
+                        ->where('tahun', $filter['angkatan'])
+                        ->where('k_aktif', true)
+                        ->first();
+    }
 }

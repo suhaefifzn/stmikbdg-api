@@ -25,23 +25,30 @@ class TahunAjaranController extends Controller
 
             // user adalah mahasiswa
             $mahasiswa = $user;
-
-            // ada query tahun dan smt
-            if ($request->query('tahun') and $request->query('smt')) {
-                $tahun = $request->query('tahun');
-                $smt = $request->query('smt');
-                $tahunAjaran = TahunAjaranView::getTahunAjaran($mahasiswa, $tahun, $smt);
-
-                return $this->successfulResponseJSON([
-                    'tahun_ajaran' => $tahunAjaran,
-                ]);
-            }
-
-            // tanpa query
             $tahunAjaran = TahunAjaranView::getTahunAjaran($mahasiswa);
 
             return $this->successfulResponseJSON([
                 'tahun_ajaran' => $tahunAjaran,
+            ]);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function getSemesterMahasiswaSekarang() {
+        try {
+            $mahasiswa = $this->getUserAuth();
+            $tahunAjaran = TahunAjaranView::getTahunAjaran($mahasiswa);
+            $gap = $tahunAjaran['tahun'] - $mahasiswa['angkatan'];
+            $semester = $tahunAjaran['smt'] === 1
+                        ? $gap * 2 + 1
+                        : $gap * 2 + 2;
+
+            return $this->successfulResponseJSON([
+                'tahun' => $tahunAjaran['tahun'],
+                'smt' => $tahunAjaran['smt'],
+                'keterangan_smt' => $tahunAjaran['smt'] === 1 ? 'Ganjil' : 'Genap',
+                'semester'=> $semester,
             ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);

@@ -5,6 +5,9 @@ namespace App\Models\Users;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+// ? Models - table
+use App\Models\Users\Mahasiswa;
+
 class Dosen extends Model
 {
     /**
@@ -18,7 +21,19 @@ class Dosen extends Model
      */
     use HasFactory;
 
-    public $table = 'dosen';
-    public $connection = 'second_pgsql'; // database 'stmikbdg_dummy'
+    protected $table = 'dosen';
+    protected $connection;
+
+    public function __construct() {
+        $this->connection = config('myconfig.database.second_connection');
+    }
+
     protected $guarded = ['id'];
+
+    /**
+     * Relasi tabel dosen ke mahasiswa, one to many
+     */
+    public function mahasiswa() {
+        return $this->hasMany(Mahasiswa::class, 'mhs_id');
+    }
 }

@@ -18,6 +18,10 @@ class DosenView extends Model
      */
     use HasFactory;
 
-    public $table = 'vdosen';
-    public $connection = 'second_pgsql'; // database 'stmikbdg_dummy'
+    protected $table = 'vdosen';
+    protected $connection;
+
+    public function __construct() {
+        $this->connection = config('myconfig.database.second_connection');
+    }
 }

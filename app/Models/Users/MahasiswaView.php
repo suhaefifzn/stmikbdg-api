@@ -21,8 +21,12 @@ class MahasiswaView extends Model
      */
     use HasFactory;
 
-    public $table = 'vmahasiswa';
-    public $connection = 'second_pgsql'; // database 'stmikbdg_dummy'
+    protected $table = 'vmahasiswa';
+    protected $connection;
+
+    public function __construct() {
+        $this->connection = config('myconfig.database.second_connection');
+    }
 
     /**
      * Relasi vmahasiswa ke vjurusan adalah, many to one

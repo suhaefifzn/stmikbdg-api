@@ -2,12 +2,12 @@
 
 // ? Controller
 use App\Http\Controllers\Authentications\AuthController;
+use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\KRS\KRSController;
 use App\Http\Controllers\KRS\MatKulController;
 use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\Users\UserController;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,13 +26,16 @@ Route::controller(UserController::class)
     ->prefix('/users')
     ->middleware('auth.jwt')
     ->group(function () {
-        Route::post('/', 'addNewUser')->withoutMiddleware('auth.jwt'); // buat awalan
+        Route::post('/', 'addNewUser'); // buat awalan tambahin withoutMiddleware('auth.jwt')
         Route::get('/me', 'getMyProfile');
         Route::put('/me', 'putMyEmail');
         Route::put('/me/password', 'putMyPassword');
 
-        // route untuk admin
+        // * route untuk admin
         Route::get('/', 'getUserList')->middleware('auth.admin');
+
+        // * route untuk wali dosen
+        Route::get('/my/mahasiswa', 'getMyMahasiswa')->middleware('auth.dosen');
     });
 
 
@@ -46,21 +49,38 @@ Route::controller(AuthController::class)
         Route::get('/', 'getNewToken');
     });
 
-// ? Tahun Ajaran routes
-Route::controller(TahunAjaranController::class)
-    ->prefix('tahun-ajaran')
-    ->middleware('auth.jwt')
-    ->group(function () {
-        Route::get('/', 'getTahunAjaran');
-    });
-
 // ? KRS routes
 Route::prefix('krs')
-    ->middleware('auth.jwt')
+    ->middleware(['auth.jwt', 'auth.mahasiswa'])
     ->group(function () {
-        // * MatKul Controller
-        Route::get('/mata-kuliah', [MatKulController::class, 'getMataKuliah']); // get list mata kuliah
+        // * Tahun Ajaran
+        Route::controller(TahunAjaranController::class)
+            ->group(function() {
+                Route::get('/tahun-ajaran', 'getTahunAjaran')->withoutMiddleware('auth.mahasiswa');
+            });
 
-        // * KRS controller
-        Route::post('/', [KRSController::class, 'addKRSMahasiswa'])->middleware('auth.mahasiswa');
+        // * MatKul Controller
+        Route::controller(MatKulController::class)
+            ->group(function() {
+                Route::get('/mata-kuliah', 'getMataKuliah')->withoutMiddleware('auth.mahasiswa');
+            });
+
+        // * KRS Controller
+        Route::controller(KRSController::class)
+            ->group(function() {
+                Route::get('/check', 'checkKRS');
+                Route::post('/mata-kuliah/pengajuan', 'addKRSMahasiswa');
+                Route::post('/mata-kuliah/draft', 'addDraftKRSMahasiswa');
+
+                // Route wali dosen
+                Route::get('/mahasiswa', 'getKRSMahasiswa')
+                    ->middleware('auth.dosen')
+                    ->withoutMiddleware('auth.mahasiswa');
+            });
     });
+
+// ? Additional
+Route::get('/current-semester', [TahunAjaranController::class, 'getSemesterMahasiswaSekarang'])
+        ->middleware(['auth.jwt', 'auth.mahasiswa']);
+Route::get('/jurusan', [JurusanController::class, 'getJurusanAktif'])
+        ->middleware(['auth.jwt', 'auth.dosen']);

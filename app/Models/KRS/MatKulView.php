@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 // ? Models -  View
 use App\Models\KRS\NilaiAkhirView;
+use App\Models\KRS\KRSMatkul;
 
 class MatKulView extends Model
 {
@@ -29,14 +30,16 @@ class MatKulView extends Model
             return $query->where('aktif_kur', true)
                             ->where('jur_id', $filter['jur_id'])
                             ->where('semester', $filter['semester'])
+                            ->where('kur_id', $filter['kur_id'])
                             ->orderBy('mk_id', 'ASC')
                             ->get();
         }
 
         return $query->where('aktif_kur', true)
-                            ->where('jur_id', $filter['jur_id'])
-                            ->orderBy('mk_id', 'ASC')
-                            ->get();
+                        ->where('jur_id', $filter['jur_id'])
+                        ->where('kur_id', $filter['kur_id'])
+                        ->orderBy('mk_id', 'ASC')
+                        ->get();
     }
 
     /**
@@ -44,5 +47,12 @@ class MatKulView extends Model
      */
     public function nilaiAkhir() {
         return $this->hasMany(NilaiAkhirView::class, 'mk_id', 'mk_id');
+    }
+
+    /**
+     * Relasi view matakuliah ke tabel krs matkul, one to many
+     */
+    public function krsMatkul() {
+        return $this->hasMany(KRSMatkul::class, 'mk_id', 'mk_id');
     }
 }

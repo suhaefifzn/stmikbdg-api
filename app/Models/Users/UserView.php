@@ -24,8 +24,13 @@ class UserView extends Authenticatable implements JWTSubject
      */
     use HasFactory, Notifiable, HasApiTokens;
 
-    public $table = 'vusers';
-    public $connection = 'pgsql';
+    protected $table = 'vusers';
+    protected $connection;
+
+    public function __construct() {
+        $this->connection = config('myconfig.database.first_connection');
+    }
+
     protected $hidden = ['password', 'id', 'remember_token', 'created_at', 'updated_at'];
     protected $casts = [
         'email_verified_at' => 'datetime',

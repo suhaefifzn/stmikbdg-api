@@ -4,15 +4,31 @@ namespace App\Http\Controllers\KRS;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Controllers\TahunAjaranController;
 
 // ? Exception
 use App\Exceptions\ErrorHandler;
 
 // ? Models - view
 use App\Models\KRS\MatKulView;
+use App\Models\KurikulumView;
+
+// ? Models - table
+use App\Models\Users\Mahasiswa;
 
 class MatKulController extends Controller
 {
+    public $user;
+    private $currentSemester;
+
+    public function __construct() {
+        $tahunAjaranController = new TahunAjaranController();
+        $this->currentSemester = $tahunAjaranController
+                                    ->getSemesterMahasiswaSekarang()
+                                    ->getData('data')['data'];
+        $this->user = $this->getUserAuth();
+    }
+
     public function getMataKuliah(Request $request)
     {
         try {
@@ -40,45 +56,126 @@ class MatKulController extends Controller
     }
 
     public function getMataKuliahByMahasiswa($filter) {
-        $user = $this->getUserAuth();
-        $filter['jur_id'] = $user['jur_id'];
+        $mahasiswa = Mahasiswa::where('mhs_id', $this->user['mhs_id'])->first();
+        $filter['jur_id'] = $this->user['jur_id'];
+        $filter['angkatan'] = $this->user['angkatan'];
+        $kurikulum = KurikulumView::getKurikulumMahasiswa($filter);
+
+        $filter['kur_id'] = $kurikulum['kur_id'];
         $mataKuliah = MatKulView::getMatkul($filter);
 
-        // hitung setiap nilai mk
-        $countNilaiAkhir = 0;
-        $totalNilaiAkhir = 0;
-        $totalSKS = 0;
+        // initial value
+        $totalSemuaSKS = 0;
+        $totalSemuaIPK = 0;
+        $countIPKPerSemester = 0;
 
-        foreach ($mataKuliah as $mk) {
-            $nilaiAkhir = $mk->nilaiAkhir()
-                            ->where('mhs_id', $user['mhs_id'])
-                            ->first();
+        if (count($mataKuliah) > 0) {
+            // grouping per semester
+            foreach ($mataKuliah as $mk) {
+                $semester = $mk['semester'];
+                $nilaiAkhir = $mk->nilaiAkhir()
+                                ->where('mhs_id', $this->user['mhs_id'])
+                                ->first();
 
-            if ($nilaiAkhir) {
-                $mk['nilai_akhir'] = [
-                    'nilai' => $nilaiAkhir['nilai'],
-                    'mutu' => $nilaiAkhir['mutu']
+                if ($nilaiAkhir) {
+                    $mk['nilai_akhir'] = [
+                        'nilai' => $nilaiAkhir['nilai'],
+                        'mutu' => $nilaiAkhir['mutu']
+                    ];
+                } else {
+                    $mk['nilai_akhir'] = null;
+                }
+
+                $latestKRS = $mahasiswa->krs()->first();
+                $kdMK = $mk['kd_mk'];
+                $mk['krs'] = [
+                    'is_aktif' => $mk['smt'] === $this->currentSemester['smt'] ?? false,
+                    'is_checked' => is_null($latestKRS
+                                        ->krsMatkul()
+                                        ->where('mk_id', $mk['mk_id'])
+                                        ->first())
+                                        ? false
+                                        : true,
                 ];
-                $totalSKS += (int) $mk['sks'];
-                $totalNilaiAkhir += (int) $nilaiAkhir['mutu'];
-                $countNilaiAkhir++;
-            } else {
-                $mk['nilai_akhir'] = null;
+
+                // mk pilihan
+                if (strpos($kdMK, 'P-') === 0) {
+                    $mk['krs'] = [
+                        'is_aktif' => false,
+                        'is_checked' => false,
+                    ];
+                } else {
+                    $mk['krs'] = [
+                        'is_aktif' => $mk['smt'] === $this->currentSemester['smt'] ?? false,
+                        'is_checked' => is_null($latestKRS
+                                            ->krsMatkul()
+                                            ->where('mk_id', $mk['mk_id'])
+                                            ->first())
+                                            ? false
+                                            : true,
+                    ];
+                }
+
+                $tempMatkul[$semester]['semester'] = $semester;
+                $tempMatkul[$semester]['mata_kuliah'][] = $mk;
             }
+
+            // hitung ipk dan total sks yang dipilih tiap semester
+            foreach ($tempMatkul as $index => $item) {
+                // initial value
+                $countNilaiAkhir = 0;
+                $totalNilaiAkhirSemester = 0;
+                $totalSksDipilihDisemester = 0;
+
+                foreach ($item['mata_kuliah'] as $mk) {
+                    if (!is_null($mk['nilai_akhir'])) {
+                        $totalNilaiAkhirSemester += (int) $mk['nilai_akhir']['mutu'];
+                        $totalSksDipilihDisemester += (int) $mk['sks'];
+                        $countNilaiAkhir++;
+                    }
+                }
+
+                // hitung ipk - rata-rata nilai
+                $averageNilaiAkhir = $countNilaiAkhir > 0
+                                        ? (float) $totalNilaiAkhirSemester/$countNilaiAkhir
+                                        : null;
+                $ipk = $averageNilaiAkhir
+                            ? number_format($averageNilaiAkhir, 3, '.', '')
+                            : null;
+
+                $tempMatkul[$index]['ipk'] = (float) $ipk;
+                $tempMatkul[$index]['ipk_per_semester_dari_total_sks'] = $totalSksDipilihDisemester;
+
+                // hitung sks dan ipk menyeluruh
+                $totalSemuaSKS += $tempMatkul[$index]['ipk_per_semester_dari_total_sks'];
+
+                if ($tempMatkul[$index]['ipk'] > 0) {
+                    $totalSemuaIPK += (float) $tempMatkul[$index]['ipk'];
+                    $countIPKPerSemester++;
+                }
+
+                // menentukan urutan response
+                $desiredOrder = ['ipk', 'semester', 'ipk_per_semester_dari_total_sks', 'mata_kuliah'];
+                $orderedData = array_replace(array_flip($desiredOrder), $tempMatkul[$index]);
+                $tempMatkul[$index] = $orderedData;
+            }
+        } else {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Tidak ada matakuliah ditemukan pada semester ' . $filter['semester']
+            ], 404);
         }
 
-        // hitung ipk - rata-rata nilai
-        $averageNilaiAkhir = $countNilaiAkhir > 0
-                                ? (float) $totalNilaiAkhir/$countNilaiAkhir
-                                : null;
-        $ipk = $averageNilaiAkhir
-                    ? number_format($averageNilaiAkhir, 3, '.', '')
-                    : null;
+        // set response paling atas
+        if (!$filter['semester']) {
+            $response['total_semua_ipk'] = (float) number_format(
+                (float) ($totalSemuaIPK / $countIPKPerSemester), 3, '.'. ''
+            );
+            $response['total_semua_sks_dipilih'] = $totalSemuaSKS;
+        }
 
-        return $this->successfulResponseJSON([
-            'ipk' => $ipk,
-            'total_sks_dipilih' => $totalSKS,
-            'mata_kuliah' => $mataKuliah,
-        ]);
+        $response['matkul_per_semester'] = array_values($tempMatkul);
+
+        return $this->successfulResponseJSON($response);
     }
 }

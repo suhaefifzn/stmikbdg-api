@@ -17,7 +17,6 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
-
     /**
      * successfulResponseJSON
      * Fungsi untuk mengembalikan response yang berhasil
@@ -28,8 +27,7 @@ class Controller extends BaseController
      *
      * @return Illuminate\Http\JsonResponse
      */
-    public function successfulResponseJSON(array $data, string $message = null, int $statusCode = 200)
-    {
+    public function successfulResponseJSON(array $data, string $message = null, int $statusCode = 200) {
         if (is_null($message)) {
             return response()->json([
                 'status' => 'success',
@@ -48,8 +46,7 @@ class Controller extends BaseController
      * Digunakan untuk mendapatkan data user yang telah terautentikasi
      * Data diambil dari view dosen atau view mahasiswa dari database 'stmikbdg_dummy'
      */
-    public function getUserAuth()
-    {
+    public function getUserAuth() {
         try {
             $isDosen = auth()->user()->is_dosen;
             $kdUserArr = explode('-', auth()->user()->kd_user);
@@ -64,6 +61,16 @@ class Controller extends BaseController
             $mahasiswa = MahasiswaView::where('nim', $userIdentifier)->first();
 
             return $mahasiswa;
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function isWaliDosen($dosen, $mhsId) {
+        try {
+            $mahasiswa = MahasiswaView::where('mhs_id', $mhsId)->first();
+
+            return $dosen['dosen_id'] === $mahasiswa['dosen_id'] ?? false;
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }

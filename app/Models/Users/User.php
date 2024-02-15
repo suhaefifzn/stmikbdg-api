@@ -20,8 +20,13 @@ class User extends Model
      */
     use HasFactory, Notifiable, HasApiTokens;
 
-    public $table = 'users';
-    public $connection = 'pgsql';
+    protected $table = 'users';
+    protected $connection;
+
+    public function __construct() {
+        $this->connection = config('myconfig.database.first_connection');
+    }
+
     protected $guarded = ['id'];
     protected $hidden = ['password'];
     protected $casts = [
