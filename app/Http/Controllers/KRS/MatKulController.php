@@ -12,6 +12,8 @@ use App\Exceptions\ErrorHandler;
 // ? Models - view
 use App\Models\KRS\MatKulView;
 use App\Models\KurikulumView;
+use App\Models\KRS\MatkulDiselenggarakanView;
+use App\Models\KRS\MatkulAktifView;
 
 // ? Models - table
 use App\Models\Users\Mahasiswa;
@@ -29,10 +31,17 @@ class MatKulController extends Controller
         $this->user = $this->getUserAuth();
     }
 
-    public function getMataKuliah(Request $request)
-    {
+    public function getMataKuliah(Request $request) {
         try {
+            if (!$request->query('tahun_id')) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Nilai query tahun_id pada url diperlukan'
+                ], 400);
+            }
+
             $isDosen = auth()->user()->is_dosen;
+            $filter['tahun_id'] = $request->query('tahun_id');
             $filter['semester'] = $request->query('semester')
                         ? $request->query('semester')
                         : null;
@@ -56,22 +65,41 @@ class MatKulController extends Controller
     }
 
     public function getMataKuliahByMahasiswa($filter) {
+        // bet mahasiswa ke tabel, untuk dapet krs_id_last
         $mahasiswa = Mahasiswa::where('mhs_id', $this->user['mhs_id'])->first();
+        
+        // buat filter untuk kurikulum aktif
         $filter['jur_id'] = $this->user['jur_id'];
         $filter['angkatan'] = $this->user['angkatan'];
         $kurikulum = KurikulumView::getKurikulumMahasiswa($filter);
 
+        /**
+         * get matakuliah diselenggarakan dan gabunggkan 
+         * dengan matakuliah di view mata kuliah
+         */
         $filter['kur_id'] = $kurikulum['kur_id'];
+        $matkulDiselenggarakan = MatkulDiselenggarakanView::getMatkulDiselenggarakan($filter);
+        $filter['smt'] = $matkulDiselenggarakan[0]['smt'];
         $mataKuliah = MatKulView::getMatkul($filter);
+
+        $mergedMatkul = $matkulDiselenggarakan->concat($mataKuliah)->sortBy('semester');
+
+        if ($filter['semester']) {
+            $listMatkul = $mergedMatkul->filter(function ($item) use ($filter) {
+                return $item['semester'] == $filter['semester'];
+            });
+        } else {
+            $listMatkul =$mergedMatkul;
+        }
 
         // initial value
         $totalSemuaSKS = 0;
         $totalSemuaIPK = 0;
         $countIPKPerSemester = 0;
 
-        if (count($mataKuliah) > 0) {
+        if (count($listMatkul) > 0) {
             // grouping per semester
-            foreach ($mataKuliah as $mk) {
+            foreach ($listMatkul->all() as $mk) {
                 $semester = $mk['semester'];
                 $nilaiAkhir = $mk->nilaiAkhir()
                                 ->where('mhs_id', $this->user['mhs_id'])
@@ -91,11 +119,11 @@ class MatKulController extends Controller
                 $mk['krs'] = [
                     'is_aktif' => $mk['smt'] === $this->currentSemester['smt'] ?? false,
                     'is_checked' => is_null($latestKRS
-                                        ->krsMatkul()
-                                        ->where('mk_id', $mk['mk_id'])
-                                        ->first())
-                                        ? false
-                                        : true,
+                                                ->krsMatkul()
+                                                ->where('mk_id', $mk['mk_id'])
+                                                ->first())
+                                                ? false
+                                                : true,
                 ];
 
                 // mk pilihan
@@ -108,11 +136,11 @@ class MatKulController extends Controller
                     $mk['krs'] = [
                         'is_aktif' => $mk['smt'] === $this->currentSemester['smt'] ?? false,
                         'is_checked' => is_null($latestKRS
-                                            ->krsMatkul()
-                                            ->where('mk_id', $mk['mk_id'])
-                                            ->first())
-                                            ? false
-                                            : true,
+                                                    ->krsMatkul()
+                                                    ->where('mk_id', $mk['mk_id'])
+                                                    ->first())
+                                                    ? false
+                                                    : true,
                     ];
                 }
 
@@ -176,6 +204,6 @@ class MatKulController extends Controller
 
         $response['matkul_per_semester'] = array_values($tempMatkul);
 
-        return $this->successfulResponseJSON($response);
+        return $this->successfulResponseJSON([ $response ]);
     }
 }

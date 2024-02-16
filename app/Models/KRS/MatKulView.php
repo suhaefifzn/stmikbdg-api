@@ -31,6 +31,7 @@ class MatKulView extends Model
                             ->where('jur_id', $filter['jur_id'])
                             ->where('semester', $filter['semester'])
                             ->where('kur_id', $filter['kur_id'])
+                            ->where('smt', '!=', $filter['smt'])
                             ->orderBy('mk_id', 'ASC')
                             ->get();
         }
@@ -38,6 +39,7 @@ class MatKulView extends Model
         return $query->where('aktif_kur', true)
                         ->where('jur_id', $filter['jur_id'])
                         ->where('kur_id', $filter['kur_id'])
+                        ->where('smt', '!=', $filter['smt'])
                         ->orderBy('mk_id', 'ASC')
                         ->get();
     }

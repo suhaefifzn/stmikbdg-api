@@ -62,7 +62,7 @@ Route::prefix('krs')
         // * MatKul Controller
         Route::controller(MatKulController::class)
             ->group(function() {
-                Route::get('/mata-kuliah', 'getMataKuliah')->withoutMiddleware('auth.mahasiswa');
+                Route::get('/mata-kuliah', 'getMataKuliah');
             });
 
         // * KRS Controller
