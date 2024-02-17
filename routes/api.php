@@ -4,6 +4,7 @@
 use App\Http\Controllers\Authentications\AuthController;
 use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\KRS\KRSController;
+use App\Http\Controllers\KRS\KRSDosenController;
 use App\Http\Controllers\KRS\MatKulController;
 use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\Users\UserController;
@@ -33,9 +34,6 @@ Route::controller(UserController::class)
 
         // * route untuk admin
         Route::get('/', 'getUserList')->middleware('auth.admin');
-
-        // * route untuk wali dosen
-        Route::get('/my/mahasiswa', 'getMyMahasiswa')->middleware('auth.dosen');
     });
 
 
@@ -56,7 +54,7 @@ Route::prefix('krs')
         // * Tahun Ajaran
         Route::controller(TahunAjaranController::class)
             ->group(function() {
-                Route::get('/tahun-ajaran', 'getTahunAjaran')->withoutMiddleware('auth.mahasiswa');
+                Route::get('/tahun-ajaran', 'getTahunAjaran');
             });
 
         // * MatKul Controller
@@ -71,15 +69,21 @@ Route::prefix('krs')
                 Route::get('/check', 'checkKRS');
                 Route::post('/mata-kuliah/pengajuan', 'addKRSMahasiswa');
                 Route::post('/mata-kuliah/draft', 'addDraftKRSMahasiswa');
+            });
 
-                // Route wali dosen
-                Route::get('/mahasiswa', 'getKRSMahasiswa')
-                    ->middleware('auth.dosen')
-                    ->withoutMiddleware('auth.mahasiswa');
+        // * KRS Route wali dosen
+        Route::controller(KRSDosenController::class)
+            ->prefix('/mahasiswa')
+            ->middleware('auth.dosen')
+            ->withoutMiddleware('auth.mahasiswa')
+            ->group(function () {
+                Route::get('/', 'getKRSMahasiswa');
+                Route::put('/', 'updateStatusKRSMahasiswa');
+                Route::get('/list', 'getListKRSMahasiswa');
             });
     });
 
-// ? Additional
+// ? Additional routes
 Route::get('/current-semester', [TahunAjaranController::class, 'getSemesterMahasiswaSekarang'])
         ->middleware(['auth.jwt', 'auth.mahasiswa']);
 Route::get('/jurusan', [JurusanController::class, 'getJurusanAktif'])

@@ -11,7 +11,7 @@ use App\Exceptions\ErrorHandler;
 
 // ? Models - view
 use App\Models\Users\MahasiswaView;
-use App\Models\Users\DosenView;
+use App\Models\Users\Dosen;
 
 class Controller extends BaseController
 {
@@ -53,7 +53,7 @@ class Controller extends BaseController
             $userIdentifier = $kdUserArr[1]; // bisa berisi kd_dosen atau nim
 
             if ($isDosen) {
-                $dosen = DosenView::where('kd_dosen', $userIdentifier)->first();
+                $dosen = Dosen::where('kd_dosen', $userIdentifier)->first();
 
                 return $dosen;
             }
@@ -66,7 +66,7 @@ class Controller extends BaseController
         }
     }
 
-    public function isWaliDosen($dosen, $mhsId) {
+    public function isDosenWali($dosen, $mhsId) {
         try {
             $mahasiswa = MahasiswaView::where('mhs_id', $mhsId)->first();
 

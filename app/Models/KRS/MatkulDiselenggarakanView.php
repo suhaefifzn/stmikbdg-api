@@ -31,6 +31,15 @@ class MatkulDiselenggarakanView extends Model
                     ->get();
     }
 
+    public function scopeGetOneMatkul(Builder $query, $filter) {
+        return $query->where('mk_id', $filter['mk_id'])
+                    ->where('tahun_id', $filter['tahun_id'])
+                    ->where('kd_kampus', $filter['kd_kampus'])
+                    ->where('jns_mhs', $filter['jns_mhs'])
+                    ->where('jur_id', $filter['jur_id'])
+                    ->get();
+    }
+
     /**
      * Relasi view mk diselenggarakan ke view nilai akhir, one to many
      */

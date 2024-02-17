@@ -22,8 +22,12 @@ class KRSMatkul extends Model
     use HasFactory;
 
     public $table = 'krs_mk';
-    public $connection = 'second_pgsql';
+    public $connection;
     public $timestamps = false;
+
+    public function __construct() {
+        $this->connection = config('myconfig.database.second_connection');
+    }
 
     /**
      * Relasi tabel krs_mk ke krs, many to one

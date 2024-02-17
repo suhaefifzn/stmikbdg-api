@@ -2,6 +2,7 @@
 
 namespace App\Models\Users;
 
+use App\Models\JurusanView;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -28,7 +29,6 @@ class Mahasiswa extends Model
 
     public $timestamps = false;
     protected $guarded = ['id'];
-    protected $hidden = ['test_tanggal', 'test_link', 'test_pwd', 'test_nilai', 'test_diterima'];
 
     public function __construct() {
         $this->connection = config('myconfig.database.second_connection');
@@ -37,19 +37,18 @@ class Mahasiswa extends Model
     public function scopeSearchMahasiswa(Builder $query, $filter, $search = null) {
         if ($search)  {
             return $query->where('dosen_id', $filter['dosen_id'])
-                        ->where('angkatan_id', $filter['angkatan_id'])
-                        ->where('jur_id', $filter['jur_id'])
-                        ->where('jns_mhs', $filter['jns_mhs'])
+                        ->where('sts_mhs', 'A')
+                        ->where('krs_id_last', '!=', null)
                         ->where('nm_mhs', 'like', '%' . strtoupper($search) . '%')
                         ->orWhere('nim', 'like', '%' . strtoupper($search) . '%')
                         ->get();
         }
 
         return $query->where('dosen_id', $filter['dosen_id'])
-                ->where('angkatan_id', $filter['angkatan_id'])
-                ->where('jur_id', $filter['jur_id'])
-                ->where('jns_mhs', $filter['jns_mhs'])
-                ->get();
+                    ->where('sts_mhs', 'A')
+                    ->where('krs_id_last', '!=', null)
+                    ->orderBy('krs_id_last', 'DESC')
+                    ->get();
     }
 
     /**
@@ -64,6 +63,13 @@ class Mahasiswa extends Model
      */
     public function dosen() {
         return $this->belongsTo(Dosen::class, 'dosen_id', 'dosen_id');
+    }
+
+    /**
+     * Relasi tabel mahasiswa ke v jurusan, many to one
+     */
+    public function jurusan() {
+        return $this->belongsTo(JurusanView::class, 'jur_id', 'jur_id');
     }
 
 }

@@ -23,7 +23,11 @@ class MatKulView extends Model
     use HasFactory;
 
     public $table = 'vmata_kuliah';
-    public $connection = 'second_pgsql';
+    public $connection;
+
+    public function __construct() {
+        $this->connection = config('myconfig.database.second_connection');
+    }
 
     public function scopeGetMatkul(Builder $query, $filter) {
         if ($filter['semester']) {
@@ -49,12 +53,5 @@ class MatKulView extends Model
      */
     public function nilaiAkhir() {
         return $this->hasMany(NilaiAkhirView::class, 'mk_id', 'mk_id');
-    }
-
-    /**
-     * Relasi view matakuliah ke tabel krs matkul, one to many
-     */
-    public function krsMatkul() {
-        return $this->hasMany(KRSMatkul::class, 'mk_id', 'mk_id');
     }
 }

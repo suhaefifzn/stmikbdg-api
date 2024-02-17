@@ -21,7 +21,11 @@ class NilaiAkhirView extends Model
     use HasFactory;
 
     public $table = 'vnilaiakhir';
-    public $connection = 'second_pgsql';
+    public $connection;
+
+    public function __construct() {
+        $this->connection = config('myconfig.database.second_connection');
+    }
 
     /**
      * Relasi view nilai akhir ke view matakuliah, many to one

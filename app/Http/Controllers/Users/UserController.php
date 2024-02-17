@@ -13,8 +13,6 @@ use Illuminate\Support\Facades\Storage;
 // ? Models - Table
 use App\Models\Users\User;
 use App\Models\Users\Dosen;
-use App\Models\Users\Mahasiswa;
-
 // ? Models - View
 use App\Models\Users\UserView;
 
@@ -196,33 +194,6 @@ class UserController extends Controller
             return $this->successfulResponseJSON([
                 'users' => $users,
             ]);
-        } catch (\Exception $e) {
-            return ErrorHandler::handle($e);
-        }
-    }
-
-    public function getMyMahasiswa(Request $request) {
-        try {
-            $dosen = Dosen::where('dosen_id', $this->getUserAuth()['dosen_id'])->first();
-
-            // query
-            $request->validate([
-                'jur_id' => 'required',
-                'jns_mhs' => 'required',
-                'angkatan_id' => 'required',
-            ]);
-
-            $filter = [
-                'jur_id' => $request->jur_id,
-                'jns_mhs' => $request->jns_mhs,
-                'dosen_id' => $dosen['dosen_id'],
-                'angkatan_id' => $request->angkatan_id,
-            ];
-
-            // ! relasi model dosen -> mahasiswa belum berfungsi
-            $listMahasiswa = Mahasiswa::searchMahasiswa($filter, $request->query('search'));
-
-            return $this->successfulResponseJSON([ 'mahasiswa' => $listMahasiswa ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }

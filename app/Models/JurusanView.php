@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 // ? Models - view
 use App\Models\TahunAjaranView;
+use App\Models\Users\Mahasiswa;
 use App\Models\Users\MahasiswaView;
 
 class JurusanView extends Model
@@ -44,6 +45,13 @@ class JurusanView extends Model
      * Relasi vjurusan ke vmahasiswa, one to many
      */
     public function mahasiswa() {
-        return $this->hasMany(MahasiswaView::class);
+        return $this->hasMany(MahasiswaView::class, 'mhs_id', 'mhs_id');
+    }
+
+    /**
+     * Relasi v jurusan ke table mahasiswa, one to many
+     */
+    public function mahasiswaTable() {
+        return $this->hasMany(Mahasiswa::class, 'mhs_id', 'mhs_id');
     }
 }

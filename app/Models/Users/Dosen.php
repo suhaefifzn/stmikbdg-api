@@ -21,19 +21,19 @@ class Dosen extends Model
      */
     use HasFactory;
 
-    protected $table = 'dosen';
     protected $connection;
+    protected $table = 'dosen';
+    protected $guarded = ['id'];
 
     public function __construct() {
         $this->connection = config('myconfig.database.second_connection');
     }
 
-    protected $guarded = ['id'];
 
     /**
      * Relasi tabel dosen ke mahasiswa, one to many
      */
     public function mahasiswa() {
-        return $this->hasMany(Mahasiswa::class, 'mhs_id');
+        return $this->hasMany(Mahasiswa::class, 'dosen_id', 'dosen_id');
     }
 }

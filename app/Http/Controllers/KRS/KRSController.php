@@ -14,10 +14,10 @@ use App\Exceptions\ErrorHandler;
 // ? Models - table
 use App\Models\KRS\KRS;
 use App\Models\KRS\KRSMatkul;
+use App\Models\KRS\MatkulDiselenggarakanView;
 use App\Models\Users\Mahasiswa;
 
 // ? Models - view
-use App\Models\KRS\MatKulView;
 use App\Models\TahunAjaranView;
 
 class KRSController extends Controller
@@ -45,6 +45,11 @@ class KRSController extends Controller
             $dataKRS['krs']['nmr_krs'] = $krs['nmr_krs'];
             $dataKRS['krs']['semester'] = $krs['semester'];
             $dataKRS['krs']['krs_id'] = $krs['krs_id'];
+
+            if (!is_null($krs['ditolak_tanggal']) and ($krs['sts_krs'] === 'D')) {
+                $dataKRS['krs']['ditolak_tanggal'] = $krs['ditolak_tanggal'];
+                $dataKRS['krs']['ditolak_alasan'] = $krs['ditolak_alasan'];
+            }
         } else {
             $dataKRS = self::getStatusKRS(null, $tahunAjaran['du_open']);
 
@@ -64,6 +69,7 @@ class KRSController extends Controller
                 'tahun_id' => $tahunAjaran['tahun_id'],
                 'tahun' => $tahunAjaran['tahun'],
                 'du_open' => $tahunAjaran['du_open'],
+                'du_sampai' => $tahunAjaran['du_sampai'],
             ],
         ], $dataKRS['message']);
     }
@@ -98,18 +104,45 @@ class KRSController extends Controller
             if ($statusKRS === 'D') {
                 // dari draft (D) ubah ke pengajuan (P)
                 KRS::where('krs_id', $krsId)->update(['sts_krs' => 'P']);
-                $setMatkul = self::setMatkulKRS($krsId, $request->mata_kuliah);
+                $setMatkul = self::setMatkulKRS($tahunAjaran, $request->mata_kuliah);
+
+                // jika setMatkul null, berarti mk yang dipilih tidak dibuka di tahun ajaran tersebut
+                if (is_null($setMatkul)) {
+                    return response()->json([
+                        'status' => 'fail',
+                        'message' => 'Matakuliah yang dipilih tidak tersedia'
+                    ], 400);
+                }
+
+                $completedMatkulData = self::setKRSIdToMatkul($krsId, $setMatkul);
+
                 KRSMatkul::where('krs_id', $krsId)->delete();
-                KRSMatkul::insert($setMatkul);
+                KRSMatkul::insert($completedMatkulData);
             } else if (($statusKRS === 'P') or ($statusKRS === 'S') or (!$krsOpen)) {
                 // sudah diajukan atau sudah disetujui
                 return $checkKRS;
             } else {
                 $krsData = self::setKRSData($tahunAjaran);
                 $krsData['pengajuan_catatan'] = $request->pengajuan_catatan;
+
+                /**
+                 * Atur matkul sesuai matkul diselenggarakan filter by tahun ajaran
+                 * Tambahkan krsId yang berhasil diinsert ke setiap matkul
+                 */
+                $setMatkul = self::setMatkulKRS($tahunAjaran, $request->mata_kuliah);
+
+                // jika setMatkul null, berarti mk yang dipilih tidak dibuka di tahun ajaran tersebut
+                if (is_null($setMatkul)) {
+                    return response()->json([
+                        'status' => 'fail',
+                        'message' => 'Matakuliah yang dipilih tidak tersedia'
+                    ], 400);
+                }
+
                 $insertedKRSId = KRS::create($krsData)->krs_id;
-                $setMatkul = self::setMatkulKRS($insertedKRSId, $request->mata_kuliah);
-                KRSMatkul::insert($setMatkul);
+                $completedMatkulData = self::setKRSIdToMatkul($insertedKRSId, $setMatkul);
+
+                KRSMatkul::insert($completedMatkulData);
                 Mahasiswa::where('mhs_id', $this->user['mhs_id'])
                             ->update([
                                 'krs_id_last' => $insertedKRSId
@@ -153,11 +186,22 @@ class KRSController extends Controller
 
             if (is_null($krsId)) {
                 if ($krsOpen) {
+                    $setMatkul = self::setMatkulKRS($tahunAjaran, $request->mata_kuliah);
                     $krsData = self::setKRSData($tahunAjaran, 'D'); // simpan sebagai draft 'D'
                     $krsData['pengajuan_catatan'] = $request->pengajuan_catatan;
                     $insertedKRSId = KRS::create($krsData)->krs_id;
-                    $setMatkul = self::setMatkulKRS($insertedKRSId, $request->mata_kuliah);
-                    KRSMatkul::insert($setMatkul);
+
+                    // jika setMatkul null, berarti mk yang dipilih tidak dibuka di tahun ajaran tersebut
+                    if (is_null($setMatkul)) {
+                        return response()->json([
+                            'status' => 'fail',
+                            'message' => 'Matakuliah yang dipilih tidak tersedia'
+                        ], 400);
+                    }
+
+                    $completedMatkulData = self::setKRSIdToMatkul($insertedKRSId, $setMatkul);
+
+                    KRSMatkul::insert($completedMatkulData);
                     Mahasiswa::where('mhs_id', $this->user['mhs_id'])
                                 ->update([
                                     'krs_id_last' => $insertedKRSId
@@ -167,50 +211,24 @@ class KRSController extends Controller
                 // sudah diajukan atau sudah disetujui
                 return $checkKRS;
             } else if ($statusKRS === 'D') {
-                $setMatkul = self::setMatkulKRS($krsId, $request->mata_kuliah);
+                $setMatkul = self::setMatkulKRS($tahunAjaran, $request->mata_kuliah);
+
+                // jika setMatkul null, berarti mk yang dipilih tidak dibuka di tahun ajaran tersebut
+                if (is_null($setMatkul)) {
+                    return response()->json([
+                        'status' => 'fail',
+                        'message' => 'Matakuliah yang dipilih tidak tersedia'
+                    ], 400);
+                }
+
+                $completedMatkulData = self::setKRSIdToMatkul($krsId, $setMatkul);
                 KRSMatkul::where('krs_id', $krsId)->delete();
-                KRSMatkul::insert($setMatkul);
+                KRSMatkul::insert($completedMatkulData);
             }
 
             return $this->successfulResponseJSON([
                 'krs_id' => is_null($krsId) ? $insertedKRSId : $krsId,
             ], 'Berhasil menyimpan KRS sebagai draft', 201);
-        } catch (\Exception $e) {
-            return ErrorHandler::handle($e);
-        }
-    }
-
-    public function getKRSMahasiswa(Request $request) {
-        try {
-            if (($request->query('mhs_id') and ($request->query('krs_id')))) {
-                // cek wali dosen
-                $isWaliDosen = $this->isWaliDosen($this->user, $request->query('mhs_id'));
-
-                if (!$isWaliDosen) {
-                    return response()->json([
-                        'status' => 'fail',
-                        'message' => 'Bukan wali dosen dari mahasiswa',
-                    ], 403);
-                }
-
-                // get krs
-                $krsMahasiswa = KRS::where('mhs_id', $request->query('mhs_id'))
-                                    ->where('krs_id', $request->query('krs_id'))
-                                    ->first();
-                $dataKRS['krs'] = $krsMahasiswa;
-                $krsMatkul = $krsMahasiswa->krsMatkul()->get();
-
-                foreach ($krsMatkul as $index => $item) {
-                    // TODO: Todo get detail matkul
-                }
-
-                return $this->successfulResponseJSON($dataKRS);
-            } else {
-                return response()->json([
-                    'status' => 'fail',
-                    'message' => 'Nilai query pada url untuk mhs_id dan krs_id diperlukan',
-                ], 400);
-            }
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
@@ -238,17 +256,37 @@ class KRSController extends Controller
         ];
     }
 
-    private function setMatkulKRS($krsId, $matkul) {
+    private function setMatkulKRS($tahunAjaran, $matkul) {
+        $filter = [
+            'tahun_id' => $tahunAjaran['tahun_id'],
+            'kd_kampus' => $tahunAjaran['kd_kampus'],
+            'jns_mhs' => $tahunAjaran['jns_mhs'],
+            'jur_id' => $tahunAjaran['jur_id']
+        ];
+
         foreach ($matkul as $index => $item) {
-            $matkulData = MatKulView::where('mk_id', $item['mk_id'])->first();
-            $setMatkul[$index]['krs_id'] = $krsId;
-            $setMatkul[$index]['mk_id'] = $matkulData['mk_id'];
-            $setMatkul[$index]['sts_mk_krs'] = $matkulData['sts_mk'];
+            $filter['mk_id'] = $item['mk_id'];
+            $matkulData = MatkulDiselenggarakanView::getOneMatkul($filter);
+
+            // jika maktul tidak ditemukan, maka kembalikan null
+            if (count($matkulData) < 1) return null;
+
+            $setMatkul[$index]['mk_id'] = $matkulData[0]['mk_id'];
+            $setMatkul[$index]['sts_mk_krs'] = $matkulData[0]['sts_mk'];
             $setMatkul[$index]['tgl_perubahan'] = Carbon::now()->format('Y-m-d');
-            $setMatkul[$index]['k_disetujui'] = true; // ! belum tau nilai defaulf dan maksudnya
+            $setMatkul[$index]['k_disetujui'] = false; // ! belum tau nilai defaulf dan maksudnya
             /**
              * Sisanya adalah nullable - dilihat dari tabel krs_mk
              */
+        }
+
+        return $setMatkul;
+    }
+
+    private function setKRSIdToMatkul($krsId, $matkul) {
+        foreach ($matkul as $index => $item) {
+            $setMatkul[$index] = $item;
+            $setMatkul[$index]['krs_id'] = $krsId;
         }
 
         return $setMatkul;

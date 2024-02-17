@@ -21,11 +21,15 @@ class KRS extends Model
     use HasFactory;
 
     public $table = 'krs';
-    public $connection = 'second_pgsql';
+    public $connection;
 
     public $primaryKey = 'krs_id';
     public $timestamps = false;
     protected $guarded = ['krs_id'];
+
+    public function __construct() {
+        $this->connection = config('myconfig.database.second_connection');
+    }
 
     public function scopeGetLastNomorKRS(Builder $query, string $similarNmrKRS) {
         $result = $query->where('nmr_krs', 'like', '%'. $similarNmrKRS . '%')
