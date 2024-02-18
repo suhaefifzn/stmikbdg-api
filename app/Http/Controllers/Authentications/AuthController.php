@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Authentications;
 
 use App\Exceptions\ErrorHandler;
 use App\Http\Controllers\Controller;
-use Error;
 use Illuminate\Http\Request;
 
 // ? JWT
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
+
+// ? Models - view
+use App\Models\Users\UserSitesView;
 
 class AuthController extends Controller
 {
@@ -105,6 +107,44 @@ class AuthController extends Controller
             ];
 
             return $this->successfulResponseJSON($data, 'Token berhasil diperbaharui');
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function validateToken() {
+        try {
+            return $this->successfulResponseJSON([
+                'token' => JWTAuth::getToken()->get(),
+            ], 'Access token OK!');
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function validateUserSiteAccess(Request $request) {
+        try {
+            $userId = auth()->user()->id;
+            $site = filter_var($request->query('url'), FILTER_VALIDATE_URL);
+            $userSite = UserSitesView::where('user_id', $userId)
+                            ->where('url', 'like', '%' . $site .'%')
+                            ->get();
+
+            if (count($userSite) > 0) {
+                return $this->successfulResponseJSON([
+                    'access' => true,
+                    'site' => $userSite,
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Pengguna dengan email <b>'
+                    . auth()->user()->email
+                    .  " tidak memiliki akses</b> ke alamat <i>"
+                    . $site
+                    . "</i>.<br/>Please <a href='$site/logout' rel='noopener'><b>Logout</b></a>.",
+            ], 403);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }

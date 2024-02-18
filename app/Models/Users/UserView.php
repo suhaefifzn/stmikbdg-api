@@ -31,7 +31,7 @@ class UserView extends Authenticatable implements JWTSubject
         $this->connection = config('myconfig.database.first_connection');
     }
 
-    protected $hidden = ['password', 'id', 'remember_token', 'created_at', 'updated_at'];
+    protected $hidden = ['password', 'remember_token', 'created_at', 'updated_at'];
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',

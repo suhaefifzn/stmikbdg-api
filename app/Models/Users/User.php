@@ -20,17 +20,16 @@ class User extends Model
      */
     use HasFactory, Notifiable, HasApiTokens;
 
-    protected $table = 'users';
     protected $connection;
-
-    public function __construct() {
-        $this->connection = config('myconfig.database.first_connection');
-    }
-
+    protected $table = 'users';
     protected $guarded = ['id'];
     protected $hidden = ['password'];
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function __construct() {
+        $this->connection = config('myconfig.database.first_connection');
+    }
 }
