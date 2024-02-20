@@ -37,18 +37,39 @@ class Mahasiswa extends Model
     public function scopeSearchMahasiswa(Builder $query, $filter, $search = null) {
         if ($search)  {
             return $query->where('dosen_id', $filter['dosen_id'])
-                        ->where('sts_mhs', 'A')
-                        ->where('krs_id_last', '!=', null)
-                        ->where('nm_mhs', 'like', '%' . strtoupper($search) . '%')
-                        ->orWhere('nim', 'like', '%' . strtoupper($search) . '%')
-                        ->get();
+                ->where('sts_mhs', 'A')
+                ->where('krs_id_last', '!=', null)
+                ->where('nm_mhs', 'like', '%' . strtoupper($search) . '%')
+                ->orWhere('nim', 'like', '%' . strtoupper($search) . '%')
+                ->get();
         }
 
         return $query->where('dosen_id', $filter['dosen_id'])
-                    ->where('sts_mhs', 'A')
-                    ->where('krs_id_last', '!=', null)
-                    ->orderBy('krs_id_last', 'DESC')
-                    ->get();
+            ->where('sts_mhs', 'A')
+            ->where('krs_id_last', '!=', null)
+            ->orderBy('krs_id_last', 'DESC')
+            ->get();
+    }
+
+    public function scopeGetMahasiswaByFilter(Builder $query, $filter) {
+        if (isset($filter['skripsi']) and isset($filter['tahun_masuk'])) {
+            return $query->where('judul_skripsi', '!=', null)
+                ->where('masuk_tahun', $filter['tahun_masuk'])
+                ->orderBy('masuk_tahun', 'DESC')
+                ->get();
+        }
+
+        if (isset($filter['skripsi'])) {
+            return $query->where('judul_skripsi', '!=', null)
+                ->orderBy('masuk_tahun', 'DESC')
+                ->get();
+        }
+
+        if (isset($filter['tahun_masuk'])) {
+            return $query->where('masuk_tahun', $filter['tahun_masuk'])
+                ->orderBy('masuk_tahun', 'DESC')
+                ->get();
+        }
     }
 
     /**

@@ -141,7 +141,7 @@
                 </div>
             @endif
 
-            <form action="/docs/api/authenticate" method="post">
+            <form action="/docs/api/authenticate" method="post" id="formLoginDocsAPI">
             @csrf
             <div class="form-floating">
                 <input type="email" class="form-control @error ('email') is-invalid @enderror" id="email" name="email" placeholder="name@example.com" autocomplete="off" value="{{ old('email') }}" required>

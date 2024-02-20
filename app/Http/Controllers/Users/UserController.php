@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 // ? Models - Table
 use App\Models\Users\User;
-use App\Models\Users\Dosen;
+
 // ? Models - View
 use App\Models\Users\UserView;
 
@@ -43,10 +43,12 @@ class UserController extends Controller
 
             $validatedData = $request->validate([
                 'kd_user' => 'required|string',
-                'is_dosen' => 'required|boolean',
-                'email' => 'required|string|email:dns|unique:users',
+                'is_dosen' => 'nullable|boolean',
+                'email' => 'required|string|email|unique:users',
                 'password' => 'required|string|min:8|max:64|regex:/^\S*$/u',
-                'is_admin' => 'nullable|boolean'
+                'is_admin' => 'nullable|boolean',
+                'is_mhs' => 'nullable|boolean',
+                'id_dev' => 'nullable|boolean'
             ]);
 
             $tempKdUser = $validatedData['is_dosen']
@@ -59,6 +61,8 @@ class UserController extends Controller
             $validatedData['created_at'] = now();
             $validatedData['updated_at'] = now();
             $validatedData['is_admin'] = $request->is_admin ?? false;
+            $validatedData['is_mhs'] = $request->is_mhs ?? false;
+            $validatedData['is_dev'] = $request->is_mhs ?? false;
 
             // validate kd_user lagi
             Validator::make(['kd_user' => $tempKdUser], [
@@ -178,25 +182,40 @@ class UserController extends Controller
 
     public function getUserList(Request $request) {
         try {
-            if ($request->query('is_dosen') or $request->query('is_admin')) {
-                $isDosen = $request->query('is_dosen')
-                            ? filter_var($request->query('is_dosen'), FILTER_VALIDATE_BOOLEAN)
-                            : null;
-                $isAdmin = $request->query('is_admin')
-                            ? filter_var($request->query('is_admin'), FILTER_VALIDATE_BOOLEAN)
-                            : null;
+            $isDosen = $request->query('is_dosen')
+                        ? filter_var($request->query('is_dosen'), FILTER_VALIDATE_BOOLEAN)
+                        : null;
+            $isAdmin = $request->query('is_admin')
+                        ? filter_var($request->query('is_admin'), FILTER_VALIDATE_BOOLEAN)
+                        : null;
+            $isMhs = $request->query('is_mhs')
+                        ? filter_var($request->query('is_mhs'), FILTER_VALIDATE_BOOLEAN)
+                        : null;
+            $isDev = $request->query('is_dev')
+                        ? filter_var($request->query('is_dev'), FILTER_VALIDATE_BOOLEAN)
+                        : null;
+
+            // initial value
+            $users = [];
+
+            if ($isDosen or $isAdmin or $isMhs or $isDev) {
                 $filter = [
                     'is_dosen' => $isDosen,
                     'is_admin' => $isAdmin,
+                    'is_mhs' => $isMhs,
+                    'is_dev' => $isDev,
                 ];
+                
+                $users = UserView::getAllUsers($filter);
+            } else {
+                $users = UserView::getAllUsers();
             }
-
-            $users = UserView::getAllUsers($filter);
 
             return $this->successfulResponseJSON([
                 'users' => $users,
             ]);
         } catch (\Exception $e) {
+            return $e;
             return ErrorHandler::handle($e);
         }
     }

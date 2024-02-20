@@ -34,10 +34,34 @@ class DocsController extends Controller
         $token = auth()->attempt($credentials);
 
         if ($token) {
-            Session::put('docs_token', $token);
-            RateLimiter::clear($throttleKey);
+            // get user account info
+            $headers = [
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer ' . $token,
+            ];
 
-            return redirect()->intended('docs/api');
+            $urlUserInfo = config('app.url') . 'api/users/me';
+            $userInfo = Http::withHeaders($headers)->get($urlUserInfo)->json();
+            $isUserDeveloper = $userInfo['data']['account']['is_dev'];
+
+            // jika user adalah developer masuk ke halaman utama docs/api
+            if ($isUserDeveloper) {
+                Session::put('docs_token', $token);
+                RateLimiter::clear($throttleKey);
+
+                return redirect()->intended('docs/api');
+            }
+
+            // jika user bukanlah developer logout paksa
+            Http::withHeaders($headers)->delete(config('app.url') . 'api/authentications');
+
+            // percobaan login gagal
+            RateLimiter::hit($throttleKey);
+            return back()
+                ->with(
+                    'loginError', 
+                    'Mohon maaf akun Anda tidak memiliki izin untuk mengakses dokumentasi API'
+                );
         }
 
         // percobaan login gagal

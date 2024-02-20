@@ -6,10 +6,11 @@ use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\KRS\KRSController;
 use App\Http\Controllers\KRS\KRSDosenController;
 use App\Http\Controllers\KRS\MatKulController;
+use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\Users\SiteController;
 use App\Http\Controllers\Users\UserController;
-
+use App\Models\Users\Mahasiswa;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -98,6 +99,10 @@ Route::controller(SiteController::class)
 
 // ? Additional Routes
 Route::get('/current-semester', [TahunAjaranController::class, 'getSemesterMahasiswaSekarang'])
-        ->middleware(['auth.jwt', 'auth.mahasiswa']);
+    ->middleware(['auth.jwt', 'auth.mahasiswa']);
 Route::get('/jurusan', [JurusanController::class, 'getJurusanAktif'])
-        ->middleware(['auth.jwt', 'auth.dosen']);
+    ->middleware(['auth.jwt', 'auth.dosen']);
+
+// Get all data mahasiswa
+Route::get('/all/mahasiswa', [MahasiswaController::class, 'getAllMahasiswa'])
+    ->middleware(['auth.jwt', 'auth.developer']);

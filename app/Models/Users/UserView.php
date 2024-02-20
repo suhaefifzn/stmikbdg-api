@@ -47,35 +47,44 @@ class UserView extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function scopeGetAllUsers(Builder $query, $filter) {
-        // query hanya is_dosen saja
-        if (!is_null($filter['is_dosen']) and is_null($filter['is_admin'])) {
-            return $query->where('kd_user', '!=', auth()->user()->kd_user)
-                            ->where('is_dosen', $filter['is_dosen'])
-                            ->orderBy('created_at', 'DESC')
-                            ->get();
-        }
+    public function scopeGetAllUsers(Builder $query, $filter = null) {
+        if ($filter) {
+            // query is_dosen
+            if (!is_null($filter['is_dosen'])) {
+                return $query->where('kd_user', '!=', auth()->user()->kd_user)
+                    ->where('is_dosen', $filter['is_dosen'])
+                    ->orderBy('created_at', 'DESC')
+                    ->get();
+            }
 
-        // query hanya is_admin saja
-        if (is_null($filter['is_dosen']) and !is_null($filter['is_admin'])) {
-            return $query->where('kd_user', '!=', auth()->user()->kd_user)
-                            ->where('is_admin', $filter['is_admin'])
-                            ->orderBy('created_at', 'DESC')
-                            ->get();
-        }
+            // query is_admin
+            if (!is_null($filter['is_admin'])) {
+                return $query->where('kd_user', '!=', auth()->user()->kd_user)
+                    ->where('is_admin', $filter['is_admin'])
+                    ->orderBy('created_at', 'DESC')
+                    ->get();
+            }
 
-        // query is_dosen dan is_admin
-        if (!is_null($filter['is_dosen']) and !is_null($filter['is_admin'])) {
-            return $query->where('kd_user', '!=', auth()->user()->kd_user)
-                            ->where('is_dosen', $filter['is_dosen'])
-                            ->where('is_admin', $filter['is_admin'])
-                            ->orderBy('created_at', 'DESC')
-                            ->get();
+            // query is_mhs
+            if (!is_null($filter['is_mhs'])) {
+                return $query->where('kd_user', '!=', auth()->user()->kd_user)
+                    ->where('is_mhs', $filter['is_mhs'])
+                    ->orderBy('created_at', 'DESC')
+                    ->get();
+            }
+
+            // query is_dev
+            if (!is_null($filter['is_dev'])) {
+                return $query->where('kd_user', auth()->user()->kd_user)
+                    ->where('is_dev', $filter['is_dev'])
+                    ->orderBy('created_at', 'DESC')
+                    ->get();
+            }
         }
 
         // tanpa query
         return $query->where('kd_user', '!=', auth()->user()->kd_user)
-                        ->orderBy('created_at', 'DESC')
-                        ->get();
+            ->orderBy('created_at', 'DESC')
+            ->get();
     }
 }

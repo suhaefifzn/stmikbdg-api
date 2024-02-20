@@ -68,6 +68,7 @@ class Kernel extends HttpKernel
         'auth.mahasiswa' => \App\Http\Middleware\isMahasiswa::class,
         'auth.dosen' => \App\Http\Middleware\isDosen::class,
         'auth.admin' => \App\Http\Middleware\isAdmin::class,
+        'auth.developer' => \App\Http\Middleware\isDeveloper::class,
         'auth.session' => \App\Http\Middleware\TokenSession::class,
     ];
 }

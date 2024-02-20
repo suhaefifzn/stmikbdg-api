@@ -202,6 +202,6 @@ class MatKulController extends Controller
 
         $response['matkul_per_semester'] = array_values($tempMatkul);
 
-        return $this->successfulResponseJSON([ $response ]);
+        return $this->successfulResponseJSON($response);
     }
 }
