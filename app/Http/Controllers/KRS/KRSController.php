@@ -26,13 +26,15 @@ class KRSController extends Controller
     private $user;
 
     public function __construct() {
-        if (!auth()->user()->is_dosen) {
-            $tahunAjaranController = new TahunAjaranController();
-            $this->currentSemester = $tahunAjaranController
-                                        ->getSemesterMahasiswaSekarang()
-                                        ->getData('data')['data']['semester'];
+        if (auth()->user()) {
+            if (!auth()->user()->is_dosen) {
+                $tahunAjaranController = new TahunAjaranController();
+                $this->currentSemester = $tahunAjaranController
+                                            ->getSemesterMahasiswaSekarang()
+                                            ->getData('data')['data']['semester'];
+            }
+            $this->user = $this->getUserAuth();
         }
-        $this->user = $this->getUserAuth();
     }
 
     public function checkKRS() {

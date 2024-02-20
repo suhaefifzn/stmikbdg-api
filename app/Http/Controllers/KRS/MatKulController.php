@@ -13,7 +13,6 @@ use App\Exceptions\ErrorHandler;
 use App\Models\KRS\MatKulView;
 use App\Models\KurikulumView;
 use App\Models\KRS\MatkulDiselenggarakanView;
-use App\Models\KRS\MatkulAktifView;
 
 // ? Models - table
 use App\Models\Users\Mahasiswa;
@@ -24,11 +23,16 @@ class MatKulController extends Controller
     private $currentSemester;
 
     public function __construct() {
-        $tahunAjaranController = new TahunAjaranController();
-        $this->currentSemester = $tahunAjaranController
-                                    ->getSemesterMahasiswaSekarang()
-                                    ->getData('data')['data'];
-        $this->user = $this->getUserAuth();
+        if (auth()->user()) {
+            if (!auth()->user()->is_dosen) {
+                $tahunAjaranController = new TahunAjaranController();
+                $this->currentSemester = $tahunAjaranController
+                    ->getSemesterMahasiswaSekarang()
+                    ->getData('data')['data'];
+            }
+
+            $this->user = $this->getUserAuth();
+        }
     }
 
     public function getMataKuliah(Request $request) {
@@ -46,43 +50,37 @@ class MatKulController extends Controller
                         ? $request->query('semester')
                         : null;
 
-            if ($isDosen) {
-                return self::getMataKuliahByDosen($filter);
-            }
-
-            // user adalah mahasiswa
             return self::getMataKuliahByMahasiswa($filter);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
     }
 
-    public function getMataKuliahByDosen($filter) {
-        // TODO: atur response list mata kuliah jika dosen yang hit endpoint
-        return response()->json([
-            'message' => 'Get matakuliah untuk dosen belum difungsikan'
-        ], 200);
-    }
-
     public function getMataKuliahByMahasiswa($filter) {
         // bet mahasiswa ke tabel, untuk dapet krs_id_last
         $mahasiswa = Mahasiswa::where('mhs_id', $this->user['mhs_id'])->first();
-        
+
         // buat filter untuk kurikulum aktif
         $filter['jur_id'] = $this->user['jur_id'];
         $filter['angkatan'] = $this->user['angkatan'];
         $kurikulum = KurikulumView::getKurikulumMahasiswa($filter);
 
         /**
-         * get matakuliah diselenggarakan dan gabunggkan 
+         * get matakuliah diselenggarakan dan gabunggkan
          * dengan matakuliah di view mata kuliah
          */
         $filter['kur_id'] = $kurikulum['kur_id'];
         $matkulDiselenggarakan = MatkulDiselenggarakanView::getMatkulDiselenggarakan($filter);
         $filter['smt'] = $matkulDiselenggarakan[0]['smt'];
-        $mataKuliah = MatKulView::getMatkul($filter);
+        $matakuliah = MatKulView::getMatkul($filter);
 
-        $mergedMatkul = $matkulDiselenggarakan->concat($mataKuliah)->sortBy('semester');
+        foreach ($matkulDiselenggarakan as $item) {
+            $listUniqueMatkul = $matakuliah->filter(function ($mk) use ($item) {
+                return $mk['mk_id'] !== $item['mk_id'];
+            });
+        }
+
+        $mergedMatkul = $matkulDiselenggarakan->concat($listUniqueMatkul)->sortBy('semester');
 
         if ($filter['semester']) {
             $listMatkul = $mergedMatkul->filter(function ($item) use ($filter) {
@@ -116,14 +114,14 @@ class MatKulController extends Controller
 
                 $latestKRS = $mahasiswa->krs()->first();
                 $kdMK = $mk['kd_mk'];
+
+                $isKrsMatkul = count($latestKRS->krsMatkul()
+                                    ->where('mk_id', $mk['mk_id'])
+                                    ->get()) > 0 ?? false;
+
                 $mk['krs'] = [
                     'is_aktif' => $mk['smt'] === $this->currentSemester['smt'] ?? false,
-                    'is_checked' => is_null($latestKRS
-                                                ->krsMatkul()
-                                                ->where('mk_id', $mk['mk_id'])
-                                                ->first())
-                                                ? false
-                                                : true,
+                    'is_checked' => $isKrsMatkul,
                 ];
 
                 // mk pilihan

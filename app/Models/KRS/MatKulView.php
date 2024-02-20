@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 // ? Models -  View
 use App\Models\KRS\NilaiAkhirView;
-use App\Models\KRS\KRSMatkul;
 
 class MatKulView extends Model
 {
@@ -32,20 +31,20 @@ class MatKulView extends Model
     public function scopeGetMatkul(Builder $query, $filter) {
         if ($filter['semester']) {
             return $query->where('aktif_kur', true)
-                            ->where('jur_id', $filter['jur_id'])
-                            ->where('semester', $filter['semester'])
-                            ->where('kur_id', $filter['kur_id'])
-                            ->where('smt', '!=', $filter['smt'])
-                            ->orderBy('mk_id', 'ASC')
-                            ->get();
+                ->where('jur_id', $filter['jur_id'])
+                ->where('semester', $filter['semester'])
+                ->where('kur_id', $filter['kur_id'])
+                ->where('smt', '!=', $filter['smt'])
+                ->orderBy('mk_id', 'ASC')
+                ->get();
         }
 
         return $query->where('aktif_kur', true)
-                        ->where('jur_id', $filter['jur_id'])
-                        ->where('kur_id', $filter['kur_id'])
-                        ->where('smt', '!=', $filter['smt'])
-                        ->orderBy('mk_id', 'ASC')
-                        ->get();
+            ->where('jur_id', $filter['jur_id'])
+            ->where('kur_id', $filter['kur_id'])
+            ->where('smt', '!=', $filter['smt'])
+            ->orderBy('mk_id', 'ASC')
+            ->get();
     }
 
     /**

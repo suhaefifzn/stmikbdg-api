@@ -25,6 +25,14 @@ class AuthController extends Controller
 
             $credentials = $request->only('email', 'password');
             $platform = $request->query('platform');
+
+            if (!$platform) {
+                return response()->json([
+                    'success' => 'fail',
+                    'message' => 'Nilai query platform pada url diperlukan',
+                ], 400);
+            }
+
             $token = auth()->attempt($credentials);
             $ttl = self::setExpirationToken($platform);
             $token = auth()->setTTL($ttl)->attempt($credentials);

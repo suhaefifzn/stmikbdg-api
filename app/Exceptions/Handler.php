@@ -31,10 +31,16 @@ class Handler extends ExceptionHandler
 
     public function render($request, \Throwable $exception)
     {
+        $explodePath = explode('/', $request->path());
+
+        if ($explodePath[0] === 'docs') {
+            return redirect()->route('docs_home');
+        }
+
         if ($exception instanceof NotFoundHttpException) {
             return response()->json([
                 'status' => 'fail',
-                'message' => 'URI tidak ditemukan.'
+                'message' => 'Target endpoint tidak ditemukan.'
             ], 404);
         }
 

@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// ? User routes
+// ? User Routes
 Route::controller(UserController::class)
     ->prefix('/users')
     ->middleware('auth.jwt')
@@ -38,7 +38,7 @@ Route::controller(UserController::class)
     });
 
 
-// ? Auth routes
+// ? Auth Routes
 Route::controller(AuthController::class)
     ->prefix('authentications')
     ->middleware('auth.jwt')
@@ -52,7 +52,7 @@ Route::controller(AuthController::class)
         Route::get('/check/site', 'validateUserSiteAccess');
     });
 
-// ? KRS routes
+// ? KRS Routes
 Route::prefix('krs')
     ->middleware(['auth.jwt', 'auth.mahasiswa'])
     ->group(function () {
@@ -75,17 +75,16 @@ Route::prefix('krs')
                 Route::post('/mata-kuliah/pengajuan', 'addKRSMahasiswa');
                 Route::post('/mata-kuliah/draft', 'addDraftKRSMahasiswa');
             });
+    });
 
-        // * KRS Route wali dosen
-        Route::controller(KRSDosenController::class)
-            ->prefix('/mahasiswa')
-            ->middleware('auth.dosen')
-            ->withoutMiddleware('auth.mahasiswa')
-            ->group(function () {
-                Route::get('/', 'getKRSMahasiswa');
-                Route::put('/', 'updateStatusKRSMahasiswa');
-                Route::get('/list', 'getListKRSMahasiswa');
-            });
+// ? KRS Routes - dosen wali memerika krs mahasiswa
+Route::controller(KRSDosenController::class)
+    ->prefix('/krs/mahasiswa')
+    ->middleware(['auth.jwt', 'auth.dosen'])
+    ->group(function () {
+        Route::get('/', 'getKRSMahasiswa');
+        Route::put('/', 'updateStatusKRSMahasiswa');
+        Route::get('/list', 'getListKRSMahasiswa');
     });
 
 // ? ACL - Routes
@@ -97,7 +96,7 @@ Route::controller(SiteController::class)
         Route::post('/', 'postUserSite');
     });
 
-// ? Additional routes
+// ? Additional Routes
 Route::get('/current-semester', [TahunAjaranController::class, 'getSemesterMahasiswaSekarang'])
         ->middleware(['auth.jwt', 'auth.mahasiswa']);
 Route::get('/jurusan', [JurusanController::class, 'getJurusanAktif'])

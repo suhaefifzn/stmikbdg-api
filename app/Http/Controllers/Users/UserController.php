@@ -113,6 +113,8 @@ class UserController extends Controller
                     'email' => $account['email'],
                     'is_dosen' => $account['is_dosen'],
                     'is_admin' => $account['is_admin'],
+                    'is_mhs' => $account['is_mhs'],
+                    'is_dev' => $account['is_dev'],
                 ],
             ]);
         } catch (\Exception $e) {
