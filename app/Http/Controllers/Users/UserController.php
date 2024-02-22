@@ -62,7 +62,7 @@ class UserController extends Controller
             $validatedData['updated_at'] = now();
             $validatedData['is_admin'] = $request->is_admin ?? false;
             $validatedData['is_mhs'] = $request->is_mhs ?? false;
-            $validatedData['is_dev'] = $request->is_mhs ?? false;
+            $validatedData['is_dev'] = $request->is_dev ?? false;
 
             // validate kd_user lagi
             Validator::make(['kd_user' => $tempKdUser], [

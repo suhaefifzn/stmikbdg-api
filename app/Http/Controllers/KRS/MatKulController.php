@@ -74,11 +74,10 @@ class MatKulController extends Controller
         $filter['smt'] = $matkulDiselenggarakan[0]['smt'];
         $matakuliah = MatKulView::getMatkul($filter);
 
-        foreach ($matkulDiselenggarakan as $item) {
-            $listUniqueMatkul = $matakuliah->filter(function ($mk) use ($item) {
-                return $mk['mk_id'] !== $item['mk_id'];
-            });
-        }
+        // buang mk_id yang sama
+        $listUniqueMatkul = $matakuliah->reject(function ($mk) use ($matkulDiselenggarakan) {
+            return $matkulDiselenggarakan->contains('mk_id', $mk['mk_id']);
+        });
 
         $mergedMatkul = $matkulDiselenggarakan->concat($listUniqueMatkul)->sortBy('semester');
 
@@ -87,7 +86,7 @@ class MatKulController extends Controller
                 return $item['semester'] == $filter['semester'];
             });
         } else {
-            $listMatkul =$mergedMatkul;
+            $listMatkul = $mergedMatkul;
         }
 
         // initial value

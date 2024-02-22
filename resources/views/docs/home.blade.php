@@ -48,7 +48,8 @@
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#scrollspyHeading5">Lima</a></li>
                         <li><a class="dropdown-item" href="#scrollspyHeading6">Enam</a></li>
-                        <li><a class="dropdown-item" href="#scrollspyHeading7">Tujuh</a></li>
+
+                        <li><a class="dropdown-item" href="#scrollspyTambahan">Tambahan</a></li>
 
                         {{-- Logout --}}
                         <li><hr class="dropdown-divider"></li>
@@ -75,6 +76,9 @@
                 <h4 class="mt-4" id="scrollspyKRS"><b>#</b> KRS - Sisi Mahasiswa</h4>
                 <hr>
                 @include('docs.docs_krs')
+                <h4 class="mt-4" id="scrollspyTambahan"><b>#</b> Tambahan</h4>
+                <hr>
+                @include('docs.docs_additional')
             </div>
         </main>
 

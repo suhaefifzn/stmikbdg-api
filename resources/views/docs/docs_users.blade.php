@@ -43,6 +43,8 @@
     <p>
         Demikian juga pada sisi API, kami menggunakan setiap nilai yang ada untuk menentukan akses pengguna ke endpoint. <b>Jadi tidak semua pengguna dapat mengakses endpoint yang ada di API ini</b>.
     </p>
+
+    {{-- Ganti Email --}}
     <h5 class="mt-4">Update Email</h5>
     <hr>
     <p>
@@ -57,6 +59,8 @@
     <div class="alert alert-warning">
         <b>Perlu diperhatikan!</b> Kemungkinan API digunakan oleh beberapa sistem, sehingga mengganti email artinya mengganti email pengguna yang bersangkutan pada seluruh sistem yang menggunakan API ini.
     </div>
+
+    {{-- Ganti Password --}}
     <h5 class="mt-5">Update Password</h5>
     <hr>
     <p>
@@ -72,4 +76,25 @@
     <div class="alert alert-warning">
         <b>Perlu diperhatikan!</b> Kemungkinan API digunakan oleh beberapa sistem, sehingga mengganti password artinya mengganti password pengguna yang bersangkutan pada seluruh sistem yang menggunakan API ini.
     </div>
+
+    {{-- Daftar web yang bisa diakses user --}}
+    <h5 class="mt-4">Get Daftar Web yang Bisa Diakses</h5>
+    <hr>
+    <p>
+        Digunakan untuk get list web yang bisa diakses oleh user. Kirim permintaan ke <span class="badge bg-dark">/sites</span> menggunakan HTTP method <span class="badge bg-info">get</span>, jika berhasil akan mengembalikan response seperti berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "sites": [
+            {
+                "id": 1,
+                "url": "http://stmikbdg-acl.test/"
+            }
+        ]
+    }
+}</code></pre>
+    <p>
+        List web yang bisa diakses oleh user terdapat pada properti <b>sites</b>.
+    </p>
 </div>

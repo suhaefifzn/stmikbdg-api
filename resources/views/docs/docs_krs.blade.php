@@ -2,7 +2,7 @@
     <p>
         KRS terbagi menjadi dua sisi, yaitu sisi untuk mahasiswa dan dosen. Sisi mahasiswa adalah melakukan pengajuan KRS pada batas waktu tertentu sesuai dengan tahun ajaran dan semester aktif.
     </p>
-    <h5 class="mt-4">Cek Tahun Ajaran Aktif</h5>
+    <h5 class="mt-4">(MHS) Cek Tahun Ajaran Aktif</h5>
     <hr>
     <p>
         Digunakan untuk mendapatkan tahun ajaran aktif dan juga berisi informasi mengenai dibuka atau ditutupnya pengajuan KRS mahasiswa. Lakukan permintaan ke <span class="badge bg-dark">/krs/tahun-ajaran</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>, jika permintaan berhasil maka akan memberikan response dalam format JSON seperti berikut:
@@ -39,7 +39,7 @@
     </p>
 
     {{-- Check Pengajuan KRS Terakhir --}}
-    <h5 class="mt-4">Cek Pengajuan KRS Terkahir (Alternatif Cek Tahun Ajaran)</h5>
+    <h5 class="mt-4">(MHS) Cek Pengajuan KRS Terkahir (Alternatif Cek Tahun Ajaran)</h5>
     <hr>
     <p>
         Kami menambahkan alternatif lain untuk memeriksa apakah pengajuan KRS mahasiswa dapat dilakukan atau tidak. cara ini merupakan alternatif dari cek tahun ajaran aktif. Lakukan request ke <span class="badge bg-dark">/krs/check</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Jika berhasil maka responsenya adalah:
@@ -70,7 +70,7 @@
     <p>
         Apabila nilai dari <b>sts_krs</b> adalah <b>S</b> berarti KRS disetujui dan KRS tidak bisa diubah kecuali oleh dosen wali. Jika <b>D</b> berarti KRS berstatus sebagai draft atau saat pengajuan ditolak <b>sts_krs</b> juga akan menjadi <b>D</b>, pada status <b>D</b> mahasiswa dapat mengirim ulang pengajuan KRS baru selama dalam batas waktu pengajuan. Terakhir, jika <b>sts_krs</b> bernilai <b>P</b> berarti KRS telah diajukan dan sedang tahap review, pada tahap ini KRS ditutup sehingga mahasiswa tidak dapat mengajukan lagi sampai statusnya berubah.
     </p>
-    <h5 class="mt-4">Cek Matakuliah Aktif</h5>
+    <h5 class="mt-4">(MHS) Cek Matakuliah Aktif</h5>
     <hr>
     <p>
         Matakuliah aktif ditentukan berdasarkan tahun ajaran aktif, maka untuk mendapatkan daftar matakuliah diperlukan nilai <b>tahun_id</b> yang diperoleh dari dua cara sebelumnya. Kirim request ke <span class="badge bg-dark">/krs/mata-kuliah</span> dan tambahkan query atau parameter <span class="badge bg-secondary">tahun_id</span> sehingga menjadi <span class="badge bg-dark">/krs/mata-kuliah?tahun_id=335</span> untuk mendapatkan seluruh daftar matakuliah. Tambahkan <span class="badge bg-secondary">semester</span> apabila ingin mendapatkan daftar matakuliah di semester tertentu, seperti <span class="badge bg-dark">/krs/mata-kuliah?tahun_id=335&semester=7</span>, kemudian gunakan HTTP method <span class="badge bg-info">get</span>. Jika sukses maka akan mengembalikan response seperti berikut:
@@ -124,7 +124,7 @@
     </p>
 
     {{-- Menyimpan KRS sebagai draft --}}
-    <h5 class="mt-4">KRS Mahasiswa - Draft (D)</h5>
+    <h5 class="mt-4">(MHS) KRS Mahasiswa - Draft (D)</h5>
     <hr>
     <p>
         Jika masih ragu mahasiswa dapat menyimpan pengajuan KRS dengan status sebagai draft sebelum benar-benar diajukan. Simpan nilai <b>mk_id</b> berdasarkan pada matakuliah yang dipilih dalam bentuk array of objects dan juga nilai <b>tahun_id</b> berdasarkan tahun ajaran aktif sebagai payload dalam format JSON seperti berikut ini:
@@ -156,7 +156,7 @@
 }</code></pre>
 
     {{-- Mengirim Pengajuan KRS - Status P --}}
-    <h5 class="mt-4">KRS Mahasiswa - Pengajuan (P)</h5>
+    <h5 class="mt-4">(MHS) KRS Mahasiswa - Pengajuan (P)</h5>
     <hr>
     <p>
         Kirim data berupa payload yang sama seperti mengirim KRS sebagai draft di atas. Gunakan HTTP method <span class="badge bg-info">post</span> dan kirim payload ke <span class="badge bg-dark">/krs/mata-kuliah/pengajuan</span>. Jika berhasil akan mendapat response seperti berikut:
@@ -171,4 +171,147 @@
     <p>
         Perlu diingat bahwa KRS yang telah diajukan tidak dapat diubah lagi. KRS baru dapat diubah jika dosen wali menolak pengajuan tersebut dan masih dalam batas waktu pengajuan KRS yang telah ditentukan.
     </p>
+</div>
+
+{{-- Untuk KRS - Sisi Doen --}}
+<h4 class="mt-4"><b>#</b> KRS - Sisi Dosen</h4>
+<hr>
+<p>
+    Alamat API yang ada di bawah ini merupakan bagian yang digunakan oleh user yang terautentikasi sebagai dosen. Digunakan untuk melihat dan update KRS terbaru dari mahasiswa.
+</p>
+<div class="m-2">
+    <h5 class="mt-4">(DSN WALI) Get List KRS Mahasiswa</h5>
+    <hr>
+    <p>
+        Digunakan untuk mendapatkan daftar KRS terbaru yang mahasiswa ajukan. Daftar krs yang muncul adalah milik mahasiswa yang dosen walinya adalah user yang terautentikasi sebagai dosen wali yang bersangkutan. Daftar yang muncul diurutkan berdasarkan pengajuan KRS paling baru.
+    </p>
+    <p>
+        Lakukan request ke <span class="badge bg-dark">/krs/mahasiswa/list</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span> untuk mendapatkan semua daftar KRS. Tambahkan query <span class="badge bg-secondary">search</span> jika ingin mendapatkan KRS berdasarkan NIM atau nama mahasiswa. Contohnya <span class="badge bg-dark">/krs/mahasiswa/list?search=1220001</span>.
+    </p>
+    <p>Hasilnya adalah:</p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "mahasiswa": [
+            {
+                "mhs_id": 15534,
+                "angkatan_id": 76,
+                "dosen_id": 573,
+                "jur_id": 23,
+                "nim": "1220001",
+                "nama": "SUHAEFI FAUZIAN",
+                "jns_mhs": "R",
+                "sts_mhs": "A",
+                "kd_kampus": "A ",
+                "kelas": "A",
+                "jk": "L",
+                "masuk_tahun": 2020,
+                "krs_id_last": 4550,
+                "tanggal_krs": "2024-02-20"
+            }
+        ]
+    }
+}</code></pre>
+    <h5 class="mt-4">(DSN WALI) Get Detail KRS Mahasiswa Menggunakan mhs_id and krs_id</h5>
+    <hr>
+    <p>
+        Untuk mendapatkan detail dari satu KRS mahasiswa lakukan permintaan ke <span class="badge bg-dark">/krs/mahasiswa</span> dan tambahkan query pada urlnya, yaitu <span class="badge bg-secondary">mhs_id</span> yang nilainya dipilih dari list di atas dan <span class="badge bg-secondary">krs_id</span> yang merupakan nilai dari <b>krs_last_id</b> yang dipilih dari list di atas yang berada pada object yang sama dengan <b>mhs_id</b>-nya.
+    </p>
+    <p>
+        Sehingga lengkapnya adalah seperti <span class="badge bg-dark">/krs/mahasiswa?mhs_id=15534&krs_id=4550</span> kemudian kirim menggunakan HTTP method <span class="badge bg-info">get</span>. Jika berhasil, response yang diberikan adalah sebagai berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "mahasiswa": {
+            "mhs_id": 15534,
+            "nim": "1220001",
+            "nama": "SUHAEFI FAUZIAN",
+            "jurusan": {
+                "jur_id": 23,
+                "nama_jurusan": "S1 - TEKNIK INFORMATIKA",
+                "nm_singkat": "IFS1 "
+            },
+            "krs": {
+                "krs_id": 4550,
+                "tahun_id": 335,
+                "nmr_krs": "089/12/KR1/23",
+                "tanggal": "2024-02-20",
+                "semester": 7,
+                "sts_krs": "P",
+                "kd_kampus": "A",
+                "kd_chanel": "A",
+                "pengajuan_catatan": "Draft KRS",
+                "ditolak_tanggal": null,
+                "ditolak_alasan": null,
+                "ditolak_stlh_sah": null,
+                "krs_matkul": [
+                    {
+                        "krs_mk_id": 34658,
+                        "mk_id": 129,
+                        "sts_mk_krs": "A",
+                        "tgl_perubahan": "2024-02-20",
+                        "kd_mk": "IF1709",
+                        "nm_mk": "Analisis Numerik",
+                        "sks": 2,
+                        "k_disetujui": false
+                    },
+                    {
+                        "krs_mk_id": 34659,
+                        "mk_id": 130,
+                        "sts_mk_krs": "A",
+                        "tgl_perubahan": "2024-02-20",
+                        "kd_mk": "IF1710",
+                        "nm_mk": "Pengolahan Citra",
+                        "sks": 3,
+                        "k_disetujui": false
+                    }
+                ]
+            }
+        }
+    }
+}</code></pre>
+    <p>
+        Kemudian nilai <b>mhs_id</b>, <b>krs_id</b>, dan setiap <b>krs_mk_id</b> yang terdapat pada <b>krs_matkul</b> nantinya digunakan untuk memperbaharui KRS mahasiswa tersebut.
+    </p>
+
+    {{-- Update pengajuan KRS mahasiswa oleh dosen wali --}}
+    <h5 class="mt-4">(DSN WALI) Update KRS Mahasiswa</h5>
+    <hr>
+    <p>
+        Gunakan nilai <b>mhs_id, krs_id</b>, dan <b>krs_id</b> yang didapat setelah get detail mahasiswa untuk memperbaharui KRS mahasiswa. Status KRS yang telah diajukan ditandai dengan <b>sts_krs</b> bernilai <b>P</b>. Berikutnya adalah beberapa status yang dapat digunakan untuk memperbaharui KRS mahasiswa.
+    </p>
+    <ul>
+        <li><b>D</b> -> draft atau saat ditolak</li>
+        <li><b>S</b> -> sah atau sudah disetujui</li>
+    </ul>
+    <p>
+        Untuk memperbaharuinya lakukan request ke <span class="badge bg-dark">/krs/mahasiswa</span> menggunakan HTTP method <span class="badge bg-info">put</span> dengan mengirim payload seperti berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "mhs_id": 15534,
+    "krs_id": 4550,
+    "sts_krs": "D", // D = Draft; S = Setujui;
+    "ditolak_alasan": "Matkul terlalu sedikit", // Jika sts_krs D maka alasan wajib diisi
+    "krs_matkul": [
+        {
+            "krs_mk_id": 34658,
+            "k_disetujui": true
+        },
+        {
+            "krs_mk_id": 34659,
+            "k_disetujui": true
+        }
+    ]
+}</code></pre>
+    <p>
+        Jika request berhasil maka akan memberikan response seperti di bawah ini:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "message": "KRS mahasiswa berhasil diperbaharui",
+    "data": {
+        "krs_id": 4550
+    }
+}</code></pre>
 </div>
