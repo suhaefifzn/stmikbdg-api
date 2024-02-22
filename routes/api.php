@@ -10,7 +10,6 @@ use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\Users\SiteController;
 use App\Http\Controllers\Users\UserController;
-use App\Models\Users\Mahasiswa;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -94,7 +93,9 @@ Route::controller(SiteController::class)
     ->middleware(['auth.jwt', 'auth.admin'])
     ->group(function () {
         Route::get('/', 'getAllSites');
-        Route::post('/', 'postUserSite');
+        Route::post('/', 'postNewSite');
+        Route::post('/user-access', 'postUserSite');
+        Route::delete('/user-access', 'deleteUserSiteAccess');
     });
 
 // ? Additional Routes

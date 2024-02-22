@@ -65,4 +65,41 @@ class SiteController extends Controller
             return ErrorHandler::handle($e);
         }
     }
+
+    public function postNewSite(Request $request) {
+        try {
+            $request->validate([
+                'url' => 'required|string',
+            ]);
+
+            $validatedURL = filter_var($request->url, FILTER_VALIDATE_URL);
+
+            Site::insert([
+                'url' => $validatedURL
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Url site berhasil ditambahkan'
+            ], 201);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function deleteUserSiteAccess(Request $request) {
+        try {
+            $request->validate([
+                'id' => 'required|integer'
+            ]);
+
+            UserSite::where('id', $request->id)->delete();
+
+            return $this->successfulResponseJSON([
+                'id' => $request->id
+            ], 'Akses user ke url berhasil dihapus');
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
 }

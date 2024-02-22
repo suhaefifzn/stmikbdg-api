@@ -112,7 +112,7 @@ class UserController extends Controller
             $account = auth()->user();
 
             return $this->successfulResponseJSON([
-                'mahasiswa' => $user,
+                'profile' => $user,
                 'account' => [
                     'email' => $account['email'],
                     'is_dosen' => $account['is_dosen'],
@@ -205,7 +205,7 @@ class UserController extends Controller
                     'is_mhs' => $isMhs,
                     'is_dev' => $isDev,
                 ];
-                
+
                 $users = UserView::getAllUsers($filter);
             } else {
                 $users = UserView::getAllUsers();
