@@ -30,6 +30,7 @@
         },
         "account": {
             "email": "suhaefi@simak.dev",
+            "image": "http://stmikbdg-api.test/storage/users/images/college_student.png",
             "is_dosen": false,
             "is_admin": true,
             "is_mhs": true,
@@ -68,13 +69,33 @@
     </p>
     <pre><code class="language-json bg-primary-subtle">{
     "current_password": "password_saat_ini",
-    "new_password": "password_baru"    
+    "new_password": "password_baru"
 }</code></pre>
     <p>
         Apabila berhasil maka akan memberikan response yang terdapat pesan yang menyatakan bahwa perubahan password telah berhasil dengan status code <span class="badge bg-success">200</span>. Setelah password berhasil diubah sangat direkomendasikan untuk logout kemudian login kembali atau autentikasi ulang.
     </p>
     <div class="alert alert-warning">
         <b>Perlu diperhatikan!</b> Kemungkinan API digunakan oleh beberapa sistem, sehingga mengganti password artinya mengganti password pengguna yang bersangkutan pada seluruh sistem yang menggunakan API ini.
+    </div>
+
+    {{-- Ganti foto profile --}}
+    <h5 class="mt-4">Update Foto Profile</h5>
+    <hr>
+    <p>
+        Lakukan permintaan ke <span class="badge bg-dark">/users/me/image</span> dengan menggunakan HTTP method <span class="badge bg-info">post</span> dan kirimkan payload berupa file dengan ekstensi png atau jpg, jenis payloadnya adalah form data. Maksimal ukuran file gambarnya adalah 1 MB.
+    </p>
+    <p>
+        Jika berhasil diganti maka akan memberikan response yang menyisipkan url gambar baru sebagai nilai dari properti <b>image</b>.
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+        "status": "success",
+        "message": "Foto profile berhasil diperbaharui.",
+        "data": {
+            "image": "http://stmikbdg-api.test/storage/users/images/qWXlHi9GRct9DCsNK4QFzgognGQvS8re6RGlpZnR.jpg"
+        }
+    }</code></pre>
+    <div class="alert alert-warning">
+        <b>Perlu diperhatikan!</b> Kemungkinan API digunakan oleh beberapa sistem, sehingga mengganti foto progile artinya mengganti foto progile pengguna yang bersangkutan pada seluruh sistem yang menggunakan API ini.
     </div>
 
     {{-- Daftar web yang bisa diakses user --}}

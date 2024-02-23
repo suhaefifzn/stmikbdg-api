@@ -63,6 +63,7 @@ class UserController extends Controller
             $validatedData['is_admin'] = $request->is_admin ?? false;
             $validatedData['is_mhs'] = $request->is_mhs ?? false;
             $validatedData['is_dev'] = $request->is_dev ?? false;
+            $validatedData['image'] = 'college_student.png';
 
             // validate kd_user lagi
             Validator::make(['kd_user' => $tempKdUser], [
@@ -105,8 +106,7 @@ class UserController extends Controller
         }
     }
 
-    public function getMyProfile()
-    {
+    public function getMyProfile() {
         try {
             $user = $this->getUserAuth();
             $account = auth()->user();
@@ -115,6 +115,9 @@ class UserController extends Controller
                 'profile' => $user,
                 'account' => [
                     'email' => $account['email'],
+                    'image' => config('app.url')
+                        . 'storage/users/images/'
+                        . auth()->user()->image,
                     'is_dosen' => $account['is_dosen'],
                     'is_admin' => $account['is_admin'],
                     'is_mhs' => $account['is_mhs'],
@@ -216,6 +219,42 @@ class UserController extends Controller
             ]);
         } catch (\Exception $e) {
             return $e;
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function addProfileImage(Request $request) {
+        try {
+            $request->validate([
+                'image' => 'required|mimes:png,jpg|max:1024',
+            ]);
+
+            $image = $request->file('image');
+            $fileName = $image->hashName();
+            $path = $image->storeAs('public/users/images/', $fileName);
+
+            // cek old image
+            $oldImage = auth()->user()->image;
+
+            if ($oldImage !== 'college_student.png') {
+                Storage::delete($path);
+            }
+
+            User::where('id', auth()->user()->id)
+                ->update([
+                    'image' => $fileName,
+                ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Foto profile berhasil diperbaharui.',
+                'data' => [
+                    'image' => config('app.url')
+                        . 'storage/users/images/'
+                        . $fileName,
+                ],
+            ], 200);
+        } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
     }

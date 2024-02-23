@@ -32,6 +32,7 @@ Route::controller(UserController::class)
         Route::get('/me', 'getMyProfile');
         Route::put('/me', 'putMyEmail');
         Route::put('/me/password', 'putMyPassword');
+        Route::post('/me/image', 'addProfileImage');
 
         // * route untuk admin
         Route::get('/', 'getUserList')->middleware('auth.admin');

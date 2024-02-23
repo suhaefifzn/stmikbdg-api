@@ -25,7 +25,6 @@ class User extends Model
     protected $guarded = ['id'];
     protected $hidden = ['password'];
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 
