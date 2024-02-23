@@ -231,13 +231,14 @@ class UserController extends Controller
 
             $image = $request->file('image');
             $fileName = $image->hashName();
-            $path = $image->storeAs('public/users/images/', $fileName);
+            $image->storeAs('public/users/images/', $fileName);
 
             // cek old image
             $oldImage = auth()->user()->image;
 
             if ($oldImage !== 'college_student.png') {
-                Storage::delete($path);
+                $pathOldImage = 'public/users/images/' . auth()->user()->image;
+                Storage::delete($pathOldImage);
             }
 
             User::where('id', auth()->user()->id)
