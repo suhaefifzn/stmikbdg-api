@@ -107,10 +107,36 @@ class KRSDosenController extends Controller
             $filter = [
                 'dosen_id' => $this->user['dosen_id'],
             ];
-            $listMahasiswa = $this->user->mahasiswa()->searchMahasiswa($filter, $request->query('search'));
+            $page = $request->query('page') ?? null;
+            $search = $request->query('search') ?? null;
+            $listMahasiswa = $this->user->mahasiswa()->searchMahasiswa($filter, $search, $page);
+
+            // jika ada nilai page pada query url
+            if ($page) {
+                $prevPageUrl = $listMahasiswa->previousPageUrl();
+                $nextPageUrl = $listMahasiswa->nextPageUrl();
+                $perPage = $listMahasiswa->perPage();
+                $totalPages = $listMahasiswa->lastPage();
+                $totalItems = $listMahasiswa->total();
+
+                return response()->json([
+                    'status' => 'success',
+                    'data' => [
+                        'list_krs_mahasiswa' => self::setVisibilityMahasiswaProperties($listMahasiswa),
+                    ],
+                    'meta' => [
+                        'page' => (int) $page,
+                        'per_page' => $perPage,
+                        'total_pages' => $totalPages,
+                        'total_items' => $totalItems,
+                        'prev_page_url' => $prevPageUrl,
+                        'next_page_url' => $nextPageUrl,
+                    ],
+                ], 200);
+            }
 
             return $this->successfulResponseJSON([
-                'mahasiswa' => self::setVisibilityMahasiswaProperties($listMahasiswa),
+                'list_krs_mahasiswa' => self::setVisibilityMahasiswaProperties($listMahasiswa),
             ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);

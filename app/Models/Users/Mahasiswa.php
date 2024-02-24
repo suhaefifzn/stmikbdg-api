@@ -34,7 +34,7 @@ class Mahasiswa extends Model
         $this->connection = config('myconfig.database.second_connection');
     }
 
-    public function scopeSearchMahasiswa(Builder $query, $filter, $search = null) {
+    public function scopeSearchMahasiswa(Builder $query, $filter, $search = null, $page = null) {
         if ($search)  {
             return $query->where('dosen_id', $filter['dosen_id'])
                 ->where('sts_mhs', 'A')
@@ -42,6 +42,17 @@ class Mahasiswa extends Model
                 ->where('nm_mhs', 'like', '%' . strtoupper($search) . '%')
                 ->orWhere('nim', 'like', '%' . strtoupper($search) . '%')
                 ->get();
+        }
+
+        if ($page) {
+            $perPage = 10;
+            $currentPage = $page ?? 1;
+
+            return $query->where('dosen_id', $filter['dosen_id'])
+                ->where('sts_mhs', 'A')
+                ->where('krs_id_last', '!=', null)
+                ->orderBy('krs_id_last', 'DESC')
+                ->paginate($perPage, ['*'], 'page', $currentPage);
         }
 
         return $query->where('dosen_id', $filter['dosen_id'])
