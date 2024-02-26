@@ -1,3 +1,7 @@
+@extends('docs.template.index')
+@section('docs_contents')
+<h4><b>#</b> Authentications</h4>
+<hr>
 <div class="m-2">
     <p>
         Authentications digunakan untuk generate dan hapus access token atau biasa dikenal dengan login dan logout. Kedua proses tersebut dapat dilakukan dengan mengakses satu URI yang sama tetapi dengan HTTP method yang berbeda, yaitu <span class="badge bg-dark">/authentications</span>.
@@ -28,7 +32,13 @@
             "token_type": "bearer",
             "expires_in": null
         },
-        "platform": "android"
+        "platform": "android",
+        "role": {
+            "is_admin": false,
+            "is_dosen": false,
+            "is_mhs": true,
+            "is_dev": true
+        }
     }
 }</code></pre>
     <p>
@@ -42,7 +52,7 @@
     "Content-Type": "application/json",
     "Authorization": "Bearer eyJ0eXxxxxxxxxxxxx"
 }</code></pre>
-    
+
     {{-- Logout --}}
     <h5 class="mt-4">Logout - Hapus Access Token</h5>
     <hr>
@@ -54,3 +64,4 @@
     "message": "Logout berhasil. Access token telah dihapus"
 }</code></pre>
 </div>
+@endsection

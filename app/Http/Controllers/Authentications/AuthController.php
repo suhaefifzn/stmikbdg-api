@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Authentications;
 
 use App\Exceptions\ErrorHandler;
 use App\Http\Controllers\Controller;
+use App\Models\Users\User;
 use Illuminate\Http\Request;
 
 // ? JWT
@@ -12,6 +13,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 // ? Models - view
 use App\Models\Users\UserSitesView;
+use App\Models\Users\UserView;
 
 class AuthController extends Controller
 {
@@ -47,6 +49,12 @@ class AuthController extends Controller
                                         : "$ttl minutes",
                     ],
                     'platform' => $platform,
+                    'role' => [
+                        'is_admin' => auth()->user()->is_admin,
+                        'is_dosen' => auth()->user()->is_dosen,
+                        'is_mhs' => auth()->user()->is_mhs,
+                        'is_dev' => auth()->user()->is_dev,
+                    ]
                 ];
             } else {
                 return response()->json([

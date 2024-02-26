@@ -52,6 +52,17 @@ class SiteController extends Controller
                 'site_id' => 'required|exists:sites,id',
             ]);
 
+            $checkAccess = UserSite::where('user_id', $request->user_id)
+                ->where('site_id', $request->site_id)
+                ->first();
+
+            if ($checkAccess) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'User telah memiliki akses ke web tersebut'
+                ], 400);
+            }
+
             UserSite::insert([
                 'user_id' => $request->user_id,
                 'site_id' => $request->site_id,
@@ -90,14 +101,25 @@ class SiteController extends Controller
     public function deleteUserSiteAccess(Request $request) {
         try {
             $request->validate([
-                'id' => 'required|integer'
+                'site_id' => 'required',
+                'user_id'=> 'required',
             ]);
 
-            UserSite::where('id', $request->id)->delete();
+            $deletedAccess = UserSite::where('site_id', $request->site_id)
+                ->where('user_id', $request->user_id)
+                ->delete();
 
-            return $this->successfulResponseJSON([
-                'id' => $request->id
-            ], 'Akses user ke url berhasil dihapus');
+            if ($deletedAccess) {
+                return $this->successfulResponseJSON([
+                    'user_id' => $request->user_id,
+                    'site_id' => $request->site_id,
+                ], 'Akses user ke url berhasil dihapus');
+            }
+
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Gagal menghapus akses user ke web'
+            ], 400);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }

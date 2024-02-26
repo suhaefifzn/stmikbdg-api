@@ -60,10 +60,16 @@ class UserController extends Controller
             $validatedData['password'] = $hashPassword;
             $validatedData['created_at'] = now();
             $validatedData['updated_at'] = now();
+            $validatedData['is_dosen'] = $request->is_dosen ?? false;
             $validatedData['is_admin'] = $request->is_admin ?? false;
             $validatedData['is_mhs'] = $request->is_mhs ?? false;
             $validatedData['is_dev'] = $request->is_dev ?? false;
             $validatedData['image'] = 'college_student.png';
+
+            // KD User untuk role admin saja
+            if ($validatedData['is_admin'] and !$validatedData['is_dosen']) {
+                $tempKdUser = 'ADM-' . $validatedData['kd_user'];
+            }
 
             // validate kd_user lagi
             Validator::make(['kd_user' => $tempKdUser], [

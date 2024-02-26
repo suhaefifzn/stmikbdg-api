@@ -1,3 +1,7 @@
+@extends('docs.template.index')
+@section('docs_contents')
+<h4><b>#</b> Users</h4>
+<hr>
 <div class="m-2">
     <h5 class="mt-4">User Profile dan Account</h5>
     <hr>
@@ -14,7 +18,6 @@
             "angkatan_id": 76,
             "kelas": "A",
             "nim": "1220001",
-            "nm_mhs": "SUHAEFI FAUZIAN",
             "jk": "L",
             "dosen_id": 573,
             "jur_id": 23,
@@ -26,13 +29,14 @@
             "tmp_lahir": "BANDUNG",
             "tgl_lahir": "2002-01-21",
             "masuk_semester": 0,
-            "masuk_tahun": 2020
+            "masuk_tahun": 2020,
+            "nama": "SUHAEFI FAUZIAN"
         },
         "account": {
             "email": "suhaefi@simak.dev",
             "image": "http://stmikbdg-api.test/storage/users/images/college_student.png",
+            "is_admin": false,
             "is_dosen": false,
-            "is_admin": true,
             "is_mhs": true,
             "is_dev": true
         }
@@ -93,7 +97,7 @@
         "data": {
             "image": "http://stmikbdg-api.test/storage/users/images/qWXlHi9GRct9DCsNK4QFzgognGQvS8re6RGlpZnR.jpg"
         }
-    }</code></pre>
+}</code></pre>
     <div class="alert alert-warning">
         <b>Perlu diperhatikan!</b> Kemungkinan API digunakan oleh beberapa sistem, sehingga mengganti foto progile artinya mengganti foto progile pengguna yang bersangkutan pada seluruh sistem yang menggunakan API ini.
     </div>
@@ -119,3 +123,4 @@
         List web yang bisa diakses oleh user terdapat pada properti <b>sites</b>.
     </p>
 </div>
+@endsection

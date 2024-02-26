@@ -1,3 +1,7 @@
+@extends('docs.template.index')
+@section('docs_contents')
+<h4><b>#</b> KRS - Sisi Mahasiswa</h4>
+<hr>
 <div class="m-2">
     <p>
         KRS terbagi menjadi dua sisi, yaitu sisi untuk mahasiswa dan dosen. Sisi mahasiswa adalah melakukan pengajuan KRS pada batas waktu tertentu sesuai dengan tahun ajaran dan semester aktif.
@@ -353,3 +357,4 @@
     }
 }</code></pre>
 </div>
+@endsection

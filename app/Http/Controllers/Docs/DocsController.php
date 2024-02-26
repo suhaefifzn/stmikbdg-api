@@ -11,11 +11,55 @@ use Illuminate\Support\Facades\Http;
 class DocsController extends Controller
 {
     public function home() {
-        return view('docs.home');
+        return view('docs.contents.home', [
+            'title' => 'Home',
+        ]);
     }
 
     public function login() {
         return view('login');
+    }
+
+    public function authentications() {
+        return view('docs.contents.auth', [
+            'title' => 'Authentications',
+        ]);
+    }
+
+    public function users() {
+        return view('docs.contents.users', [
+            'title' => 'Users',
+        ]);
+    }
+
+    public function krsMahasiswa() {
+        return view('docs.contents.krs_mhs', [
+            'title' => 'KRS - SisiMahasiswa'
+        ]);
+    }
+
+    public function krsDosenWali() {
+        return view('docs.contents.krs_dosen_wali', [
+            'title' => 'KRS - Sisi Dosen Wali'
+        ]);
+    }
+
+    public function dataMahasiswa() {
+        return view('docs.contents.data_mhs', [
+            'title' => 'Data Mahasiswa'
+        ]);
+    }
+
+    public function kuesioner() {
+        return view('docs.contents.kuesioner', [
+            'title' => 'Kuesioner'
+        ]);
+    }
+
+    public function acl() {
+        return view('docs.contents.acl', [
+            'title' => 'ACL',
+        ]);
     }
 
     public function authenticate(Request $request) {
@@ -59,7 +103,7 @@ class DocsController extends Controller
             RateLimiter::hit($throttleKey);
             return back()
                 ->with(
-                    'loginError', 
+                    'loginError',
                     'Mohon maaf akun Anda tidak memiliki izin untuk mengakses dokumentasi API'
                 );
         }

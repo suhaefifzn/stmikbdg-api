@@ -18,10 +18,19 @@ Route::controller(DocsController::class)
     ->prefix('/docs/api')
     ->middleware('auth.session')
     ->group(function () {
-        Route::get('/', 'home')->name('docs_home');
         Route::post('/authenticate', 'authenticate')->withoutMiddleware('auth.session');
         Route::get('/login', 'login')->withoutMiddleware('auth.session')->name('docs_login');
         Route::get('/logout', 'logout')->name('docs_logout');
+
+        // ? Routes sesudah login
+        Route::get('/', 'home')->name('docs_home');
+        Route::get('/authentications', 'authentications');
+        Route::get('/users', 'users');
+        Route::get('/krs-mahasiswa', 'krsMahasiswa');
+        Route::get('/krs-dosen-wali', 'krsDosenWali');
+        Route::get('/data-mahasiswa', 'dataMahasiswa');
+        Route::get('/kuesioner', 'kuesioner');
+        Route::get('/acl', 'acl');
     });
 
 // ? Auth

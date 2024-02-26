@@ -1,3 +1,7 @@
+@extends('docs.template.index')
+@section('docs_contents')
+<h4><b>#</b> Data Mahasiswa</h4>
+<hr>
 <div class="m-2">
     <p>
         Beberapa route di bawah saat ini masih dikategorikan sebagai tambahan yang mungkin dapat digunakan untuk kepentingan lain. Akan tetapi saat ini route-route tersebut hanya dapat diakses oleh user dengan role developer.
@@ -76,3 +80,4 @@
         Kemudian jika ingin data mahasiswa tersebut diekspor ke file excel paka tambahkan query <span class="badge bg-secondary">download</span> dengan nilai <b>true</b>. Sehingga secara keseluruhan menjadi <span class="badge bg-dark">/all/mahasiswa?skripsi=true&tahun_masuk=2020&download=true</span>.
     </p>
 </div>
+@endsection

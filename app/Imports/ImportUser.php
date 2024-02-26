@@ -20,13 +20,16 @@ class ImportUser implements ToModel, WithHeadingRow, WithValidation
     public function model(array $row)
     {
         $user = [
-            'kd_user' => self::setKdUser($row['kd_user'], self::toBoolean($row['is_dosen'])),
+            'kd_user' => self::setKdUser(
+                $row['kd_user'], self::toBoolean($row['is_dosen']), self::toBoolean($row['is_admin'])
+            ),
             'is_dosen' => self::toBoolean($row['is_dosen']),
             'is_admin' => self::toBoolean($row['is_admin']),
             'is_mhs' => self::toBoolean($row['is_mhs']),
             'is_dev' => self::toBoolean($row['is_dev']),
             'email' => $row['email'],
             'password' => self::setPasswordUser($row['password']),
+            'image' => 'college_student.png', // default sementara
         ];
 
         return User::create($user);
@@ -44,8 +47,14 @@ class ImportUser implements ToModel, WithHeadingRow, WithValidation
         ];
     }
 
-    private function setKdUser($kdUser, $isDosen) {
-        return $isDosen ? 'DSN-' . $kdUser : 'MHS-' . $kdUser;
+    private function setKdUser($kdUser, $isDosen, $isAdmin) {
+        $tempKdUser = $isDosen ? 'DSN-' . $kdUser : 'MHS-' . $kdUser;
+
+        if ($isAdmin and !$isDosen) {
+            $tempKdUser = 'ADM-' . $kdUser;
+        }
+
+        return $tempKdUser;
     }
 
     private function setPasswordUser($password) {
