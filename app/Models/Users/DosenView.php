@@ -2,6 +2,7 @@
 
 namespace App\Models\Users;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,5 +24,12 @@ class DosenView extends Model
 
     public function __construct() {
         $this->connection = config('myconfig.database.second_connection');
+    }
+
+    public function scopeGetListDosenAktif(Builder $query) {
+        return $query->where('sts_dosen', 'A')
+            ->select('dosen_id', 'nm_dosen', 'kd_dosen', 'gelar')
+            ->orderBy('dosen_id', 'DESC')
+            ->get();
     }
 }

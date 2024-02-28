@@ -3,25 +3,17 @@
 // ? Controller
 use App\Http\Controllers\Authentications\AuthController;
 use App\Http\Controllers\JurusanController;
+use App\Http\Controllers\KampusController;
+use App\Http\Controllers\KelasKuliahController;
 use App\Http\Controllers\KRS\KRSController;
 use App\Http\Controllers\KRS\KRSDosenController;
 use App\Http\Controllers\KRS\MatKulController;
-use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\Users\MahasiswaController;
 use App\Http\Controllers\TahunAjaranController;
+use App\Http\Controllers\Users\DosenController;
 use App\Http\Controllers\Users\SiteController;
 use App\Http\Controllers\Users\UserController;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
 
 // ? User Routes
 Route::controller(UserController::class)
@@ -99,12 +91,30 @@ Route::controller(SiteController::class)
         Route::delete('/user-access', 'deleteUserSiteAccess');
     });
 
+// ? Get tahun ajaran for common role (admin, dosen, dev)
+Route::middleware('auth.jwt')
+    ->group(function () {
+        Route::get('/tahun-ajaran', [TahunAjaranController::class, 'getTahunAjaranByQueries']);
+        Route::get('/jurusan', [JurusanController::class, 'getJurusanAktif']);
+        Route::get('/jenis-mahasiswa', [MahasiswaController::class, 'getAllJenisMahasiswa']);
+        Route::get('/list-kampus', [KampusController::class, 'getListKampus']);
+    });
+
+// ? Kuesioner Routes
+Route::prefix('/kuesioner')
+    ->middleware('auth.jwt')
+    ->group(function () {
+        Route::get('/dosen-aktif', [DosenController::class, 'getAllDosenAktif'])
+            ->middleware('auth.mahasiswa');
+        Route::get('/dosen-aktif/{id}/matkul-diampu', [
+            KelasKuliahController::class, 'getMatkulByDosenIdInKelasKuliah'
+        ])->middleware('auth.mahasiswa');
+    });
+
 // ? Additional Routes
 Route::get('/current-semester', [TahunAjaranController::class, 'getSemesterMahasiswaSekarang'])
     ->middleware(['auth.jwt', 'auth.mahasiswa']);
-Route::get('/jurusan', [JurusanController::class, 'getJurusanAktif'])
-    ->middleware(['auth.jwt', 'auth.dosen']);
 
-// Get all data mahasiswa
+// ? Get all data mahasiswa
 Route::get('/all/mahasiswa', [MahasiswaController::class, 'getAllMahasiswa'])
     ->middleware(['auth.jwt', 'auth.developer']);

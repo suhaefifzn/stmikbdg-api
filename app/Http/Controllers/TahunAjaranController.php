@@ -54,4 +54,40 @@ class TahunAjaranController extends Controller
             return ErrorHandler::handle($e);
         }
     }
+
+    public function getTahunAjaranByQueries(Request $request) {
+        if (auth()->user()->is_mhs) {
+            return response()->json([
+                'status' => 'fail',
+                'message'  => 'Forbidden access'
+            ], 403);
+        }
+
+        try {
+            $jurusanId = $request->query('jur_id');
+            $jnsMhs = $request->query('jns_mhs');
+            $kdKampus = $request->query('kd_kampus');
+
+            if ($jurusanId and $jnsMhs and $kdKampus) {
+                $filter = [
+                    'jur_id' => $jurusanId,
+                    'jns_mhs' => $jnsMhs,
+                    'kd_kampus' => $kdKampus,
+                ];
+
+                $tahunAjaran = TahunAjaranView::getTahunAjaran($filter);
+
+                return $this->successfulResponseJSON([
+                    'tahun_ajaran' => $tahunAjaran,
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Nilai jur_id, jns_mhs, dan kd_kampus dibutuhkan'
+            ], 400);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
 }

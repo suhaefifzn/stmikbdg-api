@@ -11,6 +11,13 @@ use App\Models\JurusanView;
 class JurusanController extends Controller
 {
     public function getJurusanAktif() {
+        if (auth()->user()->is_mhs) {
+            return response()->json([
+                'status' => 'fail',
+                'message'  => 'Forbidden access'
+            ], 403);
+        }
+
         try {
             $listJurusan = JurusanView::getJurusanAktif();
 

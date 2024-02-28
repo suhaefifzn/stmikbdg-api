@@ -28,12 +28,12 @@ class TahunAjaranView extends Model
         $this->connection = config('myconfig.database.second_connection');
     }
 
-    public function scopeGetTahunAjaran(Builder $query, object $user) {
-        return $query->where('jur_id', $user['jur_id'])
-                    ->where('jns_mhs', $user['jns_mhs'])
-                    ->where('kd_kampus', $user['kd_kampus'])
-                    ->orderBy('tahun_id', 'DESC')
-                    ->first();
+    public function scopeGetTahunAjaran(Builder $query, $filter) {
+        return $query->where('jur_id', $filter['jur_id'])
+            ->where('jns_mhs', $filter['jns_mhs'])
+            ->where('kd_kampus', $filter['kd_kampus'])
+            ->orderBy('tahun_id', 'DESC')
+            ->first();
     }
 
     /**

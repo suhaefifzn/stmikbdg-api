@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Users;
 
+use App\Http\Controllers\Controller;
 use App\Exceptions\ErrorHandler;
 use App\Exports\MahasiswaExport;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ class MahasiswaController extends Controller
                     : null;
 
                 $fileName = $isDownload ? 'DATA-MAHASISWA' : '';
-                
+
                 if ($isSkripsi and $tahunMasuk) { // jIKA ADA FILTER SKRIPSI DAN TAHUN MASUK
                     $filter = [
                         'skripsi' => $isSkripsi,
@@ -66,7 +67,7 @@ class MahasiswaController extends Controller
 
                     return Excel::download(new MahasiswaExport(), $excelFileName);
                 }
-                
+
                 $mahasiswa = Mahasiswa::getMahasiswaByFilter($filter);
 
                 return $this->successfulResponseJSON([
@@ -82,5 +83,31 @@ class MahasiswaController extends Controller
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
+    }
+
+    public function getAllJenisMahasiswa() {
+        /**
+         * * Karena belum ada db yang menyimpan jenis mahasiswa
+         * * jadi di hardcode dulu
+         */
+
+        $jnsMhsArr = [
+            [
+                'jns_mhs' => 'R',
+                'keterangan' => 'Reguler',
+            ],
+            [
+                'jns_mhs' => 'K',
+                'keterangan' => 'Karyawan',
+            ],
+            [
+                'jns_mhs' => 'E',
+                'keterangan' => 'Eksekutif',
+            ],
+        ];
+
+        return $this->successfulResponseJSON([
+            'jenis_mahasiswa' => $jnsMhsArr
+        ]);
     }
 }
