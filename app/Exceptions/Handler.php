@@ -40,7 +40,7 @@ class Handler extends ExceptionHandler
         if ($exception instanceof NotFoundHttpException) {
             return response()->json([
                 'status' => 'fail',
-                'message' => 'Target endpoint tidak ditemukan.'
+                'message' => 'URL tidak ditemukan.'
             ], 404);
         }
 

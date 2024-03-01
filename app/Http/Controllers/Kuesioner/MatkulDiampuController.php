@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Kuesioner;
 
+use App\Http\Controllers\Controller;
 use App\Exceptions\ErrorHandler;
 use Illuminate\Http\Request;
 
 // ? Models - view
-use App\Models\KelasKuliahView;
+use App\Models\KelasKuliah\KelasKuliahView;
 use App\Models\KRS\MatKulView;
 use App\Models\TahunAjaranView;
 use App\Models\Users\DosenView;
 
-class KelasKuliahController extends Controller
+class MatkulDiampuController extends Controller
 {
     public function getMatkulByDosenIdInKelasKuliah($dosenId) {
         try {

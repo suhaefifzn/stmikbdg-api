@@ -4,10 +4,11 @@
 use App\Http\Controllers\Authentications\AuthController;
 use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\KampusController;
-use App\Http\Controllers\KelasKuliahController;
 use App\Http\Controllers\KRS\KRSController;
 use App\Http\Controllers\KRS\KRSDosenController;
 use App\Http\Controllers\KRS\MatKulController;
+use App\Http\Controllers\Kuesioner\MatkulDiampuController;
+use App\Http\Controllers\Kuliah\KelasKuliahController;
 use App\Http\Controllers\Users\MahasiswaController;
 use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\Users\DosenController;
@@ -80,6 +81,14 @@ Route::controller(KRSDosenController::class)
         Route::get('/list', 'getListKRSMahasiswa');
     });
 
+// ? Kelas Kuliah Routes
+Route::controller(KelasKuliahController::class)
+    ->prefix('kelas-kuliah')
+    ->middleware('auth.jwt')
+    ->group(function () {
+        Route::get('/', 'getKelasKuliahByDosen')->middleware('auth.dosen');
+    });
+
 // ? ACL - Routes
 Route::controller(SiteController::class)
     ->prefix('/sites')
@@ -107,7 +116,7 @@ Route::prefix('/kuesioner')
         Route::get('/dosen-aktif', [DosenController::class, 'getAllDosenAktif'])
             ->middleware('auth.mahasiswa');
         Route::get('/dosen-aktif/{id}/matkul-diampu', [
-            KelasKuliahController::class, 'getMatkulByDosenIdInKelasKuliah'
+            MatkulDiampuController::class, 'getMatkulByDosenIdInKelasKuliah'
         ])->middleware('auth.mahasiswa');
     });
 
