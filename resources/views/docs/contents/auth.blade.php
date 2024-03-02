@@ -33,11 +33,13 @@
             "expires_in": null
         },
         "platform": "android",
-        "role": {
+        "roles": {
             "is_admin": false,
             "is_dosen": false,
             "is_mhs": true,
-            "is_dev": true
+            "is_dev": true,
+            "is_doswal": false,
+            "is_prodi": false
         }
     }
 }</code></pre>

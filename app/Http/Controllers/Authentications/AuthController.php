@@ -49,11 +49,13 @@ class AuthController extends Controller
                                         : "$ttl minutes",
                     ],
                     'platform' => $platform,
-                    'role' => [
+                    'roles' => [
                         'is_admin' => auth()->user()->is_admin,
                         'is_dosen' => auth()->user()->is_dosen,
                         'is_mhs' => auth()->user()->is_mhs,
                         'is_dev' => auth()->user()->is_dev,
+                        'is_doswal' => auth()->user()->is_doswal,
+                        'is_prodi' => auth()->user()->is_prodi,
                     ]
                 ];
             } else {

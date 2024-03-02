@@ -62,6 +62,30 @@ class DocsController extends Controller
         ]);
     }
 
+    public function kelasKuliahMahasiswa() {
+        return view('docs.contents.kelas_mhs', [
+            'title' => 'Kelas Kuliah Mahasiswa'
+        ]);
+    }
+
+    public function kelasKuliahDosen() {
+        return view('docs.contents.kelas_dosen', [
+            'title' => 'Kelas Kuliah Dosen'
+        ]);
+    }
+
+    public function kamus() {
+        return view('docs.contents.kamus', [
+            'title' => 'Kamus'
+        ]);
+    }
+
+    public function additionalRoutes() {
+        return view('docs.contents.additional', [
+            'title' => 'Additional Routes'
+        ]);
+    }
+
     public function authenticate(Request $request) {
         $credentials = $request->validate([
             'email' => 'required|email:dns',

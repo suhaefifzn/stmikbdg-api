@@ -12,9 +12,8 @@ class KelasKuliahView extends Model
      * Model ini digunakan untuk view kelas_kuliah
      * hanya digunakan untuk get data (SELECT).
      *
-     * Koneksi database terhubung ke 'stmikbdg_dummy' view kelas_kuliah.
-     *
-     * Saat ini masih menggunakan dua database berbeda
+     * Saat ini kolom join_kelas_kuliah_id diperlukan, tetapi di view sebelumnya tidak ada.
+     * Jadi jangan lupa tambahkan kolom tersebut pada view kelas kuliah.
      */
     use HasFactory;
 

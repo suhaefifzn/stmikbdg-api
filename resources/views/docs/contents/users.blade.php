@@ -8,11 +8,11 @@
     <p>
         Untuk mendapatkan data profile dan akun pengguna aktif atau pengguna terautentikasi dilakukan dengan cara mengirim permintaan ke <span class="badge bg-dark">/users/me</span> menggunakan HTTP method <span class="badge bg-info">get</span> dan jangan lupa sertakan <b>headers</b> seperti yang telah dijelaskan pada bagian Authentications.
     </p>
-    <p>Jika permintaan berhasil, maka akan memberikan response seperti berikut:</p>
+    <p>Jika permintaan berhasil, maka akan memberikan response seperti berikut untuk akun yang memiliki role sebagai mahasiswa:</p>
     <pre><code class="language-json bg-primary-subtle">{
     "status": "success",
     "data": {
-        "mahasiswa": {
+        "profile": {
             "kd_kampus": "A ",
             "mhs_id": 15534,
             "angkatan_id": 76,
@@ -25,7 +25,7 @@
             "sts_mhs": "A",
             "angkatan": 2020,
             "nama_jurusan": "S1 - TEKNIK INFORMATIKA",
-            "dosen_wali": "Mina Ismu Rahayu, M.T",
+            "dosen_wali": "Mina Ismu Rahayu, M.T                   ",
             "tmp_lahir": "BANDUNG",
             "tgl_lahir": "2002-01-21",
             "masuk_semester": 0,
@@ -35,10 +35,46 @@
         "account": {
             "email": "suhaefi@simak.dev",
             "image": "http://stmikbdg-api.test/storage/users/images/college_student.png",
-            "is_admin": false,
             "is_dosen": false,
+            "is_admin": false,
             "is_mhs": true,
-            "is_dev": true
+            "is_dev": true,
+            "is_doswal": false,
+            "is_prodi": false
+        }
+    }
+}</code></pre>
+    <p>
+        Berikut ini adalah response untuk akun yang memiliki role dosen:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "profile": {
+            "dosen_id": 573,
+            "kd_dosen": "IF054",
+            "gelar": "M.T",
+            "golongan": null,
+            "jns_dosen": "1",
+            "sts_dosen": "A",
+            "jur_id": null,
+            "kd_jab": null,
+            "honor_per_sks": null,
+            "nidn": null,
+            "inisial": "MN   ",
+            "profile_ht": null,
+            "nama": "Mina Ismu Rahayu",
+            "nama_dan_gelar": "Mina Ismu Rahayu, M.T"
+        },
+        "account": {
+            "email": "mina@simak.dev",
+            "image": "http://stmikbdg-api.test/storage/users/images/college_student.png",
+            "is_dosen": true,
+            "is_admin": true,
+            "is_mhs": false,
+            "is_dev": true,
+            "is_doswal": true,
+            "is_prodi": true
         }
     }
 }</code></pre>

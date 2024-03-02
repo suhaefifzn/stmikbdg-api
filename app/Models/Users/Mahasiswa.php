@@ -66,18 +66,21 @@ class Mahasiswa extends Model
         if (isset($filter['skripsi']) and isset($filter['tahun_masuk'])) {
             return $query->where('judul_skripsi', '!=', null)
                 ->where('masuk_tahun', $filter['tahun_masuk'])
+                ->select('mhs_id', 'nim', 'nm_mhs', 'judul_skripsi', 'predikat')
                 ->orderBy('masuk_tahun', 'DESC')
                 ->get();
         }
 
         if (isset($filter['skripsi'])) {
             return $query->where('judul_skripsi', '!=', null)
+                ->select('mhs_id', 'nim', 'nm_mhs', 'judul_skripsi', 'predikat')
                 ->orderBy('masuk_tahun', 'DESC')
                 ->get();
         }
 
         if (isset($filter['tahun_masuk'])) {
             return $query->where('masuk_tahun', $filter['tahun_masuk'])
+                ->select('mhs_id', 'nim', 'nm_mhs', 'judul_skripsi', 'predikat')
                 ->orderBy('masuk_tahun', 'DESC')
                 ->get();
         }

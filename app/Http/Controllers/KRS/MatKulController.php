@@ -8,12 +8,13 @@ use App\Http\Controllers\TahunAjaranController;
 
 // ? Exception
 use App\Exceptions\ErrorHandler;
-
+use App\Models\KRS\KRS;
+use App\Models\KRS\KRSMatkul;
 // ? Models - view
 use App\Models\KRS\MatKulView;
 use App\Models\KurikulumView;
 use App\Models\KRS\MatkulDiselenggarakanView;
-
+use App\Models\KRS\NilaiAkhirView;
 // ? Models - table
 use App\Models\Users\Mahasiswa;
 
@@ -81,6 +82,7 @@ class MatKulController extends Controller
 
         $mergedMatkul = $matkulDiselenggarakan->concat($listUniqueMatkul)->sortBy('semester');
 
+        // terdapat filter semester
         if ($filter['semester']) {
             $listMatkul = $mergedMatkul->filter(function ($item) use ($filter) {
                 return $item['semester'] == $filter['semester'];
@@ -93,14 +95,19 @@ class MatKulController extends Controller
         $totalSemuaSKS = 0;
         $totalSemuaIPK = 0;
         $countIPKPerSemester = 0;
+        $totalSemuaNilaiA = 0;
+        $totalSemuaNilaiB = 0;
+        $totalSemuaNilaiC = 0;
+        $totalSemuaNilaiD = 0;
+        $totalSemuaNilaiE = 0;
 
         if (count($listMatkul) > 0) {
             // grouping per semester
             foreach ($listMatkul->all() as $mk) {
                 $semester = $mk['semester'];
                 $nilaiAkhir = $mk->nilaiAkhir()
-                                ->where('mhs_id', $this->user['mhs_id'])
-                                ->first();
+                    ->where('mhs_id', $this->user['mhs_id'])
+                    ->first();
 
                 if ($nilaiAkhir) {
                     $mk['nilai_akhir'] = [
@@ -115,8 +122,8 @@ class MatKulController extends Controller
                 $kdMK = $mk['kd_mk'];
 
                 $isKrsMatkul = count($latestKRS->krsMatkul()
-                                    ->where('mk_id', $mk['mk_id'])
-                                    ->get()) > 0 ?? false;
+                    ->where('mk_id', $mk['mk_id'])
+                    ->get()) > 0 ?? false;
 
                 $mk['krs'] = [
                     'is_aktif' => $mk['smt'] === $this->currentSemester['smt'] ?? false,
@@ -133,11 +140,11 @@ class MatKulController extends Controller
                     $mk['krs'] = [
                         'is_aktif' => $mk['smt'] === $this->currentSemester['smt'] ?? false,
                         'is_checked' => is_null($latestKRS
-                                                    ->krsMatkul()
-                                                    ->where('mk_id', $mk['mk_id'])
-                                                    ->first())
-                                                    ? false
-                                                    : true,
+                            ->krsMatkul()
+                            ->where('mk_id', $mk['mk_id'])
+                            ->first())
+                            ? false
+                            : true,
                     ];
                 }
 
@@ -151,28 +158,69 @@ class MatKulController extends Controller
                 $countNilaiAkhir = 0;
                 $totalNilaiAkhirSemester = 0;
                 $totalSksDipilihDisemester = 0;
+                $totalNilaiAPerSemester = 0;
+                $totalNilaiBPerSemester = 0;
+                $totalNilaiCPerSemester = 0;
+                $totalNilaiDPerSemester = 0;
+                $totalNilaiEPerSemester = 0;
 
                 foreach ($item['mata_kuliah'] as $mk) {
                     if (!is_null($mk['nilai_akhir'])) {
                         $totalNilaiAkhirSemester += (int) $mk['nilai_akhir']['mutu'];
                         $totalSksDipilihDisemester += (int) $mk['sks'];
                         $countNilaiAkhir++;
+
+                        switch ($mk['nilai_akhir']['nilai']) {
+                            case 'A':
+                                $totalNilaiAPerSemester++;
+                                break;
+                            case 'B':
+                                $totalNilaiBPerSemester++;
+                                break;
+                            case 'C':
+                                $totalNilaiCPerSemester++;
+                                break;
+                            case 'D':
+                                $totalNilaiDPerSemester++;
+                                break;
+                            case 'E':
+                                $totalNilaiEPerSemester++;
+                                break;
+                            default:
+                                break;
+                        }
                     }
+                }
+
+                // untuk tiap semester
+                $tempMatkul[$index]['total_nilai_A'] = $totalNilaiAPerSemester;
+                $tempMatkul[$index]['total_nilai_B'] = $totalNilaiBPerSemester;
+                $tempMatkul[$index]['total_nilai_C'] = $totalNilaiCPerSemester;
+                $tempMatkul[$index]['total_nilai_D'] = $totalNilaiDPerSemester;
+                $tempMatkul[$index]['total_nilai_E'] = $totalNilaiEPerSemester;
+
+                // untuk keseluruhan atau tidak ada filter semester
+                if (!$filter['semester']) {
+                    $totalSemuaNilaiA += $totalNilaiAPerSemester;
+                    $totalSemuaNilaiB += $totalNilaiBPerSemester;
+                    $totalSemuaNilaiC += $totalNilaiCPerSemester;
+                    $totalSemuaNilaiD += $totalNilaiDPerSemester;
+                    $totalSemuaNilaiE += $totalNilaiEPerSemester;
                 }
 
                 // hitung ipk - rata-rata nilai
                 $averageNilaiAkhir = $countNilaiAkhir > 0
-                                        ? (float) $totalNilaiAkhirSemester/$countNilaiAkhir
-                                        : null;
+                    ? (float) $totalNilaiAkhirSemester/$countNilaiAkhir
+                    : null;
                 $ipk = $averageNilaiAkhir
-                            ? number_format($averageNilaiAkhir, 3, '.', '')
-                            : null;
+                    ? number_format($averageNilaiAkhir, 2, '.', '')
+                    : null;
 
-                $tempMatkul[$index]['ipk'] = (float) $ipk;
-                $tempMatkul[$index]['ipk_per_semester_dari_total_sks'] = $totalSksDipilihDisemester;
+                $tempMatkul[$index]['ipk'] = (float) number_format($ipk, 1);
+                $tempMatkul[$index]['ipk_dari_total_sks'] = $totalSksDipilihDisemester;
 
                 // hitung sks dan ipk menyeluruh
-                $totalSemuaSKS += $tempMatkul[$index]['ipk_per_semester_dari_total_sks'];
+                $totalSemuaSKS += $tempMatkul[$index]['ipk_dari_total_sks'];
 
                 if ($tempMatkul[$index]['ipk'] > 0) {
                     $totalSemuaIPK += (float) $tempMatkul[$index]['ipk'];
@@ -180,7 +228,9 @@ class MatKulController extends Controller
                 }
 
                 // menentukan urutan response
-                $desiredOrder = ['ipk', 'semester', 'ipk_per_semester_dari_total_sks', 'mata_kuliah'];
+                $desiredOrder = [
+                    'ipk', 'semester', 'ipk_dari_total_sks', 'total_nilai_A', 'total_nilai_B', 'total_nilai_C', 'total_nilai_D', 'total_nilai_E','mata_kuliah'
+                ];
                 $orderedData = array_replace(array_flip($desiredOrder), $tempMatkul[$index]);
                 $tempMatkul[$index] = $orderedData;
             }
@@ -194,12 +244,18 @@ class MatKulController extends Controller
         // set response paling atas
         if (!$filter['semester']) {
             $response['total_semua_ipk'] = (float) number_format(
-                (float) ($totalSemuaIPK / $countIPKPerSemester), 3, '.'. ''
+                (float) ($totalSemuaIPK / $countIPKPerSemester), 1, '.'. ''
             );
             $response['total_semua_sks_dipilih'] = $totalSemuaSKS;
+            $response['total_semua_nilai_A'] = $totalSemuaNilaiA;
+            $response['total_semua_nilai_B'] = $totalSemuaNilaiB;
+            $response['total_semua_nilai_C'] = $totalSemuaNilaiC;
+            $response['total_semua_nilai_D'] = $totalSemuaNilaiD;
+            $response['total_semua_nilai_E'] = $totalSemuaNilaiE;
+            $response['matkul_per_semester'] = array_values($tempMatkul);
+        } else {
+            $response['matkul_per_semester'] = array_values($tempMatkul)[0];
         }
-
-        $response['matkul_per_semester'] = array_values($tempMatkul);
 
         return $this->successfulResponseJSON($response);
     }

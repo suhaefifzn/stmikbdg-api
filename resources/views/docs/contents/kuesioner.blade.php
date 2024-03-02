@@ -3,7 +3,7 @@
 <h4 class="mt-4"><b>#</b> Kuesioner</h4>
 <hr>
 <div class="m-2">
-    <h5 class="mt-4">Sisi Mahasiswa - Get List Dosen Aktif</h5>
+    <h5 class="mt-4">(MHS) - Get List Dosen Aktif</h5>
     <hr>
     <p>
         Kirim request menggunakan HTTP method <span class="badge bg-info">get</span> ke <span class="badge bg-dark">/kuesioner/dosen-aktif</span>. Jika berhasil akan memberikan response dalam format JSON seperti berikut:
@@ -28,7 +28,7 @@
         ]
     }
 }</code></pre>
-    <h5 class="mt-4">Sisi Mahasiswa - Get Matakuliah Diampu Oleh Dosen</h5>
+    <h5 class="mt-4">(MHS) - Get Matakuliah Diampu Oleh Dosen</h5>
     <hr>
     <p>
         Untuk mendapatkan daftar matakuliah yang diampu oleh dosen diperlukan nilai <b>dosen_id</b> yang didapat setelah memilih salah satu dosen aktif yang ada pada list di atas. Kemudian ganti <b>dosen_id</b> yang ada pada <span class="badge bg-dark">/kuesioner/dosen-aktif/dosen_id/matkul-diampu</span> dengan nilainya. Misalnya <span class="badge bg-dark">/kuesioner/dosen-aktif/573/matkul-diampu</span>, kirim dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Hasilnya:

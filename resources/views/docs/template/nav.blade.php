@@ -26,7 +26,9 @@
             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Android</a>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="/docs/api/krs-mahasiswa">KRS - MHS</a></li>
-                <li><a class="dropdown-item" href="/docs/api/krs-dosen-wali">KRS - DSN</a></li>
+                <li><a class="dropdown-item" href="/docs/api/krs-dosen-wali">KRS - DOSWAL</a></li>
+                <li><a class="dropdown-item" href="/docs/api/kelas-mahasiswa">KELAS - MHS</a></li>
+                <li><a class="dropdown-item" href="/docs/api/kelas-dosen">KELAS - DSN</a></li>
             </ul>
         </li>
 
@@ -34,9 +36,18 @@
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Web</a>
             <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/docs/api/sikps">SIKPS</a></li>
                 <li><a class="dropdown-item" href="/docs/api/kuesioner">Kuesioner</a></li>
-                <li><a class="dropdown-item" href="/docs/api/data-mahasiswa">Data Mahasiswa</a></li>
                 <li><a class="dropdown-item" href="/docs/api/acl">ACL (For Admin)</a></li>
+            </ul>
+        </li>
+
+        {{-- Menu lainnya--}}
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Lainnya</a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/docs/api/kamus">Kamus</a></li>
+                <li><a class="dropdown-item" href="/docs/api/additional">Routes Tambahan</a></li>
             </ul>
         </li>
 
