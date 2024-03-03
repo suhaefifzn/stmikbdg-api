@@ -43,12 +43,14 @@ class UserController extends Controller
 
             $validatedData = $request->validate([
                 'kd_user' => 'required|string',
-                'is_dosen' => 'nullable|boolean',
                 'email' => 'required|string|email|unique:users',
                 'password' => 'required|string|min:8|max:64|regex:/^\S*$/u',
                 'is_admin' => 'nullable|boolean',
                 'is_mhs' => 'nullable|boolean',
-                'id_dev' => 'nullable|boolean'
+                'is_dev' => 'nullable|boolean',
+                'is_dosen' => 'nullable|boolean',
+                'is_doswal' => 'nullable|boolean',
+                'is_prodi' => 'nullable|boolean',
             ]);
 
             $tempKdUser = $validatedData['is_dosen']
@@ -64,6 +66,8 @@ class UserController extends Controller
             $validatedData['is_admin'] = $request->is_admin ?? false;
             $validatedData['is_mhs'] = $request->is_mhs ?? false;
             $validatedData['is_dev'] = $request->is_dev ?? false;
+            $validatedData['is_doswal'] = $request->is_doswal ?? false;
+            $validatedData['is_prodi'] = $request->is_prodi ?? false;
             $validatedData['image'] = 'college_student.png';
 
             // KD User untuk role admin saja

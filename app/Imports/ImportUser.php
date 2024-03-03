@@ -27,6 +27,8 @@ class ImportUser implements ToModel, WithHeadingRow, WithValidation
             'is_admin' => self::toBoolean($row['is_admin']),
             'is_mhs' => self::toBoolean($row['is_mhs']),
             'is_dev' => self::toBoolean($row['is_dev']),
+            'is_doswal' => self::toBoolean($row['is_doswal']),
+            'is_prodi' => self::toBoolean($row['is_prodi']),
             'email' => $row['email'],
             'password' => self::setPasswordUser($row['password']),
             'image' => 'college_student.png', // default sementara
@@ -42,6 +44,8 @@ class ImportUser implements ToModel, WithHeadingRow, WithValidation
             '*.is_admin' => 'nullable|boolean',
             '*.is_mhs' => 'nullable|boolean',
             '*.is_dev' => 'nullable|boolean',
+            '*.is_doswal' => 'nullable|boolean',
+            '*.is_prodi' => 'nullable|boolean',
             '*.email' => 'required|email|unique:users',
             '*.password' => 'required|string|min:8|max:64|regex:/^\S*$/u'
         ];

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Users;
 
 use App\Exceptions\ErrorHandler;
+use App\Exceptions\ExcelImportException;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportUserSiteAccess;
 use Illuminate\Http\Request;
 
 // ? Models - table
@@ -13,6 +15,8 @@ use App\Models\Users\UserSite;
 
 // ? Models - view
 use App\Models\Users\UserSitesView;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SiteController extends Controller
 {
@@ -47,6 +51,22 @@ class SiteController extends Controller
 
     public function postUserSite(Request $request) {
         try {
+            if ($request->query('import')) {
+                if ($request->query('import') === 'excel') {
+                    $request->validate([
+                        'file' => 'required|mimes:xlsx,xls|max:2048'
+                    ]);
+                    $excel = $request->file('file');
+
+                    return self::importUserSiteAccessFromExcel($excel);
+                } else {
+                    return response()->json([
+                        'status' => 'fail',
+                        'message' => 'Metode import yang tersedia saat ini adalah menggunakan file excel'
+                    ], 400);
+                }
+            }
+
             $request->validate([
                 'user_id' => 'required|exists:users,id',
                 'site_id' => 'required|exists:sites,id',
@@ -120,6 +140,28 @@ class SiteController extends Controller
                 'status' => 'fail',
                 'message' => 'Gagal menghapus akses user ke web'
             ], 400);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function importUserSiteAccessFromExcel($excel) {
+        try {
+            $fileName = $excel->hashName();
+            $path = $excel->storeAs('public/excel/', $fileName);
+
+            Excel::import(new ImportUserSiteAccess, storage_path('app/public/excel/' . $fileName));
+            Storage::delete($path);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Akses user ke web berhasil ditambahkan'
+            ], 201);
+        } catch (ExcelImportException $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage()
+            ], $e->getCode());
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }

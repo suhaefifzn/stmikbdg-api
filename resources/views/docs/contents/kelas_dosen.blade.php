@@ -6,7 +6,7 @@
     Route-route API pada halaman ini digunakan untuk mendapatkan jadwal kuliah untuk dosen, daftar kelas kuliah yang ditampilkan berdasarkan semua tahun ajan aktif. Selain melihat jadwal kuliah, digunakan juga untuk membuka kelas yang menghasilkan kode berupa PIN sebanyak 6 digit yang nantinya digunakan oleh mahasiswa untuk mengisi kehadiran.
 </p>
 <div class="m-2">
-    <h5 class="mt-4">(MHS) Get Daftar Kelas Kuliah</h5>
+    <h5 class="mt-4">(DSN) Get Daftar Kelas Kuliah</h5>
     <hr>
     <p>
         Lakukan permintaan ke <span class="badge bg-dark">/kelas-kuliah/dosen</span> menggunakan HTTP method <span class="badge bg-info">get</span>. Jika berhasil maka akan memberikan response dalam format JSON seperti berikut:

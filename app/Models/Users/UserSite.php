@@ -18,6 +18,8 @@ class UserSite extends Model
 
     protected $connection;
     protected $table = 'user_sites';
+    protected $guarded = ['id'];
+    public $timestamps = false;
 
     public function __construct() {
         $this->connection = config('myconfig.database.first_connection');

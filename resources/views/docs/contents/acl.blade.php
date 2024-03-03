@@ -4,7 +4,7 @@
 <hr>
 <div class="m-2">
     <p>
-        Setiap route yang ada di halaman ini hanya digunakan oleh admin untuk mengatur kendali pengguna terhadap sistem seperti menambah pengguna baru, melihat daftar akun, menambah alamat situs, dab mengatur akses akun terhadap suatu alamat web.
+        Setiap route yang ada di halaman ini hanya digunakan oleh admin untuk mengatur kendali pengguna terhadap sistem seperti menambah pengguna baru, melihat daftar akun, menambah alamat situs, dan mengatur akses akun terhadap suatu alamat web.
     </p>
     <h5 class="mt-4">Menambah User</h5>
     <hr>
@@ -93,7 +93,7 @@
     <p>
         Untuk impor user baru menggunakan file excel, saat ini harus mengikuti format excel dengan memiliki seperti berikut:
         <div class="img-wrapper">
-            <img src="https://lh3.googleusercontent.com/drive-viewer/AKGpihZAXBswaf8fBsaUb0hudlSQ5ll6Vmdz3ZgYGabrQoecmDedKca8PxKeIuOX_ZW34f2MY-cHRGthCgeqFLXVY_PusMJk=s2560" alt="Format Import User File Excel" class="m-2 img-fluid">
+            <img src="https://lh3.googleusercontent.com/drive-viewer/AKGpihbsqnQK2rGk5TdJJqqPjW8OQ2q-CrGOdzCfxOGop6myvaV58zKC0thp3vVtCMzxYBDw1GQOjlQtgiAfRxe0xudIoWB4=s1600" alt="Format Import User File Excel" class="m-2 img-fluid">
         </div>
         Nilai <b>Kd User</b> dapat berupa kode dosen atau nim yang kemudian diikuti dengan nilai <b>Is Dosen</b>. Apabila <b>Kd User</b> berisi kode dosen maka pastikan nilai <b>Is Dosen</b> adalah true.
     </p>
@@ -104,5 +104,21 @@
     "status": "success",
     "message": "Data user pada file excel berhasil ditambahkan"
 }</code></pre>
+    <h5 class="mt-4">Import User Site Access</h5>
+    <hr>
+    <p>
+        Untuk menambahkan akses user ke situs web sekaligus dapat menggunakan cara impor menggunakan file excel dengan format seperti berikut:
+        <div class="img-wrapper">
+            <img src="https://lh3.googleusercontent.com/drive-viewer/AKGpihbppqK1KRx9h4RWNaxrtTCt024nRGwlAFgMal5Fmu0A1sKRvYgtGzPogF2dfGEobE-8fj-ocJm5H32VaHY75qN8hgLs=s2560" alt="Format Add User Site Access Excel" class="m-2 img-fluid">
+        </div>
+        <b>Site Id</b> adalah id situs web yang telah tersedia pada table sites. Dan <b>Kd User</b> dapat berisi NIM atau Kode Dosen yang telah tersedia pada table users. Jadi sebelum impor, pastikan kedua nilai tersebut terisi dan tersedia pada table users dan sites. Untuk menghindari error atau konflik, maka pastikan juga bahwa user benar-benar belum memiliki akses ke alamat web yang ingin ditambahkan.
+    </p>
+    <p>
+        Lakukan request ke <span class="badge bg-dark">/sites/user-access?import=excel</span> dengan HTTP method <span class="badge bg-info">post</span>, jika berhasil akan memberikan response:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+        "status": "success",
+        "message": "Akses user ke web berhasil ditambahkan"
+    }</code></pre>
 </div>
 @endsection
