@@ -177,5 +177,49 @@
     <p>
         Perlu diingat bahwa KRS yang telah diajukan tidak dapat diubah lagi. KRS baru dapat diubah jika dosen wali menolak pengajuan tersebut dan masih dalam batas waktu pengajuan KRS yang telah ditentukan.
     </p>
+
+    {{-- Melihat draft krs --}}
+    <h5 class="mt-4">(MHS) Get Draft KRS Matakuliah</h5>
+    <hr>
+    <p>
+        Untuk melihat matakuliah pada KRS yang disimpan sebagai draft kirimkan request ke <span class="badge bg-dark">/krs/mata-kuliah/draft</span> menggunakan HTTP method <span class="badge bg-info">get</span>. Draft KRS hanya bisa dilihat apabila pengisian KRS masih dibuka. Berikut adalah response yang diberikan:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "krs": {
+            "krs_id": 4615,
+            "tahun_id": 348,
+            "nmr_krs": "015/12/KR2/23",
+            "tanggal": "2024-01-12",
+            "mhs_id": 15534,
+            "semester": 8,
+            "sts_krs": "D",
+            "kd_kampus": "A",
+            "dosen_id": null,
+            "pengajuan_catatan": null,
+            "ditolak_tanggal": null,
+            "ditolak_alasan": null,
+            "ditolak_stlh_sah": null,
+            "kd_chanel": "A",
+            "krs_matkul": [
+                {
+                    "krs_mk_id": 35018,
+                    "krs_id": 4615,
+                    "mk_id": 136,
+                    "sts_mk_krs": "A",
+                    "detail_matkul": {
+                        "kd_mk": "IF1800",
+                        "nm_mk": "Skripsi",
+                        "semester": 8,
+                        "sts_mk": "A",
+                        "kd_kur": "IFS120"
+                    }
+                },
+                // matkul lain disembunyikan
+            ]
+        }
+    }
+}</code></pre>
 </div>
 @endsection

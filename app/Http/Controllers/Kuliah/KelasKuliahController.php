@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Kuliah;
 use App\Exceptions\ErrorHandler;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 // ? Models - view
 use App\Models\KelasKuliah\KelasKuliahView;
@@ -45,16 +46,6 @@ class KelasKuliahController extends Controller
             $kelasKuliah = [];
             $urutanHari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jum\'at', 'Sabtu', 'Minggu'];
             foreach ($tempKelasKuliah as $item) {
-                if ($item['kjoin_kelas']) {
-                    $kelasUtama = KelasKuliahView::where('kelas_kuliah_id', $item['join_kelas_kuliah_id'])->first();
-                    $item['jadwal_kuliah1'] = $kelasUtama['jadwal_kuliah1'];
-                    $item['jadwal_kuliah2'] = $kelasUtama['jadwal_kuliah2'];
-                    $item['jadwal_uts'] = $kelasUtama['jadwal_uts'];
-                    $item['jadwal_uas'] = $kelasUtama['jadwal_uas'];
-                    $item['pengajar_id'] = $kelasUtama['pengajar_id'];
-                    $item['nm_dosen'] = $kelasUtama['nm_dosen'];
-                }
-
                 // bersihin white space di tiap sisi nm_dosen
                 $item['nm_dosen'] = trim($item['nm_dosen']);
 
@@ -82,9 +73,21 @@ class KelasKuliahController extends Controller
                     $item['detail_jadwal']['kd_ruang'] = trim($jadwal['kd_ruang']);
                 }
 
-                if (!is_null($item['jadwal_kuliah1'])) {
+                if ($item['jadwal_kuliah1'] || $item['detail_jadwal']) {
                     // ambil nama hari
-                    $namaHari = explode(',', $item['jadwal_kuliah1'])[0];
+                    $namaHari = '';
+                    if ($item['detail_jadwal']['tanggal']) {
+                        $carbonDate = Carbon::parse($item['detail_jadwal']['tanggal']);
+                        $carbonDate->setLocale('id');
+
+                        if ($carbonDate->dayName === 'Jumat') {
+                            $namaHari = 'Jum\'at';
+                        } else {
+                            $namaHari = $carbonDate->dayName;
+                        }
+                    } else {
+                        $namaHari = explode(',', $item['jadwal_kuliah1'])[0];
+                    }
 
                     // grouping by nama hari
                     $kelasKuliah[array_search($namaHari, $urutanHari)][] = $item;
@@ -128,7 +131,10 @@ class KelasKuliahController extends Controller
     public function getKelasKuliahByMahasiswa(Request $request) {
         /**
          * Alur sekarang:
-         * - Get jadwal kuliah berdasarkan tahun ajaran aktif dan krs mk yang telah disetujui
+         * - Get kelas kuliah berdasarkan tahun ajaran aktif dan krs mk yang telah disetujui.
+         * - Get detail matakuliah dan jadwal.
+         * - Grouping berdasarkan hari di nilai jadwal_kuliah1, jika kjoin_true maka grouping
+         * berdasarkan nilai hari dari tanggal yang ada di detail_jadwal.
          */
         try {
             $mahasiswa = $this->getUserAuth();
@@ -159,16 +165,6 @@ class KelasKuliahController extends Controller
                     $urutanHari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jum\'at', 'Sabtu', 'Minggu'];
 
                     foreach ($tempKelasKuliah as $item) {
-                        if ($item['kjoin_kelas']) {
-                            $kelasUtama = KelasKuliahView::where('kelas_kuliah_id', $item['join_kelas_kuliah_id'])->first();
-                            $item['jadwal_kuliah1'] = $kelasUtama['jadwal_kuliah1'];
-                            $item['jadwal_kuliah2'] = $kelasUtama['jadwal_kuliah2'];
-                            $item['jadwal_uts'] = $kelasUtama['jadwal_uts'];
-                            $item['jadwal_uas'] = $kelasUtama['jadwal_uas'];
-                            $item['pengajar_id'] = $kelasUtama['pengajar_id'];
-                            $item['nm_dosen'] = $kelasUtama['nm_dosen'];
-                        }
-
                         // bersihin white space di tiap sisi nm_dosen
                         $item['nm_dosen'] = trim($item['nm_dosen']);
 
@@ -199,9 +195,21 @@ class KelasKuliahController extends Controller
                             $item['detail_jadwal']['kd_ruang'] = trim($jadwal['kd_ruang']);
                         }
 
-                        if ($item['jadwal_kuliah1']) {
+                        if ($item['jadwal_kuliah1'] || $item['detail_jadwal']) {
                             // ambil nama hari
-                            $namaHari = explode(',', $item['jadwal_kuliah1'])[0];
+                            $namaHari = '';
+                            if ($item['detail_jadwal']['tanggal']) {
+                                $carbonDate = Carbon::parse($item['detail_jadwal']['tanggal']);
+                                $carbonDate->setLocale('id');
+
+                                if ($carbonDate->dayName === 'Jumat') {
+                                    $namaHari = 'Jum\'at';
+                                } else {
+                                    $namaHari = $carbonDate->dayName;
+                                }
+                            } else {
+                                $namaHari = explode(',', $item['jadwal_kuliah1'])[0];
+                            }
 
                             // grouping by nama hari
                             $kelasKuliah[array_search($namaHari, $urutanHari)][] = $item;

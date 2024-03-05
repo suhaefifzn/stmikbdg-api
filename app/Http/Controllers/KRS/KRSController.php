@@ -30,8 +30,8 @@ class KRSController extends Controller
             if (!auth()->user()->is_dosen) {
                 $tahunAjaranController = new TahunAjaranController();
                 $this->currentSemester = $tahunAjaranController
-                                            ->getSemesterMahasiswaSekarang()
-                                            ->getData('data')['data']['semester'];
+                    ->getSemesterMahasiswaSekarang()
+                    ->getData('data')['data']['semester'];
             }
             $this->user = $this->getUserAuth();
         }
@@ -231,6 +231,50 @@ class KRSController extends Controller
             return $this->successfulResponseJSON([
                 'krs_id' => is_null($krsId) ? $insertedKRSId : $krsId,
             ], 'Berhasil menyimpan KRS sebagai draft', 201);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function getDraftKRSMatkul() {
+        try {
+            $tahunAjaranAktif = TahunAjaranView::getTahunAjaran($this->user);
+
+            if ($tahunAjaranAktif['du_open']) {
+                $lastKRS = KRS::where('tahun_id', $tahunAjaranAktif['tahun_id'])
+                    ->where('mhs_id', $this->user['mhs_id'])
+                    ->where('sts_krs', 'D')
+                    ->first();
+
+                if ($lastKRS) {
+                    $krsMatkul = KRSMatkul::where('krs_id', $lastKRS['krs_id'])
+                        ->select('krs_mk_id', 'krs_id', 'mk_id', 'sts_mk_krs')
+                        ->get();
+
+                    foreach ($krsMatkul as $index => $matkul) {
+                        $detailMatkul = $matkul->matakuliah()
+                            ->select('kd_mk', 'nm_mk', 'semester', 'sts_mk', 'kd_kur')
+                            ->first();
+                        $krsMatkul[$index]['detail_matkul'] = $detailMatkul;
+                    }
+
+                    $lastKRS['krs_matkul'] = $krsMatkul;
+
+                    return $this->successfulResponseJSON([
+                        'krs' => $lastKRS,
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Anda tidak memiliki draft KRS di tahun ajaran sekarang'
+                ], 400);
+            }
+
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Waktu pengisian KRS telah ditutup'
+            ], 400);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }

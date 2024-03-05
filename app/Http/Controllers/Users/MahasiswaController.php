@@ -84,30 +84,4 @@ class MahasiswaController extends Controller
             return ErrorHandler::handle($e);
         }
     }
-
-    public function getAllJenisMahasiswa() {
-        /**
-         * * Karena belum ada db yang menyimpan jenis mahasiswa
-         * * jadi di hardcode dulu
-         */
-
-        $jnsMhsArr = [
-            [
-                'jns_mhs' => 'R',
-                'keterangan' => 'Reguler',
-            ],
-            [
-                'jns_mhs' => 'K',
-                'keterangan' => 'Karyawan',
-            ],
-            [
-                'jns_mhs' => 'E',
-                'keterangan' => 'Eksekutif',
-            ],
-        ];
-
-        return $this->successfulResponseJSON([
-            'jenis_mahasiswa' => $jnsMhsArr
-        ]);
-    }
 }

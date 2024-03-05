@@ -20,35 +20,5 @@
         "semester": 8
     }
 }</code></pre>
-    <h5 class="mt-4">(DSN, DEV, ADM) Get List Jurusan Aktif</h5>
-    <hr>
-    <p>
-        Digunakan untuk melihat daftar jurusan aktif di kampus STMIK Bandung. Lakukan request ke <span class="badge bg-dark">/jurusan</span> dengan HTTP method <span class="badge bg-info">get</span>. Hasilnya:
-    </p>
-    <pre><code class="language-json bg-primary-subtle">{
-    "status": "success",
-    "data": {
-        "jurusan_aktif": [
-            {
-                "jur_id": 23,
-                "fak_id": 0,
-                "kd_jur": "12",
-                "nama_jurusan": "S1 - TEKNIK INFORMATIKA",
-                "nm_singkat": "IFS1 ",
-                "prodi": "S1",
-                "k_aktif": true
-            },
-            {
-                "jur_id": 27,
-                "fak_id": 0,
-                "kd_jur": "32",
-                "nama_jurusan": "S1 - SISTEM INFORMASI",
-                "nm_singkat": "MIS1 ",
-                "prodi": "S1",
-                "k_aktif": true
-            }
-        ]
-    }
-}</code></pre>
 </div>
 @endsection

@@ -19,7 +19,7 @@ use App\Http\Controllers\TahunAjaranController;
  * 3.) Memperbaharui status KRS mahasiswa, apakah disetujui/sah atau ditolak/kembali ke draft
  */
 
-// ? KRS Routes
+// ? KRS Routes - mahasiswa
 Route::prefix('krs')
     ->middleware(['auth.jwt', 'auth.mahasiswa'])
     ->group(function () {
@@ -41,6 +41,7 @@ Route::prefix('krs')
                 Route::get('/check', 'checkKRS');
                 Route::post('/mata-kuliah/pengajuan', 'addKRSMahasiswa');
                 Route::post('/mata-kuliah/draft', 'addDraftKRSMahasiswa');
+                Route::get('/mata-kuliah/draft', 'getDraftKRSMatkul');
             });
     });
 
