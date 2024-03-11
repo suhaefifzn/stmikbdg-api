@@ -8,120 +8,53 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 // ? Models - view
-use App\Models\KelasKuliah\KelasKuliahView;
-use App\Models\KRS\MatKulView;
+use App\Models\KelasKuliah\KelasKuliahJoinView;
 use App\Models\TahunAjaranView;
 use App\Models\KelasKuliah\JadwalView;
 use App\Models\KRS\KRS;
 use App\Models\KRS\KRSMatkul;
 
-class KelasKuliahController extends Controller
-{
+class KelasKuliahController extends Controller {
     public function getKelasKuliahByDosen(Request $request) {
+        /**
+         * Note:
+         * - Jika kelas_dibuka berarti tambah ke tabel pertemuan waktu dibukanya
+         * - Ubah kelas_dibuka menjadi true
+         * - Masukkan daftar mahasiswa yang mengambil matkul di kelas tersebut
+         *     ke tabel baru di schema kuliah
+         * - Generate pin untuk presensi
+         */
         try {
-            /**
-             * Alur sekarang:
-             * - Get all tahun ajaran aktif
-             * - Get semua matkul di kelas kuliah berdasarkan tahun ajaran aktif dan dosen id
-             * - Grouping kelas kuliah berdasarkan hari
-             * - Get detail masing-masing jadwal dan matkul untuk kelas kuliah
-             */
             $filterHari = $request->query('hari');
             $dosen = $this->getUserAuth();
-            $tempTahunAjaran = TahunAjaranView::all();
+            $allTahunAjaranAktif = TahunAjaranView::all();
 
             // get all kelas kuliah by tahun ajaran aktif and dosen id
-            $tempKelasKuliah = [];
-            foreach ($tempTahunAjaran as $index => $item) {
-                $tempKelasKuliah[$index] = KelasKuliahView::where('tahun_id', $item['tahun_id'])
-                    ->where('pengajar_id', $dosen['dosen_id'])
-                    ->orderBy('kelas_kuliah_id', 'DESC')
-                    ->get();
-            }
-
-            // buat menjadi array satu dimensi
-            $tempKelasKuliah = collect($tempKelasKuliah)->flatten()->toArray();
-
-            // grouping kelas kuliah berdasarkan hari
             $kelasKuliah = [];
-            $urutanHari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jum\'at', 'Sabtu', 'Minggu'];
-            foreach ($tempKelasKuliah as $item) {
-                // bersihin white space di tiap sisi nm_dosen
-                $item['nm_dosen'] = trim($item['nm_dosen']);
 
-                // detail matkul
-                $matkul = MatKulView::where('mk_id', $item['mk_id'])
-                    ->select('kd_mk', 'nm_mk', 'semester', 'nm_jurusan', 'kd_kur')
-                    ->first();
-
-                // tambahin ke item dan bersihin white space di tiap sisi
-                $item['detail_matkul'] = [
-                    'kd_mk' => trim($matkul['kd_mk']),
-                    'nm_mk' => trim($matkul['nm_mk']),
-                    'nm_jurusan' => trim($matkul['nm_jurusan']),
-                    'kd_kur' => trim($matkul['kd_kur']),
-                ];
-
-                // detail jadwal
-                $jadwal = JadwalView::where('kelas_kuliah_id', $item['kelas_kuliah_id'])
-                    ->select('tanggal', 'jns_pert', 'jam', 'kd_ruang', 'n_akhir', 'kjoin_kelas')
-                    ->first();
-                $item['detail_jadwal'] = $jadwal;
-
-                // bersihin white space di tiap sisi
-                if ($item['detail_jadwal']) {
-                    $item['detail_jadwal']['kd_ruang'] = trim($jadwal['kd_ruang']);
-                }
-
-                if ($item['jadwal_kuliah1'] || $item['detail_jadwal']) {
-                    // ambil nama hari
-                    $namaHari = '';
-                    if ($item['detail_jadwal']['tanggal']) {
-                        $carbonDate = Carbon::parse($item['detail_jadwal']['tanggal']);
-                        $carbonDate->setLocale('id');
-
-                        if ($carbonDate->dayName === 'Jumat') {
-                            $namaHari = 'Jum\'at';
-                        } else {
-                            $namaHari = $carbonDate->dayName;
-                        }
-                    } else {
-                        $namaHari = explode(',', $item['jadwal_kuliah1'])[0];
-                    }
-
-                    // grouping by nama hari
-                    $kelasKuliah[array_search($namaHari, $urutanHari)][] = $item;
-                } else {
-                    // belum ada jadwal
-                    $kelasKuliah['Unknown'][] = $item;
-                }
+            foreach ($allTahunAjaranAktif as $index => $item) {
+                $kelasKuliah[$index] = KelasKuliahJoinView::getKelasKuliahByDosen($item['tahun_id'], $dosen['dosen_id']);
             }
 
-            // urutkan hasil grouping
-            ksort($kelasKuliah);
+            // buang array kosong
+            $kelasKuliah = collect($kelasKuliah)->flatten();
 
-            // ganti nomor urutan dengan nama hari
             foreach ($kelasKuliah as $index => $item) {
-                if ($index !== 'Unknown') {
-                    $orderedKelasKuliah[$urutanHari[$index]] = $item;
-                } else {
-                    $orderedKelasKuliah[$index] = $item;
-                }
+                $jadwal = JadwalView::getJadwalKelasKuliah($item['kelas_kuliah_id'], $dosen['dosen_id'], true);
+                $kelasKuliah[$index] = self::setKelasKuliahAndJadwalProperties($item, $jadwal);
             }
+
+            // urutkan berdasarkan nama hari, Senin, Selasa, ... Minggu, Unknown
+            $orderedKelasKuliahByNamaHari = self::orderingKelasKuliahByNamaHari($kelasKuliah);
 
             // terdapat query 'hari'
             if ($filterHari) {
-                $ucHari = ucfirst(strtolower($filterHari));
-
-                return $this->successfulResponseJSON([
-                    'kelas_kuliah' => [
-                        $ucHari => $orderedKelasKuliah[$ucHari] ?? [],
-                    ]
-                ]);
+                    return self::filterKelasKuliahByHari($orderedKelasKuliahByNamaHari, $filterHari);
             }
 
+            // semua jadwal
             return $this->successfulResponseJSON([
-                'kelas_kuliah' => $orderedKelasKuliah,
+                'kelas_kuliah' => $orderedKelasKuliahByNamaHari
             ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
@@ -130,125 +63,122 @@ class KelasKuliahController extends Controller
 
     public function getKelasKuliahByMahasiswa(Request $request) {
         /**
-         * Alur sekarang:
-         * - Get kelas kuliah berdasarkan tahun ajaran aktif dan krs mk yang telah disetujui.
-         * - Get detail matakuliah dan jadwal.
-         * - Grouping berdasarkan hari di nilai jadwal_kuliah1, jika kjoin_true maka grouping
-         * berdasarkan nilai hari dari tanggal yang ada di detail_jadwal.
+         * Note:
+         * - Jika kelas_dibuka true, maka mahasiswa dapat mengirim pin presensi
          */
         try {
+            $filterHari = $request->query('hari');
             $mahasiswa = $this->getUserAuth();
             $tahunAjaranAktif = TahunAjaranView::getTahunAjaran($mahasiswa);
-            $currentKRS = KRS::where('tahun_id', $tahunAjaranAktif['tahun_id'])
+            $lastKRS = KRS::where('tahun_id', $tahunAjaranAktif['tahun_id'])
                 ->where('mhs_id', $mahasiswa['mhs_id'])
                 ->first();
 
-            if ($currentKRS) {
-                if ($currentKRS['sts_krs'] === 'S') {
-                    $krsMatkul = KRSMatkul::where('krs_id', $currentKRS['krs_id'])->get();
+            if ($lastKRS) {
+                if ($lastKRS['sts_krs'] === 'S') {
+                    $krsMatkul = KRSMatkul::getKRSMatkulWithKelasKuliah($lastKRS['krs_id'])->toArray();
+                    $kelasKuliah = array_map(function ($item) {
+                        return $item['kelas_kuliah_join'];
+                    }, $krsMatkul);
 
-                    // get jadwal kelas kuliah
-                    $tempKelasKuliah = [];
-                    foreach ($krsMatkul as $mk) {
-                        if ($mk['kelas_kuliah_id']) {
-                            $tempKelasKuliah[] = KelasKuliahView::where(
-                                    'kelas_kuliah_id', $mk['kelas_kuliah_id']
-                                )->first();
-                        }
-                    }
-
-                    // buat menjadi array satu dimensi
-                    $tempKelasKuliah = collect($tempKelasKuliah)->flatten()->toArray();
-
-                    // grouping kelas kuliah berdasarkan hari
-                    $kelasKuliah = [];
-                    $urutanHari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jum\'at', 'Sabtu', 'Minggu'];
-
-                    foreach ($tempKelasKuliah as $item) {
-                        // bersihin white space di tiap sisi nm_dosen
-                        $item['nm_dosen'] = trim($item['nm_dosen']);
-
-                        // detail matkul
-                        $matkul = MatKulView::where('mk_id', $item['mk_id'])
-                            ->select('kd_mk', 'nm_mk', 'semester', 'nm_jurusan', 'kd_kur')
-                            ->first();
-
-                        // tambahin ke item dan bersihin white space di tiap sisi
-                        $item['detail_matkul'] = [
-                            'kd_mk' => trim($matkul['kd_mk']),
-                            'nm_mk' => trim($matkul['nm_mk']),
-                            'nm_jurusan' => trim($matkul['nm_jurusan']),
-                            'kd_kur' => trim($matkul['kd_kur']),
-                        ];
-
-                        // detail jadwal
-                        $jadwal = JadwalView::where('kelas_kuliah_id', $item['kelas_kuliah_id'])
-                            ->where('mhs_id', $mahasiswa['mhs_id'])
-                            ->select(
-                                'tanggal', 'jns_pert', 'jam', 'kd_ruang', 'n_akhir', 'kjoin_kelas'
-                            )->first();
-
-                        $item['detail_jadwal'] = $jadwal;
-
-                        // bersihin white space di tiap sisi
-                        if ($item['detail_jadwal']) {
-                            $item['detail_jadwal']['kd_ruang'] = trim($jadwal['kd_ruang']);
-                        }
-
-                        if ($item['jadwal_kuliah1'] || $item['detail_jadwal']) {
-                            // ambil nama hari
-                            $namaHari = '';
-                            if ($item['detail_jadwal']['tanggal']) {
-                                $carbonDate = Carbon::parse($item['detail_jadwal']['tanggal']);
-                                $carbonDate->setLocale('id');
-
-                                if ($carbonDate->dayName === 'Jumat') {
-                                    $namaHari = 'Jum\'at';
-                                } else {
-                                    $namaHari = $carbonDate->dayName;
-                                }
-                            } else {
-                                $namaHari = explode(',', $item['jadwal_kuliah1'])[0];
-                            }
-
-                            // grouping by nama hari
-                            $kelasKuliah[array_search($namaHari, $urutanHari)][] = $item;
-                        } else {
-                            // belum ada jadwal
-                            $kelasKuliah['Unknown'][] = $item;
-                        }
-                    }
-
-                    // urutkan hasil grouping
-                    ksort($kelasKuliah);
-
-                    // ganti nomor urutan dengan nama hari
                     foreach ($kelasKuliah as $index => $item) {
-                        if ($index !== 'Unknown') {
-                            $orderedKelasKuliah[$urutanHari[$index]] = $item;
-                        } else {
-                            $orderedKelasKuliah[$index] = $item;
-                        }
+                        $jadwal = JadwalView::getJadwalKelasKuliah($item['kelas_kuliah_id'], $mahasiswa['mhs_id'], false);
+                        $kelasKuliah[$index] = self::setKelasKuliahAndJadwalProperties($item, $jadwal);
                     }
 
+                    // urutkan berdasarkan nama hari, Senin, Selasa, ... Minggu, Unknown
+                    $orderedKelasKuliahByNamaHari = self::orderingKelasKuliahByNamaHari($kelasKuliah);
+
+                    // terdapat query 'hari'
+                    if ($filterHari) {
+                        return self::filterKelasKuliahByHari($orderedKelasKuliahByNamaHari, $filterHari);
+                    }
+
+                    // semua jadwal
                     return $this->successfulResponseJSON([
-                        'kelas_kuliah' => $orderedKelasKuliah,
+                        'kelas_kuliah' => $orderedKelasKuliahByNamaHari
                     ]);
                 }
-
-                // KRS ditolak atau masih pengajuan
-                return response()->json([
-                    'status' => 'fail',
-                    'message' => 'Masih dalam proses pengajuan KRS'
-                ], 400);
             }
 
-            return response()->json([
-                'status' => 'fail',
-                'message' => 'Belum melakukan pengajuan KRS di tahun ajaran sekarang'
-            ], 400);
+            return $this->successfulResponseJSON([
+                'kelas_kuliah' => null
+            ], null, 204);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
+    }
+
+    private function filterKelasKuliahByHari($kelasKuliah, $hari) {
+        $ucHari = ucfirst(strtolower($hari));
+
+        return $this->successfulResponseJSON([
+            'kelas_kuliah' => [
+                $ucHari => $kelasKuliah[$ucHari] ?? [],
+            ]
+        ]);
+    }
+
+    private function setKelasKuliahAndJadwalProperties($objKelasKuliah, $objJadwal) {
+        if ($objKelasKuliah['join_jur']) {
+            $objKelasKuliah['join_jur'] = trim($objKelasKuliah['join_jur']);
+        }
+
+        $objKelasKuliah['jadwal'] = $objJadwal->exists() ? $objJadwal : null;
+
+        if ($objJadwal->exists()) {
+            // format ke waktu lokal
+            $carbonDate = Carbon::parse($objJadwal['tanggal']);
+            $carbonDate->setLocale('id');
+
+            $objKelasKuliah['jadwal']['kd_ruang'] = trim($objJadwal['kd_ruang']);
+            $objKelasKuliah['jadwal']['nm_hari'] = $carbonDate->dayName;
+            $objKelasKuliah['jadwal']['tanggal_lokal'] = $carbonDate->isoFormat('D MMMM Y');
+        }
+
+        $objKelasKuliah['dosen'] = self::trimNamaDanGelarDosen($objKelasKuliah['dosen']);
+
+        /**
+         * Untuk buka presensi, sementara dulu karena belum ada db
+         */
+        $objKelasKuliah['kelas_dibuka'] = false;
+
+        return $objKelasKuliah;
+    }
+
+    private function orderingKelasKuliahByNamaHari($kelasKuliah) {
+        $urutanHari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu', 'Unknown'];
+        $orderedKelasKuliahByNamaHari = [];
+
+        // return $kelasKuliah[0]['jadwal'];
+
+        $groupedKelasKuliahByHari = collect($kelasKuliah)->groupBy(function ($item) {
+            return $item['jadwal'] ? $item['jadwal']['nm_hari'] : 'Unknown';
+        })->toArray();
+
+        foreach ($groupedKelasKuliahByHari as $index => $item) {
+            $orderedKelasKuliahByNamaHari[array_search($index, $urutanHari)] = $item;
+        }
+
+        ksort($orderedKelasKuliahByNamaHari);
+
+        // ganti nomor urutan dengan nama hari
+        $finalOrderedKelasKuliah = [];
+        foreach ($orderedKelasKuliahByNamaHari as $index => $item) {
+            $finalOrderedKelasKuliah[$urutanHari[$index]] = $item;
+        }
+
+        return $finalOrderedKelasKuliah;
+    }
+
+    private function trimNamaDanGelarDosen($objDosen) {
+        if ($objDosen) {
+            $objDosen['nm_dosen'] = trim($objDosen['nm_dosen']);
+            $objDosen['gelar'] = trim($objDosen['gelar']);
+
+            return $objDosen;
+        }
+
+        return null;
     }
 }

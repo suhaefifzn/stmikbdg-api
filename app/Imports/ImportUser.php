@@ -55,7 +55,14 @@ class ImportUser implements ToModel, WithHeadingRow, WithValidation
         $tempKdUser = $isDosen ? 'DSN-' . $kdUser : 'MHS-' . $kdUser;
 
         if ($isAdmin and !$isDosen) {
+            // jika admin saja
             $tempKdUser = 'ADM-' . $kdUser;
+        } else {
+            // jika admin dan dosen true, maka jadikan sebagai dosen
+            // selain itu maka ia mahasiswa
+            $tempKdUser = $isDosen
+                ? 'DSN-' . $kdUser
+                : 'MHS-' . $kdUser;
         }
 
         return $tempKdUser;

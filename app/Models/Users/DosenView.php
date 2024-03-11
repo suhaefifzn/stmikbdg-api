@@ -2,6 +2,7 @@
 
 namespace App\Models\Users;
 
+use App\Models\KelasKuliah\KelasKuliahJoinView;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -31,5 +32,9 @@ class DosenView extends Model
             ->select('dosen_id', 'nm_dosen', 'kd_dosen', 'gelar')
             ->orderBy('dosen_id', 'DESC')
             ->get();
+    }
+
+    public function kelasKuliahJoin() {
+        return $this->hasMany(KelasKuliahJoinView::class, 'pengajar_id', 'dosen_id');
     }
 }

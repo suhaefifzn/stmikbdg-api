@@ -18,109 +18,136 @@
             "Selasa": [
                 {
                     "kelas_kuliah_id": 3294,
-                    "kd_kampus": "A",
                     "tahun_id": 348,
                     "jur_id": 23,
                     "mk_id": 137,
-                    "kelas_kuliah": "A",
-                    "semester": 2,
-                    "jml_sks": 2,
-                    "jns_mhs": "R",
-                    "pengajar_id": 562,
-                    "jadwal_kuliah1": "Selasa, 09:30-11:10",
-                    "jadwal_kuliah2": null,
-                    "jadwal_uts": null,
-                    "jadwal_uas": null,
-                    "nm_dosen": "Dani Pradana Kartaputra, S.Si., M.T",
-                    "sts_kelas": "B",
-                    "kjoin_kelas": true,
                     "join_kelas_kuliah_id": 3268,
-                    "detail_matkul": {
+                    "kjoin_kelas": true,
+                    "kelas_kuliah": "A",
+                    "jns_mhs": "R",
+                    "sts_kelas": "B",
+                    "pengajar_id": 562,
+                    "join_jur": "MIS1",
+                    "dosen": {
+                        "dosen_id": 562,
+                        "kd_dosen": "IF043",
+                        "nm_dosen": "Dani Pradana Kartaputra, S.Si., M.T",
+                        "gelar": ", S.Si., M.T"
+                    },
+                    "matakuliah": {
+                        "mk_id": 137,
+                        "kur_id": 83,
                         "kd_mk": "KU1813",
-                        "nm_mk": "KU1813",
-                        "nm_jurusan": "TEKNIK INFORMATIKA",
+                        "nm_mk": "HAKI &Etika Profesi",
+                        "semester": 8,
+                        "sks": 2,
+                        "sts_mk": "A",
+                        "smt": 2,
                         "kd_kur": "IFS120"
                     },
-                    "detail_jadwal": {
-                        "tanggal": "2024-02-27",
+                    "jadwal": {
+                        "kelas_kuliah_id": 3294,
+                        "mk_id": 137,
+                        "mhs_id": 15534,
+                        "dosen_id": 562,
+                        "tanggal": "2024-03-12",
                         "jns_pert": "T1",
                         "jam": "09:30-11:10",
                         "kd_ruang": "31",
-                        "n_akhir": null,
-                        "kjoin_kelas": true
-                    }
+                        "nm_hari": "Selasa",
+                        "tanggal_lokal": "12 Maret 2024"
+                    },
+                    "kelas_dibuka": false
                 }
             ],
-            "Jum'at": [
+            "Jumat": [
                 {
                     "kelas_kuliah_id": 3293,
-                    "kd_kampus": "A",
                     "tahun_id": 348,
                     "jur_id": 23,
                     "mk_id": 145,
-                    "kelas_kuliah": "A",
-                    "semester": 2,
-                    "jml_sks": 3,
-                    "jns_mhs": "R",
-                    "pengajar_id": 708,
-                    "jadwal_kuliah1": "Jum'at, 13:40-16:10",
-                    "jadwal_kuliah2": null,
-                    "jadwal_uts": null,
-                    "jadwal_uas": null,
-                    "nm_dosen": "M. RIZKI PRATAMA. S, S.Kom",
-                    "sts_kelas": "B",
-                    "kjoin_kelas": false,
                     "join_kelas_kuliah_id": null,
-                    "detail_matkul": {
+                    "kjoin_kelas": false,
+                    "kelas_kuliah": "A",
+                    "jns_mhs": "R",
+                    "sts_kelas": "B",
+                    "pengajar_id": 708,
+                    "join_jur": null,
+                    "dosen": {
+                        "dosen_id": 708,
+                        "kd_dosen": "RP   ",
+                        "nm_dosen": "M. RIZKI PRATAMA. S, S.Kom",
+                        "gelar": "S.Kom"
+                    },
+                    "matakuliah": {
+                        "mk_id": 145,
+                        "kur_id": 83,
                         "kd_mk": "IF1002",
-                        "nm_mk": "IF1002",
-                        "nm_jurusan": "TEKNIK INFORMATIKA",
+                        "nm_mk": "Cloud Computing",
+                        "semester": 7,
+                        "sks": 3,
+                        "sts_mk": "A",
+                        "smt": 1,
                         "kd_kur": "IFS120"
                     },
-                    "detail_jadwal": {
-                        "tanggal": "2024-03-01",
+                    "jadwal": {
+                        "kelas_kuliah_id": 3293,
+                        "mk_id": 145,
+                        "mhs_id": 15534,
+                        "dosen_id": 708,
+                        "tanggal": "2024-03-15",
                         "jns_pert": "T1",
                         "jam": "13:40-16:10",
                         "kd_ruang": "11",
-                        "n_akhir": null,
-                        "kjoin_kelas": false
-                    }
+                        "nm_hari": "Jumat",
+                        "tanggal_lokal": "15 Maret 2024"
+                    },
+                    "kelas_dibuka": false
                 }
             ],
             "Unknown": [
                 {
                     "kelas_kuliah_id": 3295,
-                    "kd_kampus": "A",
                     "tahun_id": 348,
                     "jur_id": 23,
                     "mk_id": 136,
-                    "kelas_kuliah": "A",
-                    "semester": 2,
-                    "jml_sks": 6,
-                    "jns_mhs": "R",
-                    "pengajar_id": null,
-                    "jadwal_kuliah1": null,
-                    "jadwal_kuliah2": null,
-                    "jadwal_uts": null,
-                    "jadwal_uas": null,
-                    "nm_dosen": "",
-                    "sts_kelas": "B",
-                    "kjoin_kelas": false,
                     "join_kelas_kuliah_id": null,
-                    "detail_matkul": {
+                    "kjoin_kelas": false,
+                    "kelas_kuliah": "A",
+                    "jns_mhs": "R",
+                    "sts_kelas": "B",
+                    "pengajar_id": null,
+                    "join_jur": null,
+                    "dosen": null,
+                    "matakuliah": {
+                        "mk_id": 136,
+                        "kur_id": 83,
                         "kd_mk": "IF1800",
-                        "nm_mk": "IF1800",
-                        "nm_jurusan": "TEKNIK INFORMATIKA",
+                        "nm_mk": "Skripsi",
+                        "semester": 8,
+                        "sks": 6,
+                        "sts_mk": "A",
+                        "smt": 2,
                         "kd_kur": "IFS120"
                     },
-                    "detail_jadwal": null
+                    "jadwal": null,
+                    "kelas_dibuka": false
                 }
             ]
         }
     }
 }</code></pre>
     <p>
-        Properti <b>Unknown</b> menandakan bahwa kelas kuliah yang ada di dalamnya belum memiliki jadwal, hal tersebut dapat dilihat juga pada nilai <b>detail_jadwal</b> yang masih berisi <b>null</b>.
+        Properti <b>Unknown</b> menandakan bahwa kelas kuliah yang ada di dalamnya belum memiliki jadwal, hal tersebut dapat dilihat juga pada nilai <b>jadwal</b> yang masih berisi <b>null</b>.
+    </p>
+    <p>
+        Apabila ingin menampilkan nilai <b>kd_kur</b> atau kode kurikulum maka perhatikan juga nilai <b>kjoin_kelas</b>, jika <b>kjoin_kelas</b> bernilai true maka gunakanlah nilai <b>join_jur</b>. Jika false gunakan nilai <b>kd_kur</b>.
+    </p>
+    <p>
+        Untuk mempermudah hasil response, Anda dapat memfilter jadwal berdasarkan hari tertentu saja. Tambahkan query parameter <span class="badge bg-secondary">hari</span> dan isi dengan nama hari dalam bahasa Indonesia. Misalnya ingin mendapatkan jadwal kelas kuliah di hari Selasa saja, maka kirim request ke <span class="badge bg-dark">/kelas-kuliah/mahasiswa?hari=selasa</span>. Maka response akan menampilkan jadwal kuliah di hari Selasa saja.
+    </p>
+    <p>
+        Nilai <b>kelas_dibuka</b> digunakan untuk mengetahui apakah kelas tersebut sedang dibuka atau sedang berlangsung, apabila nilai ini true maka mahasiswa dapat mengirim PIN kehadiran yang diperoleh dari dosen setelah membuka kelas.
     </p>
 </div>
 @endsection

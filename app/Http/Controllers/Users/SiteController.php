@@ -104,6 +104,14 @@ class SiteController extends Controller
             ]);
 
             $validatedURL = filter_var($request->url, FILTER_VALIDATE_URL);
+            $urlExists = Site::where('url', 'like', '%'  . $validatedURL . '%')->first();
+
+            if ($urlExists) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'URL sudah ada'
+                ], 400);
+            }
 
             Site::insert([
                 'url' => $validatedURL

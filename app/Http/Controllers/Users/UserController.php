@@ -21,10 +21,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ImportUser;
 use App\Exceptions\ExcelImportException;
 
-class UserController extends Controller
-{
-    public function addNewUser(Request $request)
-    {
+class UserController extends Controller {
+    public function addNewUser(Request $request) {
         try {
             if ($request->query('import')) {
                 if ($request->query('import') === 'excel') {
@@ -53,9 +51,22 @@ class UserController extends Controller
                 'is_prodi' => 'nullable|boolean',
             ]);
 
-            $tempKdUser = $validatedData['is_dosen']
-                ? 'DSN-' . $validatedData['kd_user']
-                : 'MHS-' . $validatedData['kd_user'];
+             if ($validatedData['is_admin'] and $validatedData['is_mhs']) {
+                // jika admin dan mhs true
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Maaf, akun mahasiswa tidak bisa menjadi Admin'
+                ], 400);
+            } else if ($validatedData['is_admin'] and !$validatedData['is_dosen']) {
+                // jika admin saja
+                $tempKdUser = 'ADM-' . $validatedData['kd_user'];
+            } else {
+                // jika admin dan dosen true, maka jadikan sebagai dosen
+                // selain itu maka ia mahasiswa
+                $tempKdUser = $validatedData['is_dosen']
+                    ? 'DSN-' . $validatedData['kd_user']
+                    : 'MHS-' . $validatedData['kd_user'];
+            }
 
             $hashPassword = Hash::make($validatedData['password']);
             $validatedData['kd_user'] = $tempKdUser;
@@ -69,11 +80,6 @@ class UserController extends Controller
             $validatedData['is_doswal'] = $request->is_doswal ?? false;
             $validatedData['is_prodi'] = $request->is_prodi ?? false;
             $validatedData['image'] = 'college_student.png';
-
-            // KD User untuk role admin saja
-            if ($validatedData['is_admin'] and !$validatedData['is_dosen']) {
-                $tempKdUser = 'ADM-' . $validatedData['kd_user'];
-            }
 
             // validate kd_user lagi
             Validator::make(['kd_user' => $tempKdUser], [

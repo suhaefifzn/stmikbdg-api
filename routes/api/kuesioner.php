@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Kuesioner\KuesionerController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Users\DosenController;
 use App\Http\Controllers\Kuesioner\MatkulDiampuController;
@@ -18,4 +19,11 @@ Route::prefix('/kuesioner')
         Route::get('/dosen-aktif/{id}/matkul-diampu', [
             MatkulDiampuController::class, 'getMatkulByDosenIdInKelasKuliah'
         ])->middleware('auth.mahasiswa');
+
+        // untuk mahasiswa
+        Route::prefix('/mahasiswa')
+            ->middleware('auth.mahasiswa')
+            ->group(function () {
+                Route::get('/mata-kuliah', [KuesionerController::class, 'getMatkulByLastKRSMahasiswa']);
+            });
     });

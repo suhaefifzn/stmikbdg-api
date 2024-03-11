@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 // ? Models -  View
 use App\Models\KRS\NilaiAkhirView;
+use App\Models\KelasKuliah\KelasKuliahJoinView;
 
 class MatKulView extends Model
 {
@@ -50,5 +51,9 @@ class MatKulView extends Model
      */
     public function nilaiAkhir() {
         return $this->hasMany(NilaiAkhirView::class, 'mk_id', 'mk_id');
+    }
+
+    public function kelasKuliahJoin() {
+        return $this->hasMany(KelasKuliahJoinView::class, 'mk_id', 'mk_id');
     }
 }
