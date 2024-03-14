@@ -21,6 +21,7 @@ class Presensi extends Model
     protected $table = 'kuliah.presensi';
     protected $guarded = ['presensi_id'];
 
+    public $primaryKey = 'presensi_id';
     public $timestamps = false;
 
     public function __construct() {
