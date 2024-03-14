@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 // ? Models - Table
 use App\Models\Users\User;
+use App\Models\Users\Site;
 
 // ? Models - View
 use App\Models\Users\UserView;
@@ -20,6 +21,7 @@ use App\Models\Users\UserView;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ImportUser;
 use App\Exceptions\ExcelImportException;
+use App\Models\Users\UserSite;
 
 class UserController extends Controller {
     public function addNewUser(Request $request) {
@@ -273,6 +275,32 @@ class UserController extends Controller {
                         . $fileName,
                 ],
             ], 200);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function deleteUserById($userId) {
+        try {
+            $user = UserView::where('id', $userId)->first();
+
+            if ($user) {
+                /**
+                 * Menghapus user maka akan menghapus seluruh akses ke web jua
+                 */
+                UserSite::where('user_id', $userId)->delete();
+                User::where('id', $userId)->delete();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'User dengan email ' . $user['email'] . ' berhasil dihapus'
+                ], 200);
+            }
+
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'User dengan id ' . $userId . ' tidak ditemukan'
+            ], 400);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }

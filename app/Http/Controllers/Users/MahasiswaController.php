@@ -71,14 +71,14 @@ class MahasiswaController extends Controller
                 $mahasiswa = Mahasiswa::getMahasiswaByFilter($filter);
 
                 return $this->successfulResponseJSON([
-                    'mahasiswa' => $mahasiswa
+                    'list_skripsi' => $mahasiswa
                 ]);
             }
 
             $mahasiswa = Mahasiswa::all();
 
             return $this->successfulResponseJSON([
-                'mahasiswa' => $mahasiswa
+                'list_skripsi' => $mahasiswa
             ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);

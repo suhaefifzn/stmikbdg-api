@@ -5,6 +5,9 @@ namespace App\Models\KelasKuliah;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+// ? Models - view
+use App\Models\Users\MahasiswaView;
+
 class JadwalView extends Model
 {
     /**
@@ -31,5 +34,23 @@ class JadwalView extends Model
             ->where('mhs_id', $userId)
             ->select('kelas_kuliah_id', 'mk_id', 'mhs_id', 'dosen_id', 'tanggal', 'jns_pert', 'jam', 'kd_ruang')
             ->first();
+    }
+
+    public function scopeGetTanggalDanJenisPertemuan(Builder $query, $kelasKuliahId) {
+        return $query->where('kelas_kuliah_id', $kelasKuliahId)
+            ->select('tanggal', 'jam', 'jns_pert')
+            ->first();
+    }
+
+    public function scopeGetJadwalWithMahasiswa(Builder $query, $kelasKuliahId) {
+        return $query->where('kelas_kuliah_id', $kelasKuliahId)
+            ->select('kelas_kuliah_id', 'mhs_id')
+            ->with(['mahasiswa' => function ($query) {
+                $query->select('mhs_id', 'nim', 'nm_mhs');
+            }])->get();
+    }
+
+    public function mahasiswa() {
+        return $this->belongsTo(MahasiswaView::class, 'mhs_id', 'mhs_id');
     }
 }

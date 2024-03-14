@@ -11,6 +11,9 @@ use Carbon\Carbon;
 use App\Models\KelasKuliah\KelasKuliahJoinView;
 use App\Models\TahunAjaranView;
 use App\Models\KelasKuliah\JadwalView;
+
+// ? Models - table
+use App\Models\KelasKuliah\Pertemuan;
 use App\Models\KRS\KRS;
 use App\Models\KRS\KRSMatkul;
 
@@ -36,11 +39,19 @@ class KelasKuliahController extends Controller {
                 $kelasKuliah[$index] = KelasKuliahJoinView::getKelasKuliahByDosen($item['tahun_id'], $dosen['dosen_id']);
             }
 
-            // buang array kosong
             $kelasKuliah = collect($kelasKuliah)->flatten();
 
+            // cek jika ada kelas yang dijoin
+            $kelasKuliah = self::getParentJoinKelasIdArr($kelasKuliah);
+
+            // get setiap jadwal
             foreach ($kelasKuliah as $index => $item) {
-                $jadwal = JadwalView::getJadwalKelasKuliah($item['kelas_kuliah_id'], $dosen['dosen_id'], true);
+                if ($item['kjoin_kelas']) {
+                    $jadwal = JadwalView::getJadwalKelasKuliah($item['join_kelas_kuliah_id'], $dosen['dosen_id'], true);
+                } else {
+                    $jadwal = JadwalView::getJadwalKelasKuliah($item['kelas_kuliah_id'], $dosen['dosen_id'], true);
+                }
+
                 $kelasKuliah[$index] = self::setKelasKuliahAndJadwalProperties($item, $jadwal);
             }
 
@@ -109,6 +120,20 @@ class KelasKuliahController extends Controller {
         }
     }
 
+    private function getParentJoinKelasIdArr($kelasKuliah) {
+        $parentJoinKelasKuliahIdArr = array_values($kelasKuliah->pluck('join_kelas_kuliah_id')->filter()->toArray());
+
+        if (count($parentJoinKelasKuliahIdArr) > 0) {
+            $kelasKuliah = array_values(array_filter($kelasKuliah->toArray(), function ($item) use ($parentJoinKelasKuliahIdArr) {
+                return !in_array($item['kelas_kuliah_id'], $parentJoinKelasKuliahIdArr);
+            }));
+
+            return $kelasKuliah;
+        }
+
+        return $kelasKuliah;
+    }
+
     private function filterKelasKuliahByHari($kelasKuliah, $hari) {
         $ucHari = ucfirst(strtolower($hari));
 
@@ -141,7 +166,7 @@ class KelasKuliahController extends Controller {
         /**
          * Untuk buka presensi, sementara dulu karena belum ada db
          */
-        $objKelasKuliah['kelas_dibuka'] = false;
+        $objKelasKuliah['kelas_dibuka'] = self::setKelasDibuka($objKelasKuliah);
 
         return $objKelasKuliah;
     }
@@ -180,5 +205,17 @@ class KelasKuliahController extends Controller {
         }
 
         return null;
+    }
+
+    private function setKelasDibuka($objKelasKuliah) {
+        if ($objKelasKuliah['jadwal']) {
+            $pertemuan = Pertemuan::getKelasDibuka($objKelasKuliah);
+
+            if ($pertemuan->exists()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

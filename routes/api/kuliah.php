@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Kuliah\KelasKuliahController;
+use App\Http\Controllers\Kuliah\PertemuanController;
+use App\Http\Controllers\Kuliah\PresensiController;
 
 /**
  * Route yang ada di sini digunakan untuk mengelola kelas kuliah, meliputi:
@@ -20,8 +22,21 @@ Route::controller(KelasKuliahController::class)
     ->middleware('auth.jwt')
     ->group(function () {
         // * Routes untuk Dosen
-        Route::get('/dosen', 'getKelasKuliahByDosen')->middleware('auth.dosen');
+        Route::prefix('/dosen')
+            ->middleware('auth.dosen')
+            ->group(function () {
+                Route::get('/', 'getKelasKuliahByDosen');
+                Route::get('/open/{kelas_kuliah_id}', [PertemuanController::class, 'bukaKelasKuliah']);
+                Route::get('/close/{kelas_kuliah_id}', [PertemuanController::class, 'tutupKelasKuliah']);
+                Route::get('/open/{kelas_kuliah_id}/presensi', [PresensiController::class, 'getKehadiranMahasiswaByDosen']);
+            });
 
         // * Routes untuk Mahasiswa
-        Route::get('/mahasiswa', 'getKelasKuliahByMahasiswa')->middleware('auth.mahasiswa');
+        Route::prefix('/mahasiswa')
+            ->middleware('auth.mahasiswa')
+            ->group(function () {
+                Route::get('/', 'getKelasKuliahByMahasiswa')->middleware('auth.mahasiswa');
+                Route::post('/presensi', [PresensiController::class, 'kirimPinPresensi']);
+                Route::get('/presensi/qrcode', [PresensiController::class, 'kirimPinPresensiQrCode']);
+            });
     });

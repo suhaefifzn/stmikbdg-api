@@ -216,7 +216,7 @@ class MatKulController extends Controller
                     ? number_format($averageNilaiAkhir, 2, '.', '')
                     : null;
 
-                $tempMatkul[$index]['ipk'] = (float) number_format($ipk, 1);
+                $tempMatkul[$index]['ipk'] = (float) number_format($ipk, 2);
                 $tempMatkul[$index]['ipk_dari_total_sks'] = $totalSksDipilihDisemester;
 
                 // hitung sks dan ipk menyeluruh
@@ -244,7 +244,7 @@ class MatKulController extends Controller
         // set response paling atas
         if (!$filter['semester']) {
             $response['total_semua_ipk'] = (float) number_format(
-                (float) ($totalSemuaIPK / $countIPKPerSemester), 1, '.'. ''
+                (float) ($totalSemuaIPK / $countIPKPerSemester), 2, '.'. ''
             );
             $response['total_semua_sks_dipilih'] = $totalSemuaSKS;
             $response['total_semua_nilai_A'] = $totalSemuaNilaiA;

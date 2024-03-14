@@ -22,4 +22,5 @@ Route::controller(UserController::class)
         // * route untuk admin
         Route::get('/', 'getUserList')->middleware('auth.admin');
         Route::post('/', 'addNewUser'); // buat awalan tambahin withoutMiddleware('auth.jwt')
+        Route::delete('/{id}', 'deleteUserById')->middleware('auth.admin');
     });

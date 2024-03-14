@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 //? Models - view
 use App\Models\JurusanView;
+use App\Models\KelasKuliah\JadwalView;
 
 class MahasiswaView extends Model
 {
@@ -14,10 +15,7 @@ class MahasiswaView extends Model
      * Model ini digunakan untuk view mahasiswa
      * hanya digunakan untuk get data (SELECT).
      *
-     * Koneksi database terhubung ke 'stmikbdg_dummy' view mahasiswa.
-     *
-     * Saat ini masih menggunakan dua database berbeda sehingga
-     * belum mendukung relasi antar view mahasiswa->users.
+     * Saat ini masih menggunakan dua database berbeda
      */
     use HasFactory;
 
@@ -35,5 +33,9 @@ class MahasiswaView extends Model
         // param ke dua jur_id yang ada di vmahasiswa
         // param ke tiga jur_id yang merupakan primary key di vjurusan
         return $this->belongsTo(JurusanView::class, 'jur_id', 'jur_id');
+    }
+
+    public function jadwalKelas() {
+        return $this->hasMany(JadwalView::class, 'mhs_id', 'mhs_id');
     }
 }

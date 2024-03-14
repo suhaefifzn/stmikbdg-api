@@ -37,6 +37,13 @@ class KelasKuliahJoinView extends Model
             ->get();
     }
 
+    public function scopeGetJoinJurusanData(Builder $query, $kelasKuliahId) {
+        return $query->where('kelas_kuliah_id', $kelasKuliahId)
+            ->select(
+                'kelas_kuliah_id', 'kjoin_kelas', 'join_jur', 'join_kelas_kuliah_id', 'pengajar_id'
+            )->first();
+    }
+
     public function krsMatkul() {
         return $this->hasMany(KRSMatkul::class, 'kelas_kuliah_id', 'kelas_kuliah_id');
     }

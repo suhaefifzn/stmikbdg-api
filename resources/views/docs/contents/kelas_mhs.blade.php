@@ -141,13 +141,34 @@
         Properti <b>Unknown</b> menandakan bahwa kelas kuliah yang ada di dalamnya belum memiliki jadwal, hal tersebut dapat dilihat juga pada nilai <b>jadwal</b> yang masih berisi <b>null</b>.
     </p>
     <p>
-        Apabila ingin menampilkan nilai <b>kd_kur</b> atau kode kurikulum maka perhatikan juga nilai <b>kjoin_kelas</b>, jika <b>kjoin_kelas</b> bernilai true maka gunakanlah nilai <b>join_jur</b>. Jika false gunakan nilai <b>kd_kur</b>.
+        Jika nilai <b>kjoin_kelas</b> adalah true, maka kelas kuliah tersebut digabungkan dengan kelas kuliah lain, kelasnya dapat dilihat pada nilai <b>join_kelas_kuliah_id</b>. Mengikuti tampilan pada aplikasi yang telah ada, maka wajib menampilkan nilai <b>join_jur</b> untuk menandakan bahwa kelas kuliah tersebut digabung dengan kelas lain.
     </p>
     <p>
         Untuk mempermudah hasil response, Anda dapat memfilter jadwal berdasarkan hari tertentu saja. Tambahkan query parameter <span class="badge bg-secondary">hari</span> dan isi dengan nama hari dalam bahasa Indonesia. Misalnya ingin mendapatkan jadwal kelas kuliah di hari Selasa saja, maka kirim request ke <span class="badge bg-dark">/kelas-kuliah/mahasiswa?hari=selasa</span>. Maka response akan menampilkan jadwal kuliah di hari Selasa saja.
     </p>
     <p>
         Nilai <b>kelas_dibuka</b> digunakan untuk mengetahui apakah kelas tersebut sedang dibuka atau sedang berlangsung, apabila nilai ini true maka mahasiswa dapat mengirim PIN kehadiran yang diperoleh dari dosen setelah membuka kelas.
+    </p>
+    <h5 class="mt-4">(MHS) Rekam Presensi - Single PIN (INPUT MANUAL)</h5>
+    <hr>
+    <p>
+        Lakukan request ke <span class="badge bg-dark">/kelas-kuliah/mahasiswa/presensi</span> dengan menggunakan HTTP method <span class="badge bg-info">post</span> dan sertakan payload pada body berupa:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "kelas_kuliah_id": 3251,
+    "pin": 351670
+}</code></pre>
+    <p>
+        Setelah berhasil mengirim PIN presensi, mahasiswa tidak dapat mengirim PIN presensi kehadiran lagi dan PIN presensi hanya dapat dikirim apabila kelasnya dibuka. Jika berhasil akan memberikan response:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "message": "Kehadiran Anda berhasil direkam"
+}</code></pre>
+    <h5 class="mt-4">(MHS) Rekam Presensi - Single PIN (QR CODE)</h5>
+    <hr>
+    <p>
+        Setelah berhasil scan QR Code yang diberikan oleh dosen, lakukanlah request di belakang layar setelah nilai berupa url didapat dari hasil scanning. Kemudian API akan memberikan response dalam json yang memberikan pesan bahwa presensi mahasiswa berhasil direkam atau tidak. Silahkan lihat pada bagian (DSN) Buka Kelas Kuliah di <a href="http://stmikbdg-api.test/docs/api/kelas-dosen" class="text-decoration-none" rel="noopener">KELAS - DSN</a>.
     </p>
 </div>
 @endsection
