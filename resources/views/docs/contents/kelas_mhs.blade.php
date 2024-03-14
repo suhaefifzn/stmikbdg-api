@@ -168,7 +168,7 @@
     <h5 class="mt-4">(MHS) Rekam Presensi - Single PIN (QR CODE)</h5>
     <hr>
     <p>
-        Setelah berhasil scan QR Code yang diberikan oleh dosen, lakukanlah request di belakang layar setelah nilai berupa url didapat dari hasil scanning. Kemudian API akan memberikan response dalam json yang memberikan pesan bahwa presensi mahasiswa berhasil direkam atau tidak. Silahkan lihat pada bagian (DSN) Buka Kelas Kuliah di <a href="http://stmikbdg-api.test/docs/api/kelas-dosen" class="text-decoration-none" rel="noopener">KELAS - DSN</a>.
+        Setelah berhasil scan QR Code yang diberikan oleh dosen, lakukanlah request di belakang layar setelah nilai berupa url didapat dari hasil scanning. Kemudian API akan memberikan response dalam json yang memberikan pesan bahwa presensi mahasiswa berhasil direkam atau tidak. Silahkan lihat pada bagian (DSN) Buka Kelas Kuliah di <a href="{{ config('app.url') }}docs/api/kelas-dosen" class="text-decoration-none" rel="noopener">KELAS - DSN</a>.
     </p>
 </div>
 @endsection
