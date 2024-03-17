@@ -30,6 +30,9 @@
             "tgl_lahir": "2002-01-21",
             "masuk_semester": 0,
             "masuk_tahun": 2020,
+            "alamat": "Desa Cibiru Wetan, Kec. Cileunyi, Kab. Bandung, Jawa Barat 40625",
+            "nmr_hp": "0895-xxxx-xxxx",
+            "tgl_daftar": "2020-04-04",
             "nama": "SUHAEFI FAUZIAN"
         },
         "account": {
@@ -85,24 +88,8 @@
         Demikian juga pada sisi API, kami menggunakan setiap nilai yang ada untuk menentukan akses pengguna ke endpoint. <b>Jadi tidak semua pengguna dapat mengakses endpoint yang ada di API ini</b>.
     </p>
 
-    {{-- Ganti Email --}}
-    <h5 class="mt-4">Update Email</h5>
-    <hr>
-    <p>
-        Lakukan permintaan ke <span class="badge bg-dark">/users/me</span> dengan menggunakan HTTP method <span class="badge bg-info">put</span> dan kirimkan email baru dalam format JSON seperti berikut:
-    </p>
-    <pre><code class="language-json bg-primary-subtle">{
-    "email": "emailbaru@simak.dev"
-}</code></pre>
-    <p>
-        Email baru haruslah unik dalam artian berbeda dengan pengguna lainnya karena digunakan untuk login. Jika email yang digunakan telah terpakai maka API akan memberikan response yang menyatakan validasi email gagal dengan status code <span class="badge bg-warning">422</span>.
-    </p>
-    <div class="alert alert-warning">
-        <b>Perlu diperhatikan!</b> Kemungkinan API digunakan oleh beberapa sistem, sehingga mengganti email artinya mengganti email pengguna yang bersangkutan pada seluruh sistem yang menggunakan API ini.
-    </div>
-
     {{-- Ganti Password --}}
-    <h5 class="mt-5">Update Password</h5>
+    <h5 class="mt-4">Update Password</h5>
     <hr>
     <p>
         Lakukan permintaan ke <span class="badge bg-dark">/users/me/password</span> dengan menggunakan HTTP method <span class="badge bg-info">put</span> dan mengirim payload dengan format:

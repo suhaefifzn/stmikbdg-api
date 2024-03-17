@@ -15,7 +15,6 @@ Route::controller(UserController::class)
     ->middleware('auth.jwt')
     ->group(function () {
         Route::get('/me', 'getMyProfile');
-        Route::put('/me', 'putMyEmail');
         Route::put('/me/password', 'putMyPassword');
         Route::post('/me/image', 'addProfileImage');
 

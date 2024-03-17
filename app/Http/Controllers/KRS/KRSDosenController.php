@@ -5,11 +5,17 @@ namespace App\Http\Controllers\KRS;
 use App\Exceptions\ErrorHandler;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
 
 // ? Models - table
 use App\Models\KRS\KRS;
 use App\Models\KRS\KRSMatkul;
+use App\Models\Users\Dosen;
+
+// ? Models - view
 use App\Models\KRS\MatkulDiselenggarakanView;
+use App\Models\KRS\NilaiAkhirView;
 
 class KRSDosenController extends Controller
 {
@@ -28,7 +34,7 @@ class KRSDosenController extends Controller
             $jurusanMahasiswa = $mahasiswa->jurusan()->first();
             $krsMahasiswa = $mahasiswa->krs()->first();
             $krsMatkulDipilih = $krsMahasiswa->krsMatkul()->get();
-            $setKRSData = self::setKRSData($jurusanMahasiswa, $krsMahasiswa, $krsMatkulDipilih);
+            $setKRSData = self::setKRSData($jurusanMahasiswa, $krsMahasiswa, $krsMatkulDipilih, $mahasiswa['mhs_id']);
 
             return $this->successfulResponseJSON([
                 'mahasiswa' => [
@@ -104,80 +110,72 @@ class KRSDosenController extends Controller
 
     public function getListKRSMahasiswa(Request $request) {
         try {
-            $filter = [
-                'dosen_id' => $this->user['dosen_id'],
-            ];
             $page = $request->query('page') ?? null;
             $search = $request->query('search') ?? null;
-            $listMahasiswa = $this->user->mahasiswa()->searchMahasiswa($filter, $search, $page);
+            $tahunMasuk = $request->query('tahun_masuk') ?? null;
+            $semester = $request->query('semester') ?? null;
+            $listMahasiswa = Dosen::getListKRSMahasiswa($this->user['dosen_id'], $search, $tahunMasuk);
 
-            // jika ada nilai page pada query url
-            if ($page) {
-                $prevPageUrl = $listMahasiswa->previousPageUrl();
-                $nextPageUrl = $listMahasiswa->nextPageUrl();
-                $perPage = $listMahasiswa->perPage();
-                $totalPages = $listMahasiswa->lastPage();
-                $totalItems = $listMahasiswa->total();
+            // jika ada filter semester pada query params
+            if ($semester) {
+                $listMahasiswa = array_values(collect($listMahasiswa)->filter(function ($item) use ($semester) {
+                    return $item['krs'][0]['semester'] == $semester;
+                })->toArray());
+            }
+
+            // jika ada filter page pada query params
+            if ($page and !$search) {
+                $perPage = 10;
+                $currentPage = (integer) $page ?? Paginator::resolveCurrentPage();
+                $currentPageData = Collection::make($listMahasiswa)->slice(($currentPage - 1) * $perPage, $perPage);
+                $paginator = new Paginator($currentPageData->all(), $perPage, $currentPage);
+                $paginatedData = array_values($paginator->items());
+                $totalNextItems = count($listMahasiswa) - ($currentPage == 1
+                    ? $currentPageData->count()
+                    : $currentPageData->count() + ($perPage * $currentPage)
+                );
 
                 return response()->json([
                     'status' => 'success',
                     'data' => [
-                        'list_krs_mahasiswa' => self::setVisibilityMahasiswaProperties($listMahasiswa),
+                        'list_krs_mahasiswa' => $paginatedData,
                     ],
                     'meta' => [
-                        'page' => (int) $page,
-                        'per_page' => $perPage,
-                        'total_pages' => $totalPages,
-                        'total_items' => $totalItems,
-                        'prev_page_url' => $prevPageUrl,
-                        'next_page_url' => $nextPageUrl,
+                        'current_page' => $currentPage,
+                        'total_items' => count($listMahasiswa),
+                        'items_per_page' => $paginator->perPage(),
+                        'prev_page_url' => $currentPage == 1 ? null
+                            :  config('app.url') . 'krs/mahasiswa/list' . substr($paginator->previousPageUrl(), 1),
+                        'next_page_url' => ($totalNextItems > -1 and count($listMahasiswa) > 10)
+                            ? config('app.url') . 'krs/mahasiswa/list?page=' . $currentPage + 1
+                            : null,
                     ],
                 ], 200);
             }
 
             return $this->successfulResponseJSON([
-                'list_krs_mahasiswa' => self::setVisibilityMahasiswaProperties($listMahasiswa),
+                'list_krs_mahasiswa' => $listMahasiswa,
             ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
     }
 
-    private function setVisibilityMahasiswaProperties($mahasiswa) {
-        $tempMahasiswa = [];
-
-        if (count($mahasiswa) > 0) {
-            foreach ($mahasiswa as $index => $mhs) {
-                $tempMahasiswa[$index] = [
-                    'mhs_id' => $mhs['mhs_id'],
-                    'angkatan_id' => $mhs['angkatan_id'],
-                    'dosen_id' => $mhs['dosen_id'],
-                    'jur_id' => $mhs['jur_id'],
-                    'nim' => $mhs['nim'],
-                    'nama' => $mhs['nm_mhs'],
-                    'jns_mhs' => $mhs['jns_mhs'],
-                    'sts_mhs' => $mhs['sts_mhs'],
-                    'kd_kampus' => $mhs['kd_kampus'],
-                    'kelas' => 'A',
-                    'jk' => $mhs['jk'],
-                    'masuk_tahun' => $mhs['masuk_tahun'],
-                    'krs_id_last' => $mhs['krs_id_last'],
-                    'tanggal_krs' => $mhs->krs()->first()['tanggal']
-                ];
-            }
-        }
-
-        return $tempMahasiswa;
-    }
-
-    private function setKRSData($jurusan, $krs, $krsMatkul) {
+    private function setKRSData($jurusan, $krs, $krsMatkul, $mhsId) {
         $tempMatkul = [];
 
         foreach ($krsMatkul as $index => $item) {
             $detailMatkul = MatkulDiselenggarakanView::where('jur_id', $jurusan['jur_id'])
-                                ->where('tahun_id', $krs['tahun_id'])
-                                ->where('mk_id', $item['mk_id'])
-                                ->first();
+                ->where('tahun_id', $krs['tahun_id'])
+                ->where('mk_id', $item['mk_id'])
+                ->first();
+
+            // get nilai akhir
+            $nilaiAkhirMatkul = NilaiAkhirView::where('mhs_id', $mhsId)
+                ->where('mk_id', $item['mk_id'])
+                ->select('nilai', 'mutu')
+                ->first();
+
             $tempMatkul[$index] = [
                 'krs_mk_id' => $item['krs_mk_id'],
                 'mk_id' => $item['mk_id'],
@@ -187,6 +185,7 @@ class KRSDosenController extends Controller
                 'nm_mk' => $detailMatkul['nm_mk'],
                 'sks' => $detailMatkul['sks'],
                 'k_disetujui' => $item['k_disetujui'],
+                'nilai_akhir' => $nilaiAkhirMatkul,
             ];
         }
 

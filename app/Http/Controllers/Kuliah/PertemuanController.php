@@ -69,9 +69,21 @@ class PertemuanController extends Controller {
                 $kelasKuliah['kelas_kuliah_id'], $kelasKuliah['pengajar_id'], $currentDate->format('Y-m-d')
             );
 
-            $kelasKuliahIdArr = $kelasKuliah['kjoin_kelas']
-                ? [$kelasKuliah['kelas_kuliah_id'], $kelasKuliah['join_kelas_kuliah_id']]
-                : [$kelasKuliah['kelas_kuliah_id']];
+            // cek kelas join
+            $kelasKuliahIdArr = [];
+
+            /**
+             * Jika kelas yang dibuka dan dijoin ke kelas lain
+             */
+            if ($kelasKuliah['kjoin_kelas']) {
+                $kelasKuliahId = $kelasKuliah['join_kelas_kuliah_id'];
+            }
+
+            /**
+             * Kelas-kelas yang dijoin
+             */
+            $kelasKuliahIdArr = KelasKuliahJoinView::where('join_kelas_kuliah_id', $kelasKuliahId)
+                ->pluck('kelas_kuliah_id')->filter()->toArray();
 
             if ($kelasPernahDibuka->exists()) {
                 Pertemuan::updateKelasDibuka($kelasKuliahIdArr, $kelasKuliah['pengajar_id'], true); // kelas_dibuka = true
@@ -80,7 +92,7 @@ class PertemuanController extends Controller {
                  * Tanggal kelas akan dibuka sesuai tanggal di jadwal
                  */
                 $pertemuan = [
-                    'kelas_kuliah_id' => $kelasKuliah['kelas_kuliah_id'],
+                    'kelas_kuliah_id' => $kelasKuliahId,
                     'jns_pert' => $jadwal['jns_pert'],
                     'tanggal' => $jadwal['tanggal'],
                     'jam' => $jadwal['jam'],
@@ -89,21 +101,24 @@ class PertemuanController extends Controller {
                     'dosen_id' => $kelasKuliah['pengajar_id'],
                 ];
 
-                self::createDaftarKehadiran($pertemuan, $pertemuan['kelas_kuliah_id']);
+                self::createDaftarKehadiran($pertemuan, $kelasKuliahId);
 
-                // jika kelas dijoin
-                if ($kelasKuliah['kjoin_kelas']) {
-                    $pertemuan2 = $pertemuan;
-                    $pertemuan2['kelas_kuliah_id'] = $kelasKuliah['join_kelas_kuliah_id'];
-                    self::createDaftarKehadiran($pertemuan2, $pertemuan2['kelas_kuliah_id']);
+                // jika ada kelas dijoin
+                if (count($kelasKuliahIdArr) > 0) {
+                    foreach ($kelasKuliahIdArr as $item) {
+                        $pertemuan['kelas_kuliah_id'] = $item;
+                        self::createDaftarKehadiran($pertemuan, $item);
+                    }
                 }
             }
+
+            array_push($kelasKuliahIdArr, $kelasKuliahId);
 
             $randomPIN = self::generateRandomPIN($kelasKuliahIdArr);
 
             return $this->successfulResponseJSON([
                 'pertemuan' => [
-                    'kelas_kuliah_id' => implode('-', $kelasKuliahIdArr),
+                    'kelas_kuliah_id_dibuka' => implode('-', $kelasKuliahIdArr),
                     'tanggal' => $jadwal['tanggal'],
                     'presensi' => $randomPIN,
                 ],

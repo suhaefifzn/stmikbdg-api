@@ -7,12 +7,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 
 // ? Models - Table
 use App\Models\Users\User;
-use App\Models\Users\Site;
+use App\Models\Users\UserSite;
 
 // ? Models - View
 use App\Models\Users\UserView;
@@ -21,7 +20,6 @@ use App\Models\Users\UserView;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ImportUser;
 use App\Exceptions\ExcelImportException;
-use App\Models\Users\UserSite;
 
 class UserController extends Controller {
     public function addNewUser(Request $request) {
@@ -144,30 +142,6 @@ class UserController extends Controller {
                     'is_prodi' => $account['is_prodi'],
                 ],
             ]);
-        } catch (\Exception $e) {
-            return ErrorHandler::handle($e);
-        }
-    }
-
-    public function putMyEmail(Request $request) {
-        try {
-            $validatedData = $request->validate([
-                'email' =>[
-                    'required',
-                    'email:dns',
-                    Rule::unique('users')->ignore(auth()->user()->id),
-                ]
-            ]);
-            $user = auth()->user()->kd_user;
-
-            User::where('kd_user', $user)->update([
-                'email' => $validatedData['email'],
-                'updated_at' => now(),
-            ]);
-
-            return $this->successfulResponseJSON([
-                'email' => $validatedData['email']
-            ], 'Email berhasil diperbaharui');
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }

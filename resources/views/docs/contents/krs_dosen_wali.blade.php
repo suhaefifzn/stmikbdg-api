@@ -21,19 +21,27 @@
         "list_krs_mahasiswa": [
             {
                 "mhs_id": 15534,
-                "angkatan_id": 76,
-                "dosen_id": 573,
-                "jur_id": 23,
                 "nim": "1220001",
-                "nama": "SUHAEFI FAUZIAN",
+                "nm_mhs": "SUHAEFI FAUZIAN",
                 "jns_mhs": "R",
                 "sts_mhs": "A",
                 "kd_kampus": "A ",
                 "kelas": "A",
-                "jk": "L",
                 "masuk_tahun": 2020,
-                "krs_id_last": 4550,
-                "tanggal_krs": "2024-02-20"
+                "dosen_id": 573,
+                "krs_id_last": 4615,
+                "krs": [
+                    {
+                        "krs_id": 4615,
+                        "tahun_id": 348,
+                        "mhs_id": 15534,
+                        "nmr_krs": "015/12/KR2/23",
+                        "tanggal": "2024-01-12",
+                        "semester": 8,
+                        "sts_krs": "S",
+                        "kd_kampus": "A"
+                    }
+                ]
             }
         ]
     }
@@ -46,36 +54,132 @@
     "data": {
         "list_krs_mahasiswa": [
             {
-                "mhs_id": 15534,
-                "angkatan_id": 76,
-                "dosen_id": 573,
-                "jur_id": 23,
-                "nim": "1220001",
-                "nama": "SUHAEFI FAUZIAN",
+                "mhs_id": 16639,
+                "nim": "3222305",
+                "nm_mhs": "APRIYANI",
                 "jns_mhs": "R",
                 "sts_mhs": "A",
                 "kd_kampus": "A ",
                 "kelas": "A",
-                "jk": "L",
-                "masuk_tahun": 2020,
-                "krs_id_last": 4550,
-                "tanggal_krs": "2024-02-20"
-            },
+                "masuk_tahun": 2022,
+                "dosen_id": 573,
+                "krs_id_last": 4928,
+                "krs": [
+                    {
+                        "krs_id": 4928,
+                        "tahun_id": 349,
+                        "mhs_id": 16639,
+                        "nmr_krs": "094/32/KR2/23",
+                        "tanggal": "2024-02-23",
+                        "semester": 4,
+                        "sts_krs": "S",
+                        "kd_kampus": "A"
+                    }
+                ]
+            }
             // mahasiswa lain disembunyikan
         ]
     },
     "meta": {
-        "page": 1,
-        "per_page": 10,
-        "total_pages": 17,
-        "total_items": 166,
+        "current_page": 1,
+        "total_items": 267,
+        "items_per_page": 10,
         "prev_page_url": null,
-        "next_page_url": "http://stmikbdg-api.test/api/krs/mahasiswa/list?page=2"
+        "next_page_url": "http://stmikbdg-api.test/krs/mahasiswa/list?page=2"
     }
 }</code></pre>
     <p>
-        Jika menambahkan <span class="badge bg-secondary">page</span> maka akan terdapat properti baru pada response yang bernama <b>meta</b>. Properti tersebut menyimpan informasi mengenai posisi halaman, total item per halaman, total halaman, hingga, url ke halaman berikutnya.
+        Jika menambahkan <span class="badge bg-secondary">page</span> maka akan terdapat properti baru pada response yang bernama <b>meta</b>. Properti tersebut menyimpan informasi mengenai posisi halaman, total item per halaman, total halaman, hingga url ke halaman berikutnya.
     </p>
+
+    {{-- Filter by tahun masuk --}}
+    <p>
+        Anda juga dapat menggunakan filter bernama <b>tahun_masuk</b> untuk mendapatkan list KRS mahasiswa berdasarkan pada tahun masuknya atau angkatan. Misalnya <span class="badge bg-dark">/krs/mahasiswa/list?page=1&tahun_masuk=2018</span>.
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "list_krs_mahasiswa": [
+            {
+                "mhs_id": 3713,
+                "nim": "1218005",
+                "nm_mhs": "FAJAR APRILIAN",
+                "jns_mhs": "R",
+                "sts_mhs": "A",
+                "kd_kampus": "A ",
+                "kelas": "A",
+                "masuk_tahun": 2018,
+                "dosen_id": 573,
+                "krs_id_last": 4819,
+                "krs": [
+                    {
+                        "krs_id": 4819,
+                        "tahun_id": 348,
+                        "mhs_id": 3713,
+                        "nmr_krs": "080/12/KR2/23",
+                        "tanggal": "2024-01-15",
+                        "semester": 12,
+                        "sts_krs": "S",
+                        "kd_kampus": "A"
+                    }
+                ]
+            }
+            // mahasiswa lain disembunyikan
+        ]
+    },
+    "meta": {
+        "current_page": 1,
+        "total_items": 10,
+        "items_per_page": 10,
+        "prev_page_url": null,
+        "next_page_url": null
+    }
+}</code></pre>
+
+    {{-- Filter by semester --}}
+    <p>
+        Sekarang, Anda juga dapat menambahkan filter semester untuk melihat list KRS mahasiswa yang ada. Bahkan Anda juga dapat menggabungkannya dengan filter tahun masuk. Contohnya <span class="badge bg-dark">/krs/mahasiswa/list?page=1&tahun_masuk=2019&semester=8</span>.
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "list_krs_mahasiswa": [
+            {
+                "mhs_id": 3737,
+                "nim": "1219008",
+                "nm_mhs": "MUHAMAD RIZAL SEPTIANSYAH",
+                "jns_mhs": "K",
+                "sts_mhs": "A",
+                "kd_kampus": "A ",
+                "kelas": "A",
+                "masuk_tahun": 2019,
+                "dosen_id": 573,
+                "krs_id_last": 4630,
+                "krs": [
+                    {
+                        "krs_id": 4630,
+                        "tahun_id": 350,
+                        "mhs_id": 3737,
+                        "nmr_krs": "011/12/KK2/23",
+                        "tanggal": "2024-01-12",
+                        "semester": 8,
+                        "sts_krs": "S",
+                        "kd_kampus": "A"
+                    }
+                ]
+            }
+            // mahasiswa lain disembunyikan
+        ]
+    },
+    "meta": {
+        "current_page": 1,
+        "total_items": 5,
+        "items_per_page": 10,
+        "prev_page_url": null,
+        "next_page_url": null
+    }
+}</code></pre>
+
     <h5 class="mt-4">(DSN WALI) Get Detail KRS Mahasiswa Menggunakan mhs_id and krs_id</h5>
     <hr>
     <p>
@@ -118,7 +222,8 @@
                         "kd_mk": "IF1709",
                         "nm_mk": "Analisis Numerik",
                         "sks": 2,
-                        "k_disetujui": false
+                        "k_disetujui": false,
+                        "nilai_akhir": null
                     },
                     {
                         "krs_mk_id": 34659,
@@ -128,7 +233,8 @@
                         "kd_mk": "IF1710",
                         "nm_mk": "Pengolahan Citra",
                         "sks": 3,
-                        "k_disetujui": false
+                        "k_disetujui": false,
+                        "nilai_akhir": null
                     }
                 ]
             }

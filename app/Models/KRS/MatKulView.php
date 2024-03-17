@@ -9,14 +9,14 @@ use Illuminate\Database\Eloquent\Builder;
 // ? Models -  View
 use App\Models\KRS\NilaiAkhirView;
 use App\Models\KelasKuliah\KelasKuliahJoinView;
+use App\Models\KRS\NilaiLamaView;
+use App\Models\KRS\NilaiGabunganView;
 
 class MatKulView extends Model
 {
     /**
      * Model ini digunakan untuk view mata_kuliah
      * hanya digunakan untuk get data (SELECT).
-     *
-     * Koneksi database terhubung ke 'stmikbdg_dummy' view mata_kuliah.
      *
      * Saat ini masih menggunakan dua database berbeda
      */
@@ -46,14 +46,19 @@ class MatKulView extends Model
             ->get();
     }
 
-    /**
-     * Relasi view matakuliah ke view nilai akhir, one to many
-     */
     public function nilaiAkhir() {
         return $this->hasMany(NilaiAkhirView::class, 'mk_id', 'mk_id');
     }
 
     public function kelasKuliahJoin() {
         return $this->hasMany(KelasKuliahJoinView::class, 'mk_id', 'mk_id');
+    }
+
+    public function nilaiLama() {
+        return $this->hasMany(NilaiLamaView::class, 'mk_id', 'mk_id');
+    }
+
+    public function nilaiGabungan() {
+        return $this->hasMany(NilaiGabunganView::class, 'mk_id', 'mk_id');
     }
 }

@@ -5,32 +5,27 @@ namespace App\Models\KRS;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-// ? Models - View
+// ? Models - view
 use App\Models\KRS\MatKulView;
 use App\Models\KRS\MatkulDiselenggarakanView;
 
-class NilaiAkhirView extends Model
+class NilaiGabunganView extends Model
 {
     /**
-     * Model ini digunakan untuk view nilai akhir
+     * Model ini digunakan untuk view nilai gabungan
      * hanya digunakan untuk get data (SELECT).
-     *
-     * Koneksi database terhubung ke 'stmikbdg_dummy' view nilai akhir.
      *
      * Saat ini masih menggunakan dua database berbeda
      */
     use HasFactory;
 
-    public $table = 'vnilaiakhir';
+    public $table = 'vnilai_gab';
     public $connection;
 
     public function __construct() {
         $this->connection = config('myconfig.database.second_connection');
     }
 
-    /**
-     * Relasi view nilai akhir ke view matakuliah, many to one
-     */
     public function matakuliah() {
         return $this->belongsTo(MatKulView::class, 'mk_id', 'mk_id');
     }

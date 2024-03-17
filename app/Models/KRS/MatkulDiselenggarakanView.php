@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
+// ? Models - view
+use App\Models\KRS\NilaiAkhirView;
+use App\Models\KRS\NilaiLamaView;
+use App\Models\KRS\NilaiGabunganView;
+
 class MatkulDiselenggarakanView extends Model
 {
     /**
@@ -40,10 +45,15 @@ class MatkulDiselenggarakanView extends Model
                     ->get();
     }
 
-    /**
-     * Relasi view mk diselenggarakan ke view nilai akhir, one to many
-     */
     public function nilaiAkhir() {
         return $this->hasMany(NilaiAkhirView::class, 'mk_id', 'mk_id');
+    }
+
+    public function nilaiLama() {
+        return $this->hasMany(NilaiLamaView::class, 'mk_id', 'mk_id');
+    }
+
+    public function nilaiGabungan() {
+        return $this->hasMany(NilaiGabunganView::class, 'mk_id', 'mk_id');
     }
 }

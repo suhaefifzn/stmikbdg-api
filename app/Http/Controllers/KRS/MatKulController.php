@@ -8,13 +8,13 @@ use App\Http\Controllers\TahunAjaranController;
 
 // ? Exception
 use App\Exceptions\ErrorHandler;
-use App\Models\KRS\KRS;
-use App\Models\KRS\KRSMatkul;
+
 // ? Models - view
 use App\Models\KRS\MatKulView;
 use App\Models\KurikulumView;
 use App\Models\KRS\MatkulDiselenggarakanView;
-use App\Models\KRS\NilaiAkhirView;
+
+
 // ? Models - table
 use App\Models\Users\Mahasiswa;
 
@@ -45,7 +45,6 @@ class MatKulController extends Controller
                 ], 400);
             }
 
-            $isDosen = auth()->user()->is_dosen;
             $filter['tahun_id'] = $request->query('tahun_id');
             $filter['semester'] = $request->query('semester')
                         ? $request->query('semester')
@@ -213,10 +212,10 @@ class MatKulController extends Controller
                     ? (float) $totalNilaiAkhirSemester/$countNilaiAkhir
                     : null;
                 $ipk = $averageNilaiAkhir
-                    ? number_format($averageNilaiAkhir, 2, '.', '')
+                    ? $averageNilaiAkhir
                     : null;
 
-                $tempMatkul[$index]['ipk'] = (float) number_format($ipk, 2);
+                $tempMatkul[$index]['ipk'] = (float) $ipk;
                 $tempMatkul[$index]['ipk_dari_total_sks'] = $totalSksDipilihDisemester;
 
                 // hitung sks dan ipk menyeluruh
@@ -243,9 +242,7 @@ class MatKulController extends Controller
 
         // set response paling atas
         if (!$filter['semester']) {
-            $response['total_semua_ipk'] = (float) number_format(
-                (float) ($totalSemuaIPK / $countIPKPerSemester), 2, '.'. ''
-            );
+            $response['total_semua_ipk'] = (float) ($totalSemuaIPK / $countIPKPerSemester);
             $response['total_semua_sks_dipilih'] = $totalSemuaSKS;
             $response['total_semua_nilai_A'] = $totalSemuaNilaiA;
             $response['total_semua_nilai_B'] = $totalSemuaNilaiB;

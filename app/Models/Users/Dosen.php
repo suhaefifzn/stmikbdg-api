@@ -4,6 +4,7 @@ namespace App\Models\Users;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 // ? Models - table
 use App\Models\Users\Mahasiswa;
@@ -15,9 +16,6 @@ class Dosen extends Model
      * untuk melakukan proses-proses Create, Update, Delete.
      *
      * Koneksi database terhubung ke 'stmikbdg_dummy' tabel dosen.
-     *
-     * Saat ini masih menggunakan dua database berbeda sehingga
-     * belum mendukung relasi antar tabel dosen->users.
      */
     use HasFactory;
 
@@ -27,6 +25,43 @@ class Dosen extends Model
 
     public function __construct() {
         $this->connection = config('myconfig.database.second_connection');
+    }
+
+    public function scopeGetListKRSMahasiswa(Builder $query, $dosenId, $search = null,$tahunMasuk = null) {
+        $baseQuery = $query->where('dosen_id', $dosenId)
+            ->with(['mahasiswa' => function ($query) use ($search, $tahunMasuk) {
+                $mhsQuery = $query->select(
+                    'mhs_id', 'nim', 'nm_mhs', 'jns_mhs', 'sts_mhs', 'kd_kampus', 'kelas', 'masuk_tahun', 'dosen_id', 'krs_id_last'
+                )
+                ->where('krs_id_last', '!=', null)
+                ->where('sts_mhs', '!=', 'L');
+
+                // search saja
+                if ($search and !$tahunMasuk) {
+                    $mhsQuery->where('nm_mhs', 'like', '%' . strtoupper($search) . '%')
+                        ->orWhere('nim', 'like', '%' . strtoupper($search) . '%');
+                }
+
+                // tahun masuk saja
+                if ($tahunMasuk and !$search) {
+                    $mhsQuery->where('masuk_tahun', $tahunMasuk);
+                }
+
+                // search dan tahun masuk
+                if ($search and $tahunMasuk) {
+                    $mhsQuery->where('masuk_tahun', $tahunMasuk)
+                        ->where('nm_mhs', 'like', '%' . strtoupper($search) . '%')
+                        ->orWhere('nim', 'like', '%' . strtoupper($search) . '%');
+                }
+
+                $mhsQuery->with(['krs' => function ($query) {
+                    $query->select(
+                        'krs_id', 'tahun_id', 'mhs_id', 'nmr_krs', 'tanggal', 'semester', 'sts_krs', 'kd_kampus'
+                    );
+                }])->orderBy('krs_id_last', 'DESC');
+            }]);
+
+        return $baseQuery->get()[0]['mahasiswa'];
     }
 
 

@@ -19,14 +19,6 @@ use App\Models\KRS\KRSMatkul;
 
 class KelasKuliahController extends Controller {
     public function getKelasKuliahByDosen(Request $request) {
-        /**
-         * Note:
-         * - Jika kelas_dibuka berarti tambah ke tabel pertemuan waktu dibukanya
-         * - Ubah kelas_dibuka menjadi true
-         * - Masukkan daftar mahasiswa yang mengambil matkul di kelas tersebut
-         *     ke tabel baru di schema kuliah
-         * - Generate pin untuk presensi
-         */
         try {
             $filterHari = $request->query('hari');
             $dosen = $this->getUserAuth();
@@ -42,7 +34,7 @@ class KelasKuliahController extends Controller {
             $kelasKuliah = collect($kelasKuliah)->flatten();
 
             // cek jika ada kelas yang dijoin
-            $kelasKuliah = self::getParentJoinKelasIdArr($kelasKuliah);
+            // $kelasKuliah = self::getParentJoinKelasIdArr($kelasKuliah);
 
             // get setiap jadwal
             foreach ($kelasKuliah as $index => $item) {
