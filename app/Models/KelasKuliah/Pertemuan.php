@@ -68,7 +68,8 @@ class Pertemuan extends Model
             ->orderBy('pertemuan_id', 'DESC')
             ->select('pertemuan_id')
             ->with(['presensi' => function ($query) {
-                $query->select('pertemuan_id', 'nim', 'nm_mhs', 'masuk');
+                $query->select('pertemuan_id', 'nim', 'nm_mhs', 'masuk')
+                    ->orderBy('masuk', 'DESC');
             }])->get();
     }
 

@@ -162,9 +162,23 @@ class PertemuanController extends Controller {
             if ($kelasDibuka->exists()) {
                 self::destroyRandomPIN($kelasKuliah['kelas_kuliah_id']);
 
-                $kelasKuliahIdArr = $kelasKuliah['kjoin_kelas']
-                    ? [$kelasKuliah['kelas_kuliah_id'], $kelasKuliah['join_kelas_kuliah_id']]
-                    : [$kelasKuliah['kelas_kuliah_id']];
+                // cek kelas join
+                $kelasKuliahIdArr = [];
+
+                /**
+                 * Jika kelas yang dibuka dan dijoin ke kelas lain
+                 */
+                if ($kelasKuliah['kjoin_kelas']) {
+                    $kelasKuliahId = $kelasKuliah['join_kelas_kuliah_id'];
+                }
+
+                /**
+                 * Kelas-kelas yang dijoin
+                 */
+                $kelasKuliahIdArr = KelasKuliahJoinView::where('join_kelas_kuliah_id', $kelasKuliahId)
+                    ->pluck('kelas_kuliah_id')->filter()->toArray();
+
+                array_push($kelasKuliahIdArr, $kelasKuliahId);
 
                 $presensiMahasiswa = Pertemuan::getPertemuanKelasDibukaWithPresensi($kelasKuliahIdArr, $dosen['dosen_id'])
                     ->pluck('presensi')->flatten();

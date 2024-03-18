@@ -65,5 +65,40 @@
     "status": "success",
     "message": "Logout berhasil. Access token telah dihapus"
 }</code></pre>
+
+    {{-- Lupa Password --}}
+    <h5 class="mt-4">Lupa Password - Request Kode OTP</h5>
+    <hr>
+    <p>
+        Jika user lupa password, user bisa melakukan reset password dengan meminta kode OTP terlebih dahulu. Kirim permintaan menggunakan HTTP method <span class="badge bg-info">post</span> ke <span class="badge bg-dark">/authentications/password/forgot</span> dan kirimkan email yang terdaftar sebagai payload dalam body dengan format JSON seperti berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "email": "suhaefi@simak.dev"
+}</code></pre>
+    <p>
+        Apabila berhasil kode OTP akan dikirim ke alamat email tersebut. Kode OTP hanya berlaku selama 5 menit sejak user berhasil mengirimkan permintaan. Saat ini, seperti inilah isi email yang diterima:
+    </p>
+    <img src="https://lh3.googleusercontent.com/drive-viewer/AKGpihbczAefFImNNGhaRGpT2bY0a5OHcT4iPtGXOkHc6_Gfldz1VPaV4FrUncjmqzESq7_G2t_uYhs_MCRvwz43CKM6TUTR4g=s2560" class="img img-fluid" alt="Format Email Kode OTP Reset Password User" />
+    <div class="alert alert-warning mt-3">
+        <b>Note:</b> Karena belum ada kepastian mengenai layanan email yang akan digunakan, saat ini kami masih menggunakan Mailtrap untuk menangkap email yang dikirim secara otomatis dari sistem.
+    </div>
+
+    <h5 class="mt-4">Lupa Password - Buat Password Baru</h5>
+    <hr>
+    <p>
+        Setelah user berhasil menerima kode OTP, maka gunakanlah kode OTP tersebut untuk membuat password baru dengan cara mengirimkan permintaan ke <span class="badge bg-dark">/authentications/password/reset</span> dengan menggunakan HTTP method <span class="badge bg-info">post</span> dan kirimkan data dalam body dengan format JSON seperti berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "otp": "040954",
+    "password": "password_baru",
+    "confirm_password": "password_baru"
+}</code></pre>
+    <p>
+        Jika password berhasil direset maka kode OTP akan menjadi invalid dan tidak dapat digunakan lagi. API akan memberikan response seperti berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "message": "Password berhasil direset. Silahkan login kembali"
+}</code></pre>
 </div>
 @endsection

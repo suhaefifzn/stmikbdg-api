@@ -108,16 +108,6 @@ class PresensiController extends Controller {
                 ->first();
 
             /**
-             * Bukan dosen yang mengajar
-             */
-            if ($kelasKuliah['pengajar_id'] !== $dosen['dosen_id']) {
-                return response()->json([
-                    'status' => 'fail',
-                    'message' => 'Kelas kuliah id tidak ditemukan'
-                ], 400);
-            }
-
-            /**
              * Kelas kuliah id tidak ditemukan
              */
             if (!$kelasKuliah) {
@@ -128,11 +118,34 @@ class PresensiController extends Controller {
             }
 
             /**
+             * Bukan dosen yang mengajar
+             */
+            if ($kelasKuliah['pengajar_id'] !== $dosen['dosen_id']) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Kelas kuliah id tidak ditemukan'
+                ], 400);
+            }
+
+            /**
              * Cek kelas join
              */
-            $kelasKuliahIdArr = $kelasKuliah['kjoin_kelas']
-                ? [$kelasKuliah['kelas_kuliah_id'], $kelasKuliah['join_kelas_kuliah_id']]
-                : [$kelasKuliah['kelas_kuliah_id']];
+            $kelasKuliahIdArr = [];
+
+            /**
+             * Jika kelas yang dibuka dan dijoin ke kelas lain
+             */
+            if ($kelasKuliah['kjoin_kelas']) {
+                $kelasKuliahId = $kelasKuliah['join_kelas_kuliah_id'];
+            }
+
+            /**
+             * Kelas-kelas yang dijoin
+             */
+            $kelasKuliahIdArr = KelasKuliahJoinView::where('join_kelas_kuliah_id', $kelasKuliahId)
+                ->pluck('kelas_kuliah_id')->filter()->toArray();
+
+            array_push($kelasKuliahIdArr, $kelasKuliahId);
 
             $pertemuan = Pertemuan::getPertemuanKelasDibukaWithPresensi($kelasKuliahIdArr, $dosen['dosen_id']);
 

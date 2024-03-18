@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Authentications\AuthController;
+use App\Http\Controllers\Authentications\ResetPasswordController;
 
 /**
  * Route yang ada di sini digunakan untuk mengelola autentikasi user:
@@ -15,9 +16,16 @@ Route::controller(AuthController::class)
     ->prefix('authentications')
     ->middleware('auth.jwt')
     ->group(function () {
-        Route::post('/', 'userLogin')->withoutMiddleware('auth.jwt');
+        Route::withoutMiddleware('auth.jwt')
+            ->group(function () {
+                Route::post('/', 'userLogin')->withoutMiddleware('auth.jwt');
+
+                // * forgot password
+                Route::post('/password/forgot', [ResetPasswordController::class, 'forgotPassword']);
+                Route::post('/password/reset', [ResetPasswordController::class, 'resetPassword']);
+            });
+
         Route::delete('/', 'userLogout');
-        // Route::get('/', 'getNewToken');
 
         // * check token and site access
         Route::get('/check', 'validateToken');

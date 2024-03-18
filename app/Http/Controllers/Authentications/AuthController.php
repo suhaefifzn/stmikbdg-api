@@ -13,12 +13,9 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 // ? Models - view
 use App\Models\Users\UserSitesView;
-use App\Models\Users\UserView;
 
-class AuthController extends Controller
-{
-    public function userLogin(Request $request)
-    {
+class AuthController extends Controller {
+    public function userLogin(Request $request) {
         try {
             $request->validate([
                 'email' => 'required|email',
@@ -74,8 +71,7 @@ class AuthController extends Controller
         return $this->successfulResponseJSON($data, null, 201);
     }
 
-    public function userLogout()
-    {
+    public function userLogout() {
         $token = JWTAuth::getToken()->get();
 
         if ($token) {
@@ -88,46 +84,6 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Logout berhasil. Access token telah dihapus',
         ], 200);
-    }
-
-    public function getNewToken(Request $request)
-    {
-        try {
-            $platform = $request->query('platform');
-
-            if (is_null($platform)) {
-                return response()->json([
-                    'status' => 'fail',
-                    'message' => 'Jenis platform tidak diketahui'
-                ], 400);
-            }
-
-            if ($platform === 'android') {
-                return response()->json([
-                    'status' => 'fail',
-                    'message' => 'Access token tidak memiliki waktu kadaluarsa',
-                    'data' => [
-                        'platform' => $platform,
-                    ],
-                ], 400);
-            }
-
-            $ttl = self::setExpirationToken($platform);
-            $token = auth()->refresh(true, true);
-
-            $data = [
-                'token' => [
-                    'access_token' => $token,
-                    'token_type' => 'bearer',
-                    'expires_in' => "$ttl minutes",
-                ],
-                'platform' => $platform,
-            ];
-
-            return $this->successfulResponseJSON($data, 'Token berhasil diperbaharui');
-        } catch (\Exception $e) {
-            return ErrorHandler::handle($e);
-        }
     }
 
     public function validateToken() {
