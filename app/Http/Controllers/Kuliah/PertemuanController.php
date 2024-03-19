@@ -85,6 +85,8 @@ class PertemuanController extends Controller {
             $kelasKuliahIdArr = KelasKuliahJoinView::where('join_kelas_kuliah_id', $kelasKuliahId)
                 ->pluck('kelas_kuliah_id')->filter()->toArray();
 
+            array_push($kelasKuliahIdArr, $kelasKuliahId);
+
             if ($kelasPernahDibuka->exists()) {
                 Pertemuan::updateKelasDibuka($kelasKuliahIdArr, $kelasKuliah['pengajar_id'], true); // kelas_dibuka = true
             } else {
@@ -111,8 +113,6 @@ class PertemuanController extends Controller {
                     }
                 }
             }
-
-            array_push($kelasKuliahIdArr, $kelasKuliahId);
 
             $randomPIN = self::generateRandomPIN($kelasKuliahIdArr);
 

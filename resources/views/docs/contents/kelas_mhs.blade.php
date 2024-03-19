@@ -45,62 +45,22 @@
                         "smt": 2,
                         "kd_kur": "IFS120"
                     },
+                    "riwayat_presensi": [
+                        {
+                            "masuk": null
+                        }
+                    ],
                     "jadwal": {
                         "kelas_kuliah_id": 3294,
                         "mk_id": 137,
                         "mhs_id": 15534,
                         "dosen_id": 562,
-                        "tanggal": "2024-03-12",
+                        "tanggal": "2024-03-19",
                         "jns_pert": "T1",
                         "jam": "09:30-11:10",
                         "kd_ruang": "31",
                         "nm_hari": "Selasa",
-                        "tanggal_lokal": "12 Maret 2024"
-                    },
-                    "kelas_dibuka": false
-                }
-            ],
-            "Jumat": [
-                {
-                    "kelas_kuliah_id": 3293,
-                    "tahun_id": 348,
-                    "jur_id": 23,
-                    "mk_id": 145,
-                    "join_kelas_kuliah_id": null,
-                    "kjoin_kelas": false,
-                    "kelas_kuliah": "A",
-                    "jns_mhs": "R",
-                    "sts_kelas": "B",
-                    "pengajar_id": 708,
-                    "join_jur": null,
-                    "dosen": {
-                        "dosen_id": 708,
-                        "kd_dosen": "RP   ",
-                        "nm_dosen": "M. RIZKI PRATAMA. S, S.Kom",
-                        "gelar": "S.Kom"
-                    },
-                    "matakuliah": {
-                        "mk_id": 145,
-                        "kur_id": 83,
-                        "kd_mk": "IF1002",
-                        "nm_mk": "Cloud Computing",
-                        "semester": 7,
-                        "sks": 3,
-                        "sts_mk": "A",
-                        "smt": 1,
-                        "kd_kur": "IFS120"
-                    },
-                    "jadwal": {
-                        "kelas_kuliah_id": 3293,
-                        "mk_id": 145,
-                        "mhs_id": 15534,
-                        "dosen_id": 708,
-                        "tanggal": "2024-03-15",
-                        "jns_pert": "T1",
-                        "jam": "13:40-16:10",
-                        "kd_ruang": "11",
-                        "nm_hari": "Jumat",
-                        "tanggal_lokal": "15 Maret 2024"
+                        "tanggal_lokal": "19 Maret 2024"
                     },
                     "kelas_dibuka": false
                 }
@@ -134,6 +94,7 @@
                     "kelas_dibuka": false
                 }
             ]
+            // kelas kuliah lain disembunyikan
         }
     }
 }</code></pre>

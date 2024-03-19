@@ -15,48 +15,55 @@
     "status": "success",
     "data": {
         "kelas_kuliah": {
-            "Rabu": [
+            "Selasa": [
                 {
-                    "kelas_kuliah_id": 3318,
-                    "tahun_id": 350,
-                    "jur_id": 23,
-                    "mk_id": 137,
-                    "join_kelas_kuliah_id": 3349,
-                    "kjoin_kelas": true,
+                    "kelas_kuliah_id": 3268,
+                    "tahun_id": 349,
+                    "jur_id": 27,
+                    "mk_id": 62,
+                    "join_kelas_kuliah_id": null,
+                    "kjoin_kelas": false,
                     "kelas_kuliah": "A",
-                    "jns_mhs": "K",
+                    "jns_mhs": "R",
                     "sts_kelas": "B",
-                    "pengajar_id": 573,
-                    "join_jur": "MIS1",
-                    "dosen": {
-                        "dosen_id": 573,
-                        "kd_dosen": "IF054",
-                        "nm_dosen": "Mina Ismu Rahayu, M.T",
-                        "gelar": "M.T"
+                    "pengajar_id": 562,
+                    "join_jur": null,
+                    "riwayat_pertemuan": [
+                        {
+                            "pertemuan_id": 79,
+                            "jns_pert": "T1",
+                            "create_time": "2024-03-19 13:35:06"
+                        }
+                    ],
+                    "jadwal": {
+                        "kelas_kuliah_id": 3268,
+                        "mk_id": 62,
+                        "dosen_id": 562,
+                        "tanggal": "2024-03-19",
+                        "jns_pert": "T1",
+                        "jam": "09:30-11:10",
+                        "kd_ruang": "31",
+                        "nm_hari": "Selasa",
+                        "tanggal_lokal": "19 Maret 2024"
                     },
+                    "dosen": {
+                        "dosen_id": 562,
+                        "kd_dosen": "IF043",
+                        "nm_dosen": "Dani Pradana Kartaputra, S.Si., M.T",
+                        "gelar": ", S.Si., M.T"
+                    },
+                    "kelas_dibuka": false,
                     "matakuliah": {
-                        "mk_id": 137,
-                        "kur_id": 83,
+                        "mk_id": 62,
+                        "kur_id": 82,
                         "kd_mk": "KU1813",
                         "nm_mk": "HAKI &Etika Profesi",
                         "semester": 8,
                         "sks": 2,
                         "sts_mk": "A",
                         "smt": 2,
-                        "kd_kur": "IFS120"
-                    },
-                    "jadwal": {
-                        "kelas_kuliah_id": 3349,
-                        "mk_id": 62,
-                        "dosen_id": 573,
-                        "tanggal": "2024-03-13",
-                        "jns_pert": "T1",
-                        "jam": "19:45-21:15",
-                        "kd_ruang": "",
-                        "nm_hari": "Rabu",
-                        "tanggal_lokal": "13 Maret 2024"
-                    },
-                    "kelas_dibuka": false
+                        "kd_kur": "MIS120"
+                    }
                 }
                 // jadwal lain disembunyikan
             ]
@@ -81,17 +88,17 @@
     <h5 class="mt-4">(DSN) Buka Kelas Kuliah</h5>
     <hr>
     <p>
-        Kirimkan request ke <span class="badge bg-dark">/kelas-kuliah/dosen/open/{kelas_kuliah_id}</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>, ganti <b>kelas_kuliah_id</b> dengan nilai id dari kelas kuliah yang akan dibuka. Kelas hanya dapat dibuka pada tanggal yang sama dengan yang telah ditentukan. Misalnya <span class="badge bg-dark">/kelas-kuliah/dosen/open/3251</span>.
+        Kirimkan request ke <span class="badge bg-dark">/kelas-kuliah/dosen/open/{kelas_kuliah_id}</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>, ganti <b>kelas_kuliah_id</b> dengan nilai id dari kelas kuliah yang akan dibuka. Kelas hanya dapat dibuka pada tanggal yang sama dengan yang telah ditentukan. Misalnya <span class="badge bg-dark">/kelas-kuliah/dosen/open/3268</span>.
     </p>
     <pre><code class="language-json bg-primary-subtle">{
     "status": "success",
     "data": {
         "pertemuan": {
-            "kelas_kuliah_id": "3251-3275",
-            "tanggal": "2024-03-14",
+            "kelas_kuliah_id_dibuka": "3294-3268",
+            "tanggal": "2024-03-19",
             "presensi": {
-                "qrcode_value": "http://stmikbdg-api.test/api/kelas-kuliah/mahasiswa/presensi/qrcode?kelas=3251-3275&pin=351670",
-                "pin": "351670"
+                "qrcode_value": "http://stmikbdg-api.test/api/kelas-kuliah/mahasiswa/presensi/qrcode?kelas=3294-3268&pin=758496",
+                "pin": "758496"
             }
         }
     }
@@ -102,21 +109,22 @@
     <h5 class="mt-4">(DSN) Get Daftar Kehadiran Mahasiswa Saat Kelas Dibuka</h5>
     <hr>
     <p>
-        Kirimkan request ke <span class="badge bg-dark">/kelas-kuliah/dosen/open/{kelas_kuliah_id}/presensi</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>, ganti <b>kelas_kuliah_id</b> dengan id kelas kuliah yang sedang dibuka. Misalnya, <span class="badge bg-dark">/kelas-kuliah/dosen/open/3251/presensi</span>. Hasilnya:
+        Kirimkan request ke <span class="badge bg-dark">/kelas-kuliah/dosen/open/{kelas_kuliah_id}/presensi</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>, ganti <b>kelas_kuliah_id</b> dengan id kelas kuliah yang sedang dibuka. Misalnya, <span class="badge bg-dark">/kelas-kuliah/dosen/open/3268/presensi</span>. Hasilnya:
     </p>
     <pre><code class="language-json bg-primary-subtle">{
     "status": "success",
     "data": {
-        "jumlah_mahasiswa": 22,
-        "jumlah_mahasiswa_hadir": 1,
-        "jumlah_mahasiswa_belum_hadir": 21,
+        "jumlah_mahasiswa": 59,
+        "jumlah_mahasiswa_hadir": 0,
+        "jumlah_mahasiswa_belum_hadir": 59,
         "presensi_mahasiswa": [
             {
-                "pertemuan_id": 42,
-                "nim": "3220701",
-                "nm_mhs": "JAYA LAZUARDI",
-                "masuk": "2024-03-14 17:01:42"
-            }
+                "pertemuan_id": 80,
+                "mhs_id": 15534,
+                "nim": "1220001",
+                "nm_mhs": "SUHAEFI FAUZIAN",
+                "masuk": "2024-03-19 14:59:13"
+            },
             // mahasiswa lain disembunyikan
         ]
     }
@@ -130,28 +138,30 @@
     <h5 class="mt-4">(DSN) Tutup Kelas Kuliah</h5>
     <hr>
     <p>
-        Lakukan request ke <span class="badge bg-dark">/kelas-kuliah/dosen/close/{kelas_kuliah_id}</span> menggunakan HTTP method <span class="badge bg-info">info</span>, ganti <b>kelas_kuliah_id</b> dengan id kelas kuliah yang akan ditutup. Misalnya, <span class="badge bg-dark">/kelas-kuliah/dosen/close/3251</span> jika berhasil akan memberikan response:
+        Lakukan request ke <span class="badge bg-dark">/kelas-kuliah/dosen/close/{kelas_kuliah_id}</span> menggunakan HTTP method <span class="badge bg-info">info</span>, ganti <b>kelas_kuliah_id</b> dengan id kelas kuliah yang akan ditutup. Misalnya, <span class="badge bg-dark">/kelas-kuliah/dosen/close/3268</span> jika berhasil akan memberikan response:
     </p>
     <pre><code class="language-json bg-primary-subtle">{
     "status": "success",
     "message": "Kelas kuliah berhasil ditutup",
     "data": {
-        "jumlah_mahasiswa": 22,
-        "jumlah_mahasiswa_hadir": 1,
-        "jumlah_mahasiswa_belum_hadir": 21,
+        "jumlah_mahasiswa": 59,
+        "jumlah_mahasiswa_hadir": 0,
+        "jumlah_mahasiswa_belum_hadir": 59,
         "presensi_mahasiswa": [
             {
-                "pertemuan_id": 42,
-                "nim": "3220008",
-                "nm_mhs": "MUHAMMAD RAIHAN AL GHIFARI",
-                "masuk": null
+                "pertemuan_id": 80,
+                "mhs_id": 15534,
+                "nim": "1220001",
+                "nm_mhs": "SUHAEFI FAUZIAN",
+                "masuk": "2024-03-19 14:59:13"
             },
             {
-                "pertemuan_id": 42,
-                "nim": "3220701",
-                "nm_mhs": "JAYA LAZUARDI",
-                "masuk": "2024-03-14 17:01:42"
-            }
+                "pertemuan_id": 80,
+                "mhs_id": 15680,
+                "nim": "1220313",
+                "nm_mhs": "YOGA PRATAMA ",
+                "masuk": null
+            },
             // mahasiswa lain disembunyikan
         ]
     }
@@ -159,5 +169,23 @@
     <p>
         Dalam response tersebut terdapat daftar presensi mahasiswa dan setelah kelas ditutup mahasiswa tidak bisa mengirim PIN presensi.
     </p>
+
+    {{-- Menghapus presensi mahasiswa --}}
+    <h5 class="mt-4">(DSN) Hapus Kehadiran Mahasiswa Pada Pertemuan Kelas Kuliah</h5>
+    <hr>
+    <p>
+        Dosen dapat menghapus status kehadiran mahasiswa pada pertemuan tertentu apabila kehadiran dari mahasiswa tersebut tidaklah valid, contohnya mahasiswa hanya mengirim PIN presensi tetapi tidak hadir di kelas. Untuk menghapusnya, kirimkam permintaan ke <span class="badge bg-dark">/kelas-kuliah/dosen/presensi-mahasiswa</span> dengan menggunakan HTTP method <span class="badge bg-info">delete</span> dan juga sertakan payload dalam body dengan format JSON seperti berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "pertemuan_id": 80,
+    "mhs_id": 15534
+}</code></pre>
+    <p>
+        Jika berhasil akan memberikan response dengan status sukses seperti di bawah ini:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "message": "Berhasil menghapus presensi mahasiswa"
+}</code></pre>
 </div>
 @endsection

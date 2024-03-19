@@ -29,6 +29,7 @@ Route::controller(KelasKuliahController::class)
                 Route::get('/open/{kelas_kuliah_id}', [PertemuanController::class, 'bukaKelasKuliah']);
                 Route::get('/close/{kelas_kuliah_id}', [PertemuanController::class, 'tutupKelasKuliah']);
                 Route::get('/open/{kelas_kuliah_id}/presensi', [PresensiController::class, 'getKehadiranMahasiswaByDosen']);
+                Route::delete('/presensi-mahasiswa', [PresensiController::class, 'deletePresensiMahasiswaByDosen']);
             });
 
         // * Routes untuk Mahasiswa

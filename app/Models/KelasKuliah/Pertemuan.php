@@ -68,7 +68,7 @@ class Pertemuan extends Model
             ->orderBy('pertemuan_id', 'DESC')
             ->select('pertemuan_id')
             ->with(['presensi' => function ($query) {
-                $query->select('pertemuan_id', 'nim', 'nm_mhs', 'masuk')
+                $query->select('pertemuan_id', 'mhs_id', 'nim', 'nm_mhs', 'masuk')
                     ->orderBy('masuk', 'DESC');
             }])->get();
     }
@@ -79,6 +79,13 @@ class Pertemuan extends Model
             ->orderBy('create_time', 'DESC')
             ->select('pertemuan_id')
             ->first();
+    }
+
+    public function scopeGetRiwayatPertemuanKelasKuliahByDosen(Builder $query, $kelasKuliahId, $dosenId) {
+        return $query->where('kelas_kuliah_id', $kelasKuliahId)
+            ->where('dosen_id', $dosenId)
+            ->select('pertemuan_id', 'jns_pert', 'create_time')
+            ->get();
     }
 
     public function presensi() {

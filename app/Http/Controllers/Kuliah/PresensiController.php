@@ -259,4 +259,54 @@ class PresensiController extends Controller {
             return ErrorHandler::handle($e);
         }
     }
+
+    public function deletePresensiMahasiswaByDosen(Request $request) {
+        try {
+            $request->validate([
+                'pertemuan_id' => 'required',
+                'mhs_id' => 'required'
+            ]);
+
+            $dosen = $this->getUserAuth();
+
+            // cek pertemuan id dan dosen
+            $hasPertemuan = Pertemuan::where('pertemuan_id', ((integer) $request->pertemuan_id))
+                ->where('dosen_id', $dosen['dosen_id'])
+                ->first();
+
+            if ($hasPertemuan) {
+                // cek mahasiswa
+                $mahasiswa = Presensi::where('pertemuan_id', ((integer) $request->pertemuan_id))
+                    ->where('mhs_id', ((integer) $request->mhs_id))
+                    ->first();
+
+                if (!$mahasiswa) {
+                    return response()->json([
+                        'status' => 'fail',
+                        'message' => 'Mahasiswa tidak mengambil kelas kuliah pada pertemuan tersebut'
+                    ], 404);
+                }
+
+                // update presensi mahasiswa ke null
+                Presensi::where('pertemuan_id', ((integer) $request->pertemuan_id))
+                    ->where('mhs_id', ((integer) $request->mhs_id))
+                    ->update([
+                        'pin' => null,
+                        'masuk' => null,
+                    ]);
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Berhasil menghapus presensi mahasiswa'
+                ], 200);
+            }
+
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Pertemuan tidak valid'
+            ], 400);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
 }

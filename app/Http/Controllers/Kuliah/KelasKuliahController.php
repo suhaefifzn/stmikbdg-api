@@ -14,6 +14,7 @@ use App\Models\KelasKuliah\JadwalView;
 
 // ? Models - table
 use App\Models\KelasKuliah\Pertemuan;
+use App\Models\KelasKuliah\Presensi;
 use App\Models\KRS\KRS;
 use App\Models\KRS\KRSMatkul;
 
@@ -33,9 +34,6 @@ class KelasKuliahController extends Controller {
 
             $kelasKuliah = collect($kelasKuliah)->flatten();
 
-            // cek jika ada kelas yang dijoin
-            // $kelasKuliah = self::getParentJoinKelasIdArr($kelasKuliah);
-
             // get setiap jadwal
             foreach ($kelasKuliah as $index => $item) {
                 if ($item['kjoin_kelas']) {
@@ -44,6 +42,11 @@ class KelasKuliahController extends Controller {
                     $jadwal = JadwalView::getJadwalKelasKuliah($item['kelas_kuliah_id'], $dosen['dosen_id'], true);
                 }
 
+                // get riwayat pertemuan
+                $riwayatPertemuan = Pertemuan::getRiwayatPertemuanKelasKuliahByDosen($item['kelas_kuliah_id'], $dosen['dosen_id']);
+                $item['riwayat_pertemuan'] = $riwayatPertemuan;
+
+                // atur response properti kelas dan jadwal
                 $kelasKuliah[$index] = self::setKelasKuliahAndJadwalProperties($item, $jadwal);
             }
 
@@ -86,6 +89,20 @@ class KelasKuliahController extends Controller {
 
                     foreach ($kelasKuliah as $index => $item) {
                         $jadwal = JadwalView::getJadwalKelasKuliah($item['kelas_kuliah_id'], $mahasiswa['mhs_id'], false);
+
+                        // get riwayat presensi mahasiswa
+                        $pertemuan = Pertemuan::where('kelas_kuliah_id', $item['kelas_kuliah_id'])->first();
+                        $riwayatPresensi = [];
+
+                        if ($pertemuan) {
+                            $riwayatPresensi = Presensi::where('pertemuan_id', 80)
+                                ->where('mhs_id', $mahasiswa['mhs_id'])
+                                ->select('masuk')
+                                ->get();
+                        }
+
+                        $item['riwayat_presensi'] = $riwayatPresensi;
+
                         $kelasKuliah[$index] = self::setKelasKuliahAndJadwalProperties($item, $jadwal);
                     }
 
@@ -110,20 +127,6 @@ class KelasKuliahController extends Controller {
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
-    }
-
-    private function getParentJoinKelasIdArr($kelasKuliah) {
-        $parentJoinKelasKuliahIdArr = array_values($kelasKuliah->pluck('join_kelas_kuliah_id')->filter()->toArray());
-
-        if (count($parentJoinKelasKuliahIdArr) > 0) {
-            $kelasKuliah = array_values(array_filter($kelasKuliah->toArray(), function ($item) use ($parentJoinKelasKuliahIdArr) {
-                return !in_array($item['kelas_kuliah_id'], $parentJoinKelasKuliahIdArr);
-            }));
-
-            return $kelasKuliah;
-        }
-
-        return $kelasKuliah;
     }
 
     private function filterKelasKuliahByHari($kelasKuliah, $hari) {
