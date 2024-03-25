@@ -126,7 +126,7 @@
     "status": "success",
     "message": "Kehadiran Anda berhasil direkam"
 }</code></pre>
-    <h5 class="mt-4">(MHS) Rekam Presensi - Single PIN (QR CODE)</h5>
+    <h5 class="mt-4">(MHS) Rekam Presensi - QR Code - Single atau Unique PIN</h5>
     <hr>
     <p>
         Setelah berhasil scan QR Code yang diberikan oleh dosen, lakukanlah request di belakang layar setelah nilai berupa url didapat dari hasil scanning. Kemudian API akan memberikan response dalam json yang memberikan pesan bahwa presensi mahasiswa berhasil direkam atau tidak. Silahkan lihat pada bagian (DSN) Buka Kelas Kuliah di <a href="{{ config('app.url') }}docs/api/kelas-dosen" class="text-decoration-none" rel="noopener">KELAS - DSN</a>.

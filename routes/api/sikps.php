@@ -8,5 +8,5 @@ use App\Http\Controllers\Users\MahasiswaController;
  */
 
 // ? Get all data skripsi mahasiswa
-Route::get('/sikps/mahasiswa', [MahasiswaController::class, 'getAllMahasiswa'])
-    ->middleware(['auth.jwt', 'auth.developer']);
+// Route::get('/sikps/mahasiswa', [MahasiswaController::class, 'getAllMahasiswa'])
+//     ->middleware(['auth.jwt', 'auth.developer']);

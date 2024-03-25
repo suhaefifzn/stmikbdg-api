@@ -85,7 +85,7 @@
     <p>
         Nilai <b>kelas_dibuka</b> akan berubah menjadi true jika kelas yang dipilih dibuka oleh Dosen, setelah dibuka jangan lupa untuk mengirim request untuk mendapatkan PIN. Setelah PIN didapat, maka Mahasiswa dapat mengisi presensi dengan mengirimkan PIN yang sama dengan yang didapat oleh Dosen nantinya.
     </p>
-    <h5 class="mt-4">(DSN) Buka Kelas Kuliah</h5>
+    <h5 class="mt-4">(DSN) Buka Kelas Kuliah - Single PIN</h5>
     <hr>
     <p>
         Kirimkan request ke <span class="badge bg-dark">/kelas-kuliah/dosen/open/{kelas_kuliah_id}</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>, ganti <b>kelas_kuliah_id</b> dengan nilai id dari kelas kuliah yang akan dibuka. Kelas hanya dapat dibuka pada tanggal yang sama dengan yang telah ditentukan. Misalnya <span class="badge bg-dark">/kelas-kuliah/dosen/open/3268</span>.
@@ -115,7 +115,7 @@
     "status": "success",
     "data": {
         "jumlah_mahasiswa": 59,
-        "jumlah_mahasiswa_hadir": 0,
+        "jumlah_mahasiswa_hadir": 1,
         "jumlah_mahasiswa_belum_hadir": 59,
         "presensi_mahasiswa": [
             {
@@ -145,7 +145,7 @@
     "message": "Kelas kuliah berhasil ditutup",
     "data": {
         "jumlah_mahasiswa": 59,
-        "jumlah_mahasiswa_hadir": 0,
+        "jumlah_mahasiswa_hadir": 1,
         "jumlah_mahasiswa_belum_hadir": 59,
         "presensi_mahasiswa": [
             {
@@ -187,5 +187,30 @@
     "status": "success",
     "message": "Berhasil menghapus presensi mahasiswa"
 }</code></pre>
+    <h5 class="mt-4">(DSN) Get Unique PIN per Mahasiswa untuk Presensi</h5>
+    <hr>
+    <p>
+        Untuk mendapatkan PIN acak yang bersifat unik atau hanya berlaku untuk satu mahasiswa saja, hal pertama yang harus dilakukan adalah membuka kelas terlebih dahulu. Setelah kelas berhasil dibuka yang ditandai response berisi pertemuan dan presensi dengan tipe pin single, kemudian barulah tambahkan query parameter <b>unique_pin</b> dengan nilai <b>true</b> pada url yang sama untuk mendapatkan PIN unique. Sehingga url yang dikirim menjadi seperti <span class="badge bg-dark">/kelas-kuliah/dosen/open/3248?unique_pin=true</span>. Hasilnya:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "pertemuan": {
+            "kelas_kuliah_id_dibuka": "3248-3272",
+            "tanggal": "2024-03-25",
+            "presensi": {
+                "qrcode_value": "http://stmikbdg-api.test/api/kelas-kuliah/mahasiswa/presensi/qrcode?kelas=3248-3272&pin=049314&unique_pin=true",
+                "pin": "049314",
+                "type_pin": "unique"
+            }
+        }
+    }
+}</code></pre>
+    <p>
+        Nilai <b>qrcode_value</b> dan <b>pin</b> saling berkaitan, maka pin hanya dapat digunakan satu mahasiswa saja. Pada sisi client gunakanlah metode polling request ke url yang digunakan untuk meminta unique PIN, jika nilai PIN yang diberikan pada response-nya masih sama, itu menandakan bahwa belum ada mahasiswa yang menggunakan PIN tersebut, jika nilai PIN pada response telah berubah berarti PIN sebelumnya telah digunakan oleh mahasiswa.
+    </p>
+    <p>
+        Dengan mengetahui perubahan PIN pada proses sebelumnya, maka pada sisi client atau Front-End Anda dapat melanjutkan untuk mengirim permintaan daftar presensi mahasiswa apabila PIN telah berubah.
+    </p>
 </div>
 @endsection

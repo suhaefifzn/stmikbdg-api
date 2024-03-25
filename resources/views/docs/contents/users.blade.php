@@ -122,7 +122,7 @@
         }
 }</code></pre>
     <div class="alert alert-warning">
-        <b>Perlu diperhatikan!</b> Kemungkinan API digunakan oleh beberapa sistem, sehingga mengganti foto progile artinya mengganti foto progile pengguna yang bersangkutan pada seluruh sistem yang menggunakan API ini.
+        <b>Perlu diperhatikan!</b> Kemungkinan API digunakan oleh beberapa sistem, sehingga mengganti foto profile artinya mengganti foto profile pengguna yang bersangkutan pada seluruh sistem yang menggunakan API ini.
     </div>
 
     {{-- Daftar web yang bisa diakses user --}}

@@ -3,12 +3,13 @@
 <h4><b>#</b> SIKPS</h4>
 <hr>
 <div class="m-2">
-    <p>
+    <p>API untuk SIKPS belum tersedia.</p>
+    {{-- <p>
         Beberapa route di bawah saat ini masih dikategorikan sebagai tambahan yang mungkin dapat digunakan untuk kepentingan lain..
-    </p>
+    </p> --}}
 
     {{-- Route untuk get data mahasiswa--}}
-    <h5 class="mt-4">(MHS) Get All Data Skripsi Mahasiswa</h5>
+    {{-- <h5 class="mt-4">(MHS) Get All Data Skripsi Mahasiswa</h5>
     <hr>
     <p>
         Digunakan untuk mendapatkan semua data mahasiswa yang ada database saat ini. Lakukan request ke ke <span class="badge bg-dark">/sikps/mahasiswa</span>. Jika ingin mendapatkan data mahasiswa yang telah memiliki judul skripsi tambahkan query <span class="badge bg-secondary">skripsi</span> dengan nilai <b>true</b> dan atau jika ingin mendapatkan data mahasiswa berdasarkan tahun masuk, maka tambahkan query <span class="badge bg-secondary">tahun_masuk</span>.
@@ -33,6 +34,6 @@
 }</code></pre>
     <p>
         Kemudian jika ingin data mahasiswa tersebut diekspor ke file excel paka tambahkan query <span class="badge bg-secondary">download</span> dengan nilai <b>true</b>. Sehingga secara keseluruhan menjadi <span class="badge bg-dark">/sikps/mahasiswa?skripsi=true&tahun_masuk=2020&download=true</span>.
-    </p>
+    </p> --}}
 </div>
 @endsection

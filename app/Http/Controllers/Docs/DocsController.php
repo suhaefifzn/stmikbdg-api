@@ -44,9 +44,9 @@ class DocsController extends Controller
         ]);
     }
 
-    public function dataMahasiswa() {
-        return view('docs.contents.data_mhs', [
-            'title' => 'Data Mahasiswa'
+    public function sikps() {
+        return view('docs.contents.sikps', [
+            'title' => 'SIKPS'
         ]);
     }
 
@@ -83,6 +83,24 @@ class DocsController extends Controller
     public function additionalRoutes() {
         return view('docs.contents.additional', [
             'title' => 'Additional Routes'
+        ]);
+    }
+
+    public function marketing() {
+        return view('docs.contents.marketing', [
+            'title' => 'Sistem Marketing'
+        ]);
+    }
+
+    public function surat() {
+        return view('docs.contents.surat', [
+            'title' => 'Sistem Penomoran Surat'
+        ]);
+    }
+
+    public function beritaAcara() {
+        return view('docs.contents.berita', [
+            'title' => 'Sistem Berita Acara'
         ]);
     }
 

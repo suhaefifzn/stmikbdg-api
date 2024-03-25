@@ -15,9 +15,7 @@ class TahunAjaranView extends Model
      * Model ini digunakan untuk view tahun ajaran aktif
      * hanya digunakan untuk get data (SELECT).
      *
-     * Koneksi database terhubung ke 'stmikbdg_dummy' view ta_aktif.
-     *
-     * Saat ini masih menggunakan dua database berbeda
+     * Koneksi database terhubung ke 'stmikbdg_dummy' view ta_aktif
      */
     use HasFactory;
 
@@ -36,10 +34,14 @@ class TahunAjaranView extends Model
             ->first();
     }
 
+    public function scopeGetTahunAjaranWithKRS(Builder $query) {
+        return $query->with('krs')->get();
+    }
+
     /**
      * Relasi view ta_aktif ke tabel krs, one to many
      */
     public function krs() {
-        return $this->hasMany(KRS::class);
+        return $this->hasMany(KRS::class, 'tahun_id', 'tahun_id');
     }
 }

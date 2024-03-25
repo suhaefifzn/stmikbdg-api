@@ -21,8 +21,8 @@ class PresensiController extends Controller {
     public function kirimPinPresensi(Request $request) {
         try {
             $request->validate([
-                'kelas_kuliah_id' => 'required',
-                'pin' => 'required|min:6|max:6',
+                'kelas_kuliah_id' => 'required|string',
+                'pin' => 'required|string|min:6|max:6',
             ]);
 
             /**
@@ -70,7 +70,49 @@ class PresensiController extends Controller {
              * pada cache di API
              */
             if (Cache::has((string) $request->kelas_kuliah_id)) {
-                $isSamePIN = (string) $request->pin === Cache::get((string) $request->kelas_kuliah_id);
+                /**
+                 * Cek apakah PIN yang dikirim tipenya unique
+                 * jika ya, pastikan pada Cache bahwa pin tersebut unique
+                 * pin yang unique disimpan dengan tipe array key pada Cache-nya
+                 */
+                $isSamePIN = false;
+
+                if (is_array(Cache::get((string) $request->kelas_kuliah_id))) {
+                    $dataPIN = Cache::get((string) $request->kelas_kuliah_id);
+
+                    if ($dataPIN['type_pin'] === 'unique') {
+                        $isSamePIN = (string) $request->pin === (string) $dataPIN['pin'];
+
+                        if ($isSamePIN) {
+                            // cek kelas join
+                            $kelasKuliahId = (integer) $request->kelas_kuliah_id;
+                            $kelasKuliahIdArr = [];
+                            $kelasKuliah = KelasKuliahJoinView::getJoinJurusanData($kelasKuliahId);
+
+                            /**
+                             * Jika kelas yang dibuka dan dijoin ke kelas lain
+                             */
+                            if ($kelasKuliah['kjoin_kelas']) {
+                                $kelasKuliahId = $kelasKuliah['join_kelas_kuliah_id'];
+                            }
+
+                            /**
+                             * Kelas-kelas yang dijoin
+                             */
+                            $kelasKuliahIdArr = KelasKuliahJoinView::where('join_kelas_kuliah_id', $kelasKuliahId)
+                                ->pluck('kelas_kuliah_id')->filter()->toArray();
+
+                            array_push($kelasKuliahIdArr, $kelasKuliahId);
+
+                            // hapus setiap pin yang ada di cache
+                            foreach ($kelasKuliahIdArr as $item) {
+                                Cache::forget(((string) $item));
+                            }
+                        }
+                    }
+                } else {
+                    $isSamePIN = (string) $request->pin === Cache::get((string) $request->kelas_kuliah_id);
+                }
 
                 if ($isSamePIN) {
                     /**
@@ -85,7 +127,7 @@ class PresensiController extends Controller {
 
                     return response()->json([
                         'status' => 'success',
-                        'message' => 'Kehadiran Anda berhasil direkam'
+                        'message' => 'Kehadiran Anda berhasil direkam',
                     ], 200);
                 }
             }
@@ -218,23 +260,50 @@ class PresensiController extends Controller {
                          * pada cache di API
                          */
                         if (Cache::has((string) $kelasKuliahId)) {
-                            $isSamePIN = (string) $pin === Cache::get((string) $kelasKuliahId);
+                            /**
+                             * Cek unique pin terlebih dahulu
+                             */
+                            $isSamePIN = false;
+
+                            if ($request->unique_pin) {
+                                $isUniquePIN = filter_var($request->unique_pin, FILTER_VALIDATE_BOOLEAN);
+
+                                if ($isUniquePIN) {
+                                    if (is_array(Cache::get((string) $kelasKuliahId))) {
+                                        $dataPIN = Cache::get((string) $kelasKuliahId);
+                                        $isSamePIN = (string) $request->pin === (string) $dataPIN['pin'];
+
+                                        /**
+                                         * Jika pin sama, maka hapus semua pin di cache
+                                         */
+                                        if ($isSamePIN) {
+                                            foreach ($kelasKuliahIdArr as $item) {
+                                                Cache::forget((string) $item);
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                $isSamePIN = (string) $pin === Cache::get((string) $kelasKuliahId);
+                            }
 
                             if ($isSamePIN) {
                                 /**
                                  * Presensi mahasiswa terisi, isi pin dan waktu masuk
                                  */
-                                Presensi::where('pertemuan_id', $pertemuan['pertemuan_id'])
+                                $updateResult = Presensi::where('pertemuan_id', $pertemuan['pertemuan_id'])
                                     ->where('mhs_id', $mahasiswa['mhs_id'])
                                     ->update([
                                         'pin' => (string) $request->pin,
                                         'masuk' => Carbon::now(),
                                     ]);
 
-                                return response()->json([
-                                    'status' => 'success',
-                                    'message' => 'Kehadiran Anda berhasil direkam'
-                                ], 200);
+                                if ($updateResult) {
+                                    return response()->json([
+                                        'status' => 'success',
+                                        'message' => 'Kehadiran Anda berhasil direkam'
+                                    ], 200);
+                                }
                             }
                         }
 

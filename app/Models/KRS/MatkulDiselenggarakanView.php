@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Models\KRS\NilaiAkhirView;
 use App\Models\KRS\NilaiLamaView;
 use App\Models\KRS\NilaiGabunganView;
+use App\Models\KelasKuliah\KelasKuliahJoinView;
 
 class MatkulDiselenggarakanView extends Model
 {
@@ -32,17 +33,32 @@ class MatkulDiselenggarakanView extends Model
 
     public function scopeGetMatkulDiselenggarakan(Builder $query, $filter) {
         return $query->where('tahun_id', $filter['tahun_id'])
-                    ->orderBy('mk_id', 'ASC')
-                    ->get();
+            ->orderBy('mk_id', 'ASC')
+            ->get();
     }
 
     public function scopeGetOneMatkul(Builder $query, $filter) {
         return $query->where('mk_id', $filter['mk_id'])
-                    ->where('tahun_id', $filter['tahun_id'])
-                    ->where('kd_kampus', $filter['kd_kampus'])
-                    ->where('jns_mhs', $filter['jns_mhs'])
-                    ->where('jur_id', $filter['jur_id'])
-                    ->get();
+            ->where('tahun_id', $filter['tahun_id'])
+            ->where('kd_kampus', $filter['kd_kampus'])
+            ->where('jns_mhs', $filter['jns_mhs'])
+            ->where('jur_id', $filter['jur_id'])
+            ->get();
+    }
+
+    public function scopeGetMatkulWithKelasKuliah(Builder $query, $tahunId, $jnsMhs, $kdKampus, $semester = null) {
+        return $query->where('tahun_id', $tahunId)
+            ->when($semester, function ($query) use ($semester) {
+                $query->where('semester', $semester);
+            })
+            ->with(['kelasKuliah' => function ($query) use ($tahunId, $jnsMhs, $kdKampus) {
+                $query->where('tahun_id', $tahunId)
+                    ->where('jns_mhs', $jnsMhs)
+                    ->where('kd_kampus', $kdKampus)
+                    ->select('kelas_kuliah_id', 'tahun_id', 'mk_id', 'jur_id', 'smt', 'jml_sks', 'kelas_kuliah', 'jns_mhs', 'pengajar_id', 'sts_kelas', 'kjoin_kelas', 'join_kelas_kuliah_id')
+                    ->with('dosen');
+            }])
+            ->get();
     }
 
     public function nilaiAkhir() {
@@ -55,5 +71,9 @@ class MatkulDiselenggarakanView extends Model
 
     public function nilaiGabungan() {
         return $this->hasMany(NilaiGabunganView::class, 'mk_id', 'mk_id');
+    }
+
+    public function kelasKuliah() {
+        return $this->hasMany(KelasKuliahJoinView::class, 'mk_id', 'mk_id');
     }
 }

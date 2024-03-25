@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use App\Models\KelasKuliah\KelasKuliahJoinView;
 use App\Models\TahunAjaranView;
 use App\Models\KRS\KRS;
+use App\Models\KRS\KRSMatkul;
+use App\Models\KRS\MatkulDiselenggarakanView;
 
 class KuesionerController extends Controller
 {
@@ -60,6 +62,85 @@ class KuesionerController extends Controller
                 'status' => 'fail',
                 'message' => 'Belum mengajukan atau KRS belum disetujui untuk tahun ajaran aktif saat ini'
             ], 400);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function getMatkulByTahunAjaran(Request $request) {
+        try {
+            $tahunId = $request->query('tahun_id');
+            $jnsMhs = $request->query('jns_mhs');
+            $kdKampus = $request->query('kd_kampus');
+            $semester = $request->query('semester');
+
+            if (!$tahunId or !$jnsMhs or !$kdKampus) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Pastikan terdapat nilai tahun_id, jns_mhs, dan kd_kampus pada url sebagai query parameter',
+                ], 400);
+            }
+
+            $listMatkul = MatkulDiselenggarakanView::getMatkulWithKelasKuliah($tahunId, $jnsMhs, $kdKampus, $semester);
+
+            foreach ($listMatkul as $index => $item) {
+                /**
+                 * Jika kjoin_kelas true dan pengajar_id null
+                 * maka dapatkan data pengajar dari join_kelas_kuliah_id
+                 */
+                if ($item['kelasKuliah'][0]['kjoin_kelas'] and is_null($item['kelasKuliah'][0]['pengajar_id'])) {
+                    $joinKelasKuliahId = $item['kelasKuliah'][0]['join_kelas_kuliah_id'];
+                    $tempkelasKuliah = KelasKuliahJoinView::where('kelas_kuliah_id', $joinKelasKuliahId)
+                        ->select('pengajar_id')->with('dosen')->first();
+
+                    $item['kelasKuliah'][0]['dosen'] = $tempkelasKuliah['dosen'];
+                    $listMatkul[$index] = $item;
+                }
+
+                /**
+                 * ! Kode di bawah ini sementara karena desain db belum ada
+                 * Cek Data Kuesioner
+                 */
+
+                /**
+                 * Hitung total mahasiswa yang mengambil mata kuliahnya
+                 */
+                $totalMahasiswa = 0;
+                $tempJoinedKelasKuliahIds = null;
+                $tempAllKelasKuliahIdArr = [];
+
+                if ($item['kelasKuliah'][0]['kjoin_kelas']) {
+                    /**
+                     * Kelas ($item) dijoin dengan kelas lain
+                     */
+                    $tempJoinKelasKuliahId = $item['kelasKuliah'][0]['join_kelas_kuliah_id'];
+                    $tempJoinKelasKuliahIdArr = KelasKuliahJoinView::where('join_kelas_kuliah_id', $tempJoinKelasKuliahId)
+                        ->get()->pluck('kelas_kuliah_id')->flatten()->toArray();
+
+                    array_push($tempAllKelasKuliahIdArr, $tempJoinKelasKuliahId);
+                    $tempAllKelasKuliahIdArr = array_merge($tempAllKelasKuliahIdArr, $tempJoinKelasKuliahIdArr);
+
+                    $tempJoinedKelasKuliahIds = implode('-', $tempJoinKelasKuliahIdArr);
+
+                    // count total mahasiswa
+                    $totalMahasiswa = KRSMatkul::whereIn('kelas_kuliah_id', $tempAllKelasKuliahIdArr)->get()->count();
+                } else {
+                    $totalMahasiswa = KRSMatkul::where('kelas_kuliah_id', $item['kelasKuliah'][0]['kelas_kuliah_id'])
+                        ->get()->count();
+                }
+
+                $item['kuesioner'] = [
+                    'total_mahasiswa' => $totalMahasiswa,
+                    'joined_kelas_kuliah_ids' => $tempJoinedKelasKuliahIds,
+                    'all_kelas_kuliah_id' => $tempAllKelasKuliahIdArr,
+                ];
+
+                $listMatkul[$index] = $item;
+            }
+
+            return $this->successfulResponseJSON([
+                'mata_kuliah' => $listMatkul,
+            ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }

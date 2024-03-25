@@ -88,10 +88,52 @@ class PertemuanController extends Controller {
             array_push($kelasKuliahIdArr, $kelasKuliahId);
 
             if ($kelasPernahDibuka->exists()) {
-                Pertemuan::updateKelasDibuka($kelasKuliahIdArr, $kelasKuliah['pengajar_id'], true); // kelas_dibuka = true
+                /**
+                 * Jika terdapat query param unique_pin = true, maka
+                 * Generate unique random pin per mahasiswa
+                 */
+                if ($request->unique_pin) {
+                    $validatedValueUniquePIN = filter_var($request->unique_pin, FILTER_VALIDATE_BOOLEAN);
+
+                    /**
+                     * Jika kelas sudah ditutup dan terdapat query param unique_pin,
+                     * maka kelas harus dibuka terlebih dahulu dengan single pin
+                     */
+                    if (!$kelasPernahDibuka['kelas_dibuka']) {
+                        return response()->json([
+                            'status' => 'fail',
+                            'message' => 'Buka kelas terlebih dahulu tanpa menggunakan query parameter unique_pin'
+                        ], 400);
+                    }
+
+                    if ($validatedValueUniquePIN) {
+                        $randomPIN = self::generateUniqueRandomPIN($kelasKuliahIdArr);
+                    } else {
+                        return response()->json([
+                            'status' => 'fail',
+                            'message' => 'Nilai unique_pin tidak ditemukan'
+                        ], 404);
+                    }
+                } else {
+                    /**
+                     * Jika kelas ditutup, dan akan dibuka kembali di hari yang sama
+                     */
+                    Pertemuan::updateKelasDibuka($kelasKuliahIdArr, $kelasKuliah['pengajar_id'], true); // kelas_dibuka = true
+                }
             } else {
                 /**
-                 * Tanggal kelas akan dibuka sesuai tanggal di jadwal
+                 * Request terdapat query param unique_pin,
+                 * maka tolak permintaan kelas dibuka
+                 */
+                if ($request->unique_pin) {
+                    return response()->json([
+                        'status' => 'fail',
+                        'message' => 'Buka kelas terlebih dahulu tanpa menggunakan query parameter unique_pin'
+                    ], 400);
+                }
+
+                /**
+                 * Tanggal kelas pertama kali dibuka sesuai tanggal di jadwal
                  */
                 $pertemuan = [
                     'kelas_kuliah_id' => $kelasKuliahId,
@@ -103,18 +145,24 @@ class PertemuanController extends Controller {
                     'dosen_id' => $kelasKuliah['pengajar_id'],
                 ];
 
-                self::createDaftarKehadiran($pertemuan, $kelasKuliahId);
-
                 // jika ada kelas dijoin
                 if (count($kelasKuliahIdArr) > 0) {
                     foreach ($kelasKuliahIdArr as $item) {
                         $pertemuan['kelas_kuliah_id'] = $item;
                         self::createDaftarKehadiran($pertemuan, $item);
                     }
+                } else {
+                    self::createDaftarKehadiran($pertemuan, $kelasKuliahId);
                 }
             }
 
-            $randomPIN = self::generateRandomPIN($kelasKuliahIdArr);
+            /**
+             * Saat kelas dibuka dan single PIN
+             * maka generate pin single atau tetap
+             */
+            if (!$request->unique_pin) {
+                $randomPIN = self::generateSingleRandomPIN($kelasKuliahIdArr);
+            }
 
             return $this->successfulResponseJSON([
                 'pertemuan' => [
@@ -160,8 +208,6 @@ class PertemuanController extends Controller {
             );
 
             if ($kelasDibuka->exists()) {
-                self::destroyRandomPIN($kelasKuliah['kelas_kuliah_id']);
-
                 // cek kelas join
                 $kelasKuliahIdArr = [];
 
@@ -179,6 +225,11 @@ class PertemuanController extends Controller {
                     ->pluck('kelas_kuliah_id')->filter()->toArray();
 
                 array_push($kelasKuliahIdArr, $kelasKuliahId);
+
+                // hapus setiap pin yang ada di cache
+                foreach ($kelasKuliahIdArr as $item) {
+                    self::destroyRandomPIN($item);
+                }
 
                 $presensiMahasiswa = Pertemuan::getPertemuanKelasDibukaWithPresensi($kelasKuliahIdArr, $dosen['dosen_id'])
                     ->pluck('presensi')->flatten();
@@ -209,7 +260,44 @@ class PertemuanController extends Controller {
         }
     }
 
-    private function generateRandomPIN($kelasKuliahIdArr) {
+    private function generateUniqueRandomPIN($kelasKuliahIdArr) {
+        $implodedKelasId = implode('-', $kelasKuliahIdArr);
+        $randomPIN = str_pad(rand(1, 999999), 6, '0', STR_PAD_LEFT);
+
+        /**
+         * Jika PIN sebelumnya masih ada di cache,
+         * maka PIN tersebut belum digunakan sama sekali.
+         */
+        if (Cache::has(((string) $kelasKuliahIdArr[0]))) {
+            $dataPIN = Cache::get((string) $kelasKuliahIdArr[0]);
+
+            if (is_array($dataPIN)) {
+                $randomPIN = $dataPIN['pin'];
+            } else {
+                $randomPIN = Cache::get((string) $kelasKuliahIdArr[0]);
+            }
+        } else {
+            // simpan pin baru
+            foreach ($kelasKuliahIdArr as $item) {
+                $dataPIN = [
+                    'pin' => $randomPIN,
+                    'type_pin' => 'unique',
+                ];
+
+                Cache::put(((string) $item), $dataPIN);
+            }
+        }
+
+        return [
+            'qrcode_value' => config('app.url') . 'api/kelas-kuliah/'
+                . 'mahasiswa/presensi/qrcode?kelas=' . $implodedKelasId . '&pin=' . $randomPIN
+                . '&unique_pin=true',
+            'pin' => $randomPIN,
+            'type_pin' => 'unique',
+        ];
+    }
+
+    private function generateSingleRandomPIN($kelasKuliahIdArr) {
         $randomPIN = str_pad(rand(1, 999999), 6, '0', STR_PAD_LEFT);
         $implodedKelasId = implode('-', $kelasKuliahIdArr);
 
@@ -223,6 +311,7 @@ class PertemuanController extends Controller {
             'qrcode_value' => config('app.url') . 'api/kelas-kuliah/'
                 . 'mahasiswa/presensi/qrcode?kelas=' . $implodedKelasId . '&pin=' . $randomPIN,
             'pin' => $randomPIN,
+            'type_pin' => 'single',
         ];
     }
 

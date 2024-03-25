@@ -28,13 +28,16 @@ Route::controller(DocsController::class)
         Route::get('/users', 'users');
         Route::get('/krs-mahasiswa', 'krsMahasiswa');
         Route::get('/krs-dosen-wali', 'krsDosenWali');
-        Route::get('/sikps', 'dataMahasiswa');
+        Route::get('/sikps', 'sikps');
         Route::get('/kuesioner', 'kuesioner');
         Route::get('/acl', 'acl');
         Route::get('/kelas-mahasiswa', 'kelasKuliahMahasiswa');
         Route::get('/kelas-dosen', 'kelasKuliahDosen');
         Route::get('/kamus', 'kamus');
         Route::get('/additional', 'additionalRoutes');
+        Route::get('/marketing', 'marketing');
+        Route::get('/berita-acara', 'beritaAcara');
+        Route::get('/penomoran-surat', 'surat');
     });
 
 // ? Auth

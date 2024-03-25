@@ -38,6 +38,10 @@
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="/docs/api/sikps">SIKPS</a></li>
                 <li><a class="dropdown-item" href="/docs/api/kuesioner">Kuesioner</a></li>
+                <li><a class="dropdown-item" href="/docs/api/marketing">Marketing</a></li>
+                <li><a class="dropdown-item" href="/docs/api/berita-acara">Berita Acara</a></li>
+                <li><a class="dropdown-item" href="/docs/api/penomoran-surat">Penomoran Surat</a></li>
+                <hr>
                 <li><a class="dropdown-item" href="/docs/api/acl">ACL (For Admin)</a></li>
             </ul>
         </li>
