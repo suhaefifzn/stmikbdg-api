@@ -51,28 +51,46 @@ class TahunAjaranController extends Controller
                 }
             })->flatten();
 
-            $filteredTahunArajanArr = [];
-
+            /**
+             * Grouping berdasarkan jns_mhs dan kd_kampus
+             */
+            $tempGroupedTahunAjaran = [];
             foreach ($tahunAjaranArr as $item) {
-                $dataKampus = KampusView::getDetailKampus($item['kd_kampus']);
-                $dataJurusan = JurusanView::where('jur_id', $item['jur_id'])->first();
-                $tahunAjaran = [
-                    'tahun_id' => $item['tahun_id'],
-                    'jur_id' => $item['jur_id'],
-                    'tahun' => $item['tahun'],
-                    'smt' => $item['smt'],
-                    'ket_smt' => $item['smt'] == 1 ? 'Ganjil'
-                        : ($item['smt'] == 2 ? 'Genap' : 'Tambahan'),
-                    'jns_mhs' => $item['jns_mhs'],
-                    'jurusan' => $dataJurusan,
-                    'detail_kampus' => $dataKampus
-                ];
+                $key = $item['jns_mhs'];
+                $key2 = $item['kd_kampus'];
+                $tempGroupedTahunAjaran[$key][$key2][] = $item;
+            }
 
-                array_push($filteredTahunArajanArr, $tahunAjaran);
+            $groupedTahunAjaran = [];
+            foreach ($tempGroupedTahunAjaran as $jnsMhs) {
+                foreach ($jnsMhs as $key => $kdKampus) {
+                    $tahunIdArr = collect($kdKampus)->pluck('tahun_id')->filter()->toArray();
+                    $tahunIds = implode('-', $tahunIdArr);
+                    $tempJnsMhs = $kdKampus[0]['jns_mhs'];
+                    $tempKdKampus = $kdKampus[0]['kd_kampus'];
+                    $tempSmt = $kdKampus[0]['smt'];
+
+                    $formattedItem = [
+                        'tahun' => $kdKampus[0]['tahun'],
+                        'tahun_ids' => $tahunIds,
+                        'jns_mhs' => $tempJnsMhs == 'R' ? 'Reguler'
+                            : ($tempJnsMhs == 'E' ? 'Eksekutif'
+                                : 'Karyawan'),
+                        'sts_ta' => $kdKampus[0]['sts_ta'],
+                        'smt' => $tempSmt,
+                        'ket_smt' => $tempSmt == 1 ? 'Ganjil'
+                            : ($tempSmt == 2 ? 'Genap'
+                                : 'Tambahan'),
+                        'kd_kampus' => $tempKdKampus,
+                        'detail_kampus' => KampusView::getDetailKampus($tempKdKampus)
+                    ];
+
+                    array_push($groupedTahunAjaran, $formattedItem);
+                }
             }
 
             return $this->successfulResponseJSON([
-                'tahun_ajaran_aktif' => $filteredTahunArajanArr
+                'tahun_ajaran_aktif' => $groupedTahunAjaran
             ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);

@@ -18,6 +18,9 @@ require __DIR__.'/api/kuesioner.php';
 // ? SIKPS Routes
 require __DIR__.'/api/sikps.php';
 
+// ? Pengajuan Wisuda Routes
+require __DIR__.'/api/wisuda.php';
+
 // ? ACL Routes
 require __DIR__.'/api/acl.php';
 

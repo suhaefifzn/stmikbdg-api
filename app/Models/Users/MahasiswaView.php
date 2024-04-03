@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 //? Models - view
 use App\Models\JurusanView;
 use App\Models\KelasKuliah\JadwalView;
+use Illuminate\Database\Eloquent\Builder;
 
 class MahasiswaView extends Model
 {
@@ -24,6 +25,10 @@ class MahasiswaView extends Model
 
     public function __construct() {
         $this->connection = config('myconfig.database.second_connection');
+    }
+
+    public function scopeGetMahasiswa(Builder $query, $nim) {
+        return $query->where('nim', $nim)->first();
     }
 
     /**

@@ -41,6 +41,7 @@
                 <li><a class="dropdown-item" href="/docs/api/marketing">Marketing</a></li>
                 <li><a class="dropdown-item" href="/docs/api/berita-acara">Berita Acara</a></li>
                 <li><a class="dropdown-item" href="/docs/api/penomoran-surat">Penomoran Surat</a></li>
+                <li><a class="dropdown-item" href="/docs/api/pengajuan-wisuda">Pengajuan Wisuda</a></li>
                 <hr>
                 <li><a class="dropdown-item" href="/docs/api/acl">ACL (For Admin)</a></li>
             </ul>

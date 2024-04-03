@@ -46,18 +46,20 @@ class MatkulDiselenggarakanView extends Model
             ->get();
     }
 
-    public function scopeGetMatkulWithKelasKuliah(Builder $query, $tahunId, $jnsMhs, $kdKampus, $semester = null) {
-        return $query->where('tahun_id', $tahunId)
+    public function scopeGetMatkulWithKelasKuliah(Builder $query, $tahunIdArr, $jnsMhs, $kdKampus, $semester = null) {
+        return $query->whereIn('tahun_id', $tahunIdArr)
             ->when($semester, function ($query) use ($semester) {
                 $query->where('semester', $semester);
             })
-            ->with(['kelasKuliah' => function ($query) use ($tahunId, $jnsMhs, $kdKampus) {
-                $query->where('tahun_id', $tahunId)
+            ->with(['kelasKuliah' => function ($query) use ($tahunIdArr, $jnsMhs, $kdKampus) {
+                $query->whereIn('tahun_id', $tahunIdArr)
                     ->where('jns_mhs', $jnsMhs)
                     ->where('kd_kampus', $kdKampus)
                     ->select('kelas_kuliah_id', 'tahun_id', 'mk_id', 'jur_id', 'smt', 'jml_sks', 'kelas_kuliah', 'jns_mhs', 'pengajar_id', 'sts_kelas', 'kjoin_kelas', 'join_kelas_kuliah_id')
                     ->with('dosen');
             }])
+            ->whereNotIn('kd_mk', ['IF1200', 'SI1200', 'IF1400', 'SI1400', 'IF1600', 'SI1600', 'IF1800', 'SI1800'])
+            ->distinct('kd_mk')
             ->get();
     }
 

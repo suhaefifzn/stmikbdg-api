@@ -104,6 +104,12 @@ class DocsController extends Controller
         ]);
     }
 
+    public function pengajuanWisuda() {
+        return view('docs.contents.wisuda', [
+            'title' => 'Pengajuan Wisuda'
+        ]);
+    }
+
     public function authenticate(Request $request) {
         $credentials = $request->validate([
             'email' => 'required|email:dns',

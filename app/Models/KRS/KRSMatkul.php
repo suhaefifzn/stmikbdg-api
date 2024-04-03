@@ -46,6 +46,12 @@ class KRSMatkul extends Model
             }])->get();
     }
 
+    public function scopeGetKRSMatkulDisejutuiByKelasKuliahIdArr(Builder $query, $kelasKuliahIdArr) {
+        return $query->whereIn('kelas_kuliah_id', $kelasKuliahIdArr)
+            ->where('k_disetujui', true)
+            ->get();
+    }
+
     public function krs() {
         return $this->belongsTo(KRS::class, 'krs_id', 'krs_id');
     }
@@ -54,16 +60,10 @@ class KRSMatkul extends Model
         return $this->belongsTo(MatKulView::class, 'mk_id', 'mk_id');
     }
 
-    /**
-     * Relasi ke view kelas kuliah
-     */
     public function kelasKuliah() {
         return $this->belongsTo(KelasKuliahView::class, 'kelas_kuliah_id', 'kelas_kuliah_id');
     }
 
-    /**
-     * Relasi ke view kelas kuliah join
-     */
     public function kelasKuliahJoin() {
         return $this->belongsTo(KelasKuliahJoinView::class, 'kelas_kuliah_id', 'kelas_kuliah_id');
     }

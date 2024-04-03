@@ -38,6 +38,7 @@ Route::controller(DocsController::class)
         Route::get('/marketing', 'marketing');
         Route::get('/berita-acara', 'beritaAcara');
         Route::get('/penomoran-surat', 'surat');
+        Route::get('/pengajuan-wisuda', 'pengajuanWisuda');
     });
 
 // ? Auth

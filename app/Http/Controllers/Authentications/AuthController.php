@@ -32,7 +32,6 @@ class AuthController extends Controller {
                 ], 400);
             }
 
-            $token = auth()->attempt($credentials);
             $ttl = self::setExpirationToken($platform);
             $token = auth()->setTTL($ttl)->attempt($credentials);
 
@@ -41,9 +40,7 @@ class AuthController extends Controller {
                     'token' => [
                         'access_token' => $token,
                         'token_type' => 'bearer',
-                        'expires_in' => $platform === 'android' ?
-                                        null
-                                        : "$ttl minutes",
+                        'expires_in' => $platform === 'android' ? null : "$ttl minutes",
                     ],
                     'platform' => $platform,
                     'roles' => [
@@ -135,7 +132,7 @@ class AuthController extends Controller {
      */
     private function setExpirationToken(string $platform)
     {
-        if ($platform === 'android') return 60 * 24 * 30 * 12 * 1000; // kurang lebih 1000 tahun
-        else if ($platform === 'web') return 60 * 6; // 6 hours
+        if ($platform == 'android') return 60 * 24 * 30 * 12 * 1000; // kurang lebih 1000 tahun
+        else if ($platform == 'web') return 60 * 6; // 6 hours
     }
 }
