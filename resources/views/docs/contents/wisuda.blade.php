@@ -106,7 +106,7 @@
     </h5>
     <hr>
     <p>
-        Untuk edit pengajuan kirimkan permintaan ke <span class="badge bg-dark">/wisuda/pengajuan/{nim}</span> dengan menggunakan HTTP method <span class="badge bg-info">PUT</span>, ganti <b>nim</b> dengan NIM milik Anda. Contohnya menjadi <span class="badge bg-dark">/wisuda/pengajuan/1220001/update</span>. Kemudian, kirimkan data dalam format json sebagai payload body seperti berikut:
+        Untuk edit pengajuan kirimkan permintaan ke <span class="badge bg-dark">/wisuda/pengajuan/{nim}/update</span> dengan menggunakan HTTP method <span class="badge bg-info">PUT</span>, ganti <b>nim</b> dengan NIM milik Anda. Contohnya menjadi <span class="badge bg-dark">/wisuda/pengajuan/1220001/update</span>. Kemudian, kirimkan data dalam format JSON sebagai payload body seperti berikut:
     </p>
     <pre><code class="language-json bg-primary-subtle">{
     "pengajuan_id": 3,
@@ -223,7 +223,7 @@
     </h5>
     <hr>
     <p>
-        Gunakan HTTP method <span class="badge bg-info">put</span>, kirimkan permintaan ke <span class="badge bg-dark">/wisuda/pengajuan/detail/{nim}</span>, ganti <b>nim</b> dengan NIM mahasiswa yang mengajukan pendaftaran, kemudian sertakan payload body dalam format JSON seperti di bawah ini:
+        Gunakan HTTP method <span class="badge bg-info">put</span>, kirimkan permintaan ke <span class="badge bg-dark">/wisuda/pengajuan/{nim}/update-by-admin</span>, ganti <b>nim</b> dengan NIM mahasiswa yang mengajukan pendaftaran, contohnya <span class="badge bg-dark">/wisuda/pengajuan/1220001/update-by-admin</span>. Kemudian, sertakan payload body dalam format JSON seperti di bawah ini:
     </p>
     <pre><code class="language-json bg-primary-subtle">{
     "pengajuan_id": 3,
@@ -291,7 +291,7 @@
     </h5>
     <hr>
     <p>
-        Admin dapat mengetahui daftar jadwal dan angkatan wisuda setiap tahunnya. Kirimkan permintaan ke <span class="badge bg-dark">/wisuda/pengajuan/list/jadwal</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>/ Hasilnya:
+        Admin dapat mengetahui daftar jadwal dan angkatan wisuda setiap tahunnya. Kirimkan permintaan ke <span class="badge bg-dark">/wisuda/pengajuan/list/jadwal</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Hasilnya:
     </p>
     <pre><code class="language-json bg-primary-subtle">{
     "status": "success",
@@ -310,6 +310,20 @@
                 "angkatan_wisuda": 32
             }
         ]
+    }
+}</code></pre>
+    <p>
+        Untuk mendapatkan jadwal dan angkatan wisuda yang sedang aktif tambahkan <span class="badge bg-secondary">?aktif=true</span>, sehingga menjadi <span class="badge bg-dark">/wisuda/pengajuan/list/jadwal?aktif=true</span>. Hasilnya:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "jadwal_wisuda": {
+            "jadwal_wisuda_id": 2,
+            "tahun": 2024,
+            "tgl_wisuda": "23-09-2024",
+            "angkatan_wisuda": 33
+        }
     }
 }</code></pre>
 
