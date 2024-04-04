@@ -6,6 +6,12 @@
             <b>API Base URL:</b> {{ $apiBaseURL }}
         </p>
         <hr>
+        <div class="alert alert-danger">
+            <b>Riwayat Update:</b><br>
+            <ul>
+                <li>Kamis, 04-04-2024 | <a href="/docs/api/pengajuan-wisuda" class="text-decoration-none">Update API Sistem Pengajuan Pendaftaran Wisuda</a></li>
+            </ul>
+        </div>
         <div class="alert alert-warning">
             <span class="fw-bold fs-6">Cara Penggunaan:</span>
             <p>

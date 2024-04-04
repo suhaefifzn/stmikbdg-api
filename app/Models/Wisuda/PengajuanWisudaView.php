@@ -36,10 +36,14 @@ class PengajuanWisudaView extends Model
             ->first();
     }
 
-    public function scopeGetAllPengajuan(Builder $query, $kdStatus = null) {
+    public function scopeGetAllPengajuan(Builder $query, $kdStatus = null, $jadwalId = null) {
         return $query->when($kdStatus, function ($query) use ($kdStatus) {
                 $query->where('kd_status', $kdStatus);
-            })->orderBy('tgl_pengajuan', 'DESC')
+            })
+            ->when($jadwalId, function ($query) use ($jadwalId) {
+                $query->where('jadwal_wisuda_id', $jadwalId);
+            })
+            ->orderBy('tgl_pengajuan', 'DESC')
             ->get();
     }
 }

@@ -13,8 +13,11 @@ Route::prefix('/wisuda')
             ->middleware('auth.mahasiswa')
             ->group(function () {
                 Route::post('/pengajuan', 'addPengajuan');
+                Route::put('/pengajuan/{nim}/update', 'updatePengajuan');
                 Route::get('/pengajuan/{nim}', 'getDetailPengajuan');
                 Route::get('/pengajuan/{nim}/status', 'getStatusPengajuan');
+                Route::get('/pengajuan/skripsi/{nim}', 'getSkripsiDiajukanPadaSIKPS');
+                Route::get('/pengajuan/jadwal/aktif', 'getJadwalWisudaAktif');
             });
 
         // ? Admin
@@ -24,9 +27,11 @@ Route::prefix('/wisuda')
                 Route::get('/pengajuan/list/pendaftar', 'getListPengajuan');
                 Route::get('/pengajuan/list/status-tersedia', 'getListStatus');
                 Route::get('/pengajuan/detail/{nim}', 'getDetailPengajuan');
+                Route::put('/pengajuan/{nim}/update-by-admin', 'updatePengajuan');
                 Route::get('/pengajuan/statistik/pendaftaran', 'getStatistikPengajuan');
-                Route::put('/pengajuan/detail/{nim}', 'updatePengajuan');
-                Route::post('/pengajuan/add-by-admin', 'addPengajuan');
-                Route::delete('/pengajuan/{nim}/delete', 'deletePengajuan');
+                Route::post('/pengajuan/{nim}/verifikasi', 'verifikasiPengajuan');
+                Route::get('/pengajuan/list/jadwal', 'getJadwalWisuda');
+                Route::post('/pengajuan/jadwal/add', 'addJadwalWisuda');
+                Route::put('/pengajuan/jadwal/{tahun}/update', 'updateJadwalWisuda');
             });
     });

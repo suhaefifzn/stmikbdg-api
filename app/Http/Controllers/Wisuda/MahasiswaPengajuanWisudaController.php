@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 // ? Models - Views
-use App\Models\Verdig\VerifikasiView;
 use App\Models\Wisuda\StatusView;
 use App\Models\Wisuda\PengajuanWisudaView;
+use App\Models\SIKPS\PengajuanSkripsiDiterimaView;
+use App\Models\Wisuda\JadwalWisudaAktifView;
 
 // ? Models - Tables
 use App\Models\Wisuda\PengajuanWisuda;
@@ -31,6 +32,7 @@ class MahasiswaPengajuanWisudaController extends Controller
                 'email' => 'required|email',
                 'no_hp' => 'required|string',
                 'tgl_sidang_akhir' => 'required|string',
+                'judul_skripsi' => 'required|string',
                 'file_bukti_pembayaran' => 'required|string',
                 'file_ktp' => 'required|string',
                 'file_bukti_pembayaran_sumbangan' => 'required|string',
@@ -42,7 +44,19 @@ class MahasiswaPengajuanWisudaController extends Controller
             if ($mahasiswa['nim'] !== ((string) $request->nim)) {
                 return response()->json([
                     'status' => 'fail',
-                    'message' => 'NIM tidak sesuai. Pastikan NIM yang Anda kirimkan sesuai dengan pemilik akun'
+                    'message' => 'NIM tidak sesuai. Pastikan NIM sesuai dengan milik Anda'
+                ], 400);
+            }
+
+            /**
+             * Cek pengajuan sudah ada atau belum
+             */
+            $oldPengajuan = PengajuanWisudaView::getPengajuan($mahasiswa['nim']);
+
+            if ($oldPengajuan->exists()) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Anda sudah mengajukan pendaftaran wisuda'
                 ], 400);
             }
 
@@ -55,57 +69,30 @@ class MahasiswaPengajuanWisudaController extends Controller
                 'email' => $request->email,
                 'no_hp' => $request->no_hp,
                 'tgl_sidang_akhir' => $request->tgl_sidang_akhir,
+                'judul_skripsi' => $request->judul_skripsi,
+                'is_bayar' => null, // default
+                'is_ditolak' => null, // default
+                'ditolak_alasan' => null, // default
             ];
 
             /**
-             * Cek ke status verifikasi digital
+             * Secara default status pengajuan adalah menunggu
+             * kd_status = M
              */
-            $skka1 = VerifikasiView::getVerdigMahasiswa($mahasiswa['nim'], 'skka1');
-            $skka3 = VerifikasiView::getVerdigMahasiswa($mahasiswa['nim'], 'skka3');
-
-            if ($skka1->exists() and $skka3->exists()) {
-                if ($skka1['status'] == 'DITERIMA' and $skka3['status'] == 'DITERIMA') {
-                    /**
-                     * Jika status kedua jenis surat skripsi dan pra sidang diterima
-                     * maka status pengajuannya adalah menunggu hasil review dari admin (M1)
-                     */
-                    $status = StatusView::getDetailStatus('M1');
-                    $pengajuan['status_id'] = $status['status_id'];
-                } else if ($skka1['status'] == 'DITOLAK' or $skka3['status'] == 'DITOLAK') {
-                    /**
-                     * Jika salah satu surat ditolak
-                     * maka status pengajuannya adalah ditolak dari verdig (T2)
-                     */
-                    $status = StatusView::getDetailStatus('T2');
-                    $pengajuan['status_id'] = $status['status_id'];
-                } else {
-                    /**
-                     * Jika tidak keduanya berarti berarti sedang menunggu verifikasi suratnya (M2)
-                     */
-                    $status = StatusView::getDetailStatus('M2');
-                    $pengajuan['status_id'] = $status['status_id'];
-                }
-            } else {
-                /**
-                 * Jika surat tidak ada sama sekali
-                 * maka belum mengajukan verifikasi digital sama sekali dan langsung ditolak
-                 */
-                $status = StatusView::getDetailStatus('T1');
-                $pengajuan['status_id'] = $status['status_id'];
-            }
-
+            $status = StatusView::getDetailStatus('M');
+            $pengajuan['status_id'] = $status['status_id'];
             $pengajuan['tgl_pengajuan'] = Carbon::now();
             $createPengajuanId = PengajuanWisuda::create($pengajuan)->pengajuan_id;
 
             /**
              * Insert ke table files berupa storage path,
-             * karena file disimpan pada storage di front-end
+             * karena file disimpan pada storage di frontend
              */
             $files = [
+                'pengajuan_id' => $createPengajuanId,
                 'file_ktp' => $request->file_ktp,
                 'file_bukti_pembayaran' => $request->file_bukti_pembayaran,
                 'file_bukti_pembayaran_sumbangan' => $request->file_bukti_pembayaran_sumbangan,
-                'pengajuan_id' => $createPengajuanId
             ];
 
             $createFileId = File::create($files)->file_id;
@@ -123,6 +110,107 @@ class MahasiswaPengajuanWisudaController extends Controller
         }
     }
 
+    public function updatePengajuan(Request $request, $nim) {
+        try {
+            $mahasiswa = $this->getUserAuth();
+
+            $request->validate([
+                'pengajuan_id' => 'required',
+                'nim' => 'required|string',
+                'nama' => 'required|string',
+                'nik' => 'required|string',
+                'tempat_lahir' => 'required|string',
+                'tgl_lahir' => 'required|string',
+                'email' => 'required|email',
+                'no_hp' => 'required|string',
+                'tgl_sidang_akhir' => 'required|string',
+                'judul_skripsi' => 'required|string',
+                'file_bukti_pembayaran' => 'required|string',
+                'file_ktp' => 'required|string',
+                'file_bukti_pembayaran_sumbangan' => 'required|string',
+            ]);
+
+            /**
+             * Cek nim pada payload body dan path parameter
+             */
+            if ((string) $request->nim != $nim) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'NIM yang Anda kirim pada payload body tidak sama dengan NIM pada URL'
+                ], 400);
+            }
+
+            /**
+             * Cek nim sesuai dengan mahasiswa yang mengajukan atau tidak
+             */
+            if ($mahasiswa['nim'] !== ((string) $request->nim)) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'NIM tidak sesuai. Pastikan NIM sesuai dengan milik Anda'
+                ], 400);
+            }
+
+            /**
+             * Cek pengajuan sudah ada atau belum
+             */
+            $oldPengajuan = PengajuanWisudaView::getPengajuan($mahasiswa['nim']);
+
+            if (!$oldPengajuan->exists()) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Pengajuan wisuda dengan NIM ' . $nim . ' tidak ditemukan'
+                ], 404);
+            }
+
+            $pengajuan = [
+                'nim' => $request->nim,
+                'nama' => $request->nama,
+                'nik' => $request->nik,
+                'tempat_lahir' => $request->tempat_lahir,
+                'tgl_lahir' => $request->tgl_lahir,
+                'email' => $request->email,
+                'no_hp' => $request->no_hp,
+                'tgl_sidang_akhir' => $request->tgl_sidang_akhir,
+                'judul_skripsi' => $request->judul_skripsi,
+                'is_bayar' => null, // default
+                'is_ditolak' => null, // default
+                'ditolak_alasan' => null, // default
+            ];
+
+            /**
+             * Jika mahasiswa update pengajuan
+             * maka status mahasiswa akan berubah lagi menjadi menunggu
+             * kd_status = M
+             */
+            $status = StatusView::getDetailStatus('M');
+            $pengajuan['status_id'] = $status['status_id'];
+            $pengajuan['tgl_pengajuan'] = Carbon::now();
+            $pengajuan['jadwal_wisuda_id'] = null;
+
+            PengajuanWisuda::updatePengajuan((integer) $request->pengajuan_id, $mahasiswa['nim'], $pengajuan);
+
+            /**
+             * Insert ke table files berupa storage path,
+             * karena file disimpan pada storage di frontend
+             */
+            $files = [
+                'pengajuan_id' => (integer) $request->pengajuan_id,
+                'file_ktp' => $request->file_ktp,
+                'file_bukti_pembayaran' => $request->file_bukti_pembayaran,
+                'file_bukti_pembayaran_sumbangan' => $request->file_bukti_pembayaran_sumbangan,
+            ];
+
+            File::updateFiles((integer) $request->pengajuan_id, $files);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Pengajuan pendaftaran wisuda berhasil diperbarui'
+            ], 201);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
     public function getStatusPengajuan($nim) {
         try {
             $mahasiswa = $this->getUserAuth();
@@ -133,19 +221,18 @@ class MahasiswaPengajuanWisudaController extends Controller
             if ($nim != $mahasiswa['nim']) {
                 return response()->json([
                     'status' => 'fail',
-                    'message' => 'NIM tidak sesuai. Pastikan NIM yang digunakan sesuai dengan pemilik akun'
+                    'message' => 'NIM tidak sesuai. Pastikan NIM sesuai dengan milik Anda'
                 ], 400);
             }
 
             $pengajuan = PengajuanWisudaView::getStatusPengajuan($mahasiswa['nim']);
 
             if ($pengajuan->exists()) {
-                if ($pengajuan['kd_status'] == 'S1') {
+                if ($pengajuan['kd_status'] == 'S') {
                     /**
-                     * Jika pengajuan disetujui (S1)
-                     * maka tampilkan response berisi tanggal wisuda
+                     * Jika pengajuan disetujui (S)
+                     * maka tampilkan response status pengajuan dan berisi tanggal wisuda
                      */
-
                      return $this->successfulResponseJSON([
                         'pengajuan_wisuda' => $pengajuan
                      ]);
@@ -196,6 +283,47 @@ class MahasiswaPengajuanWisudaController extends Controller
                 'status' => 'fail',
                 'message' => 'Belum mengajukan pendaftaran wisuda'
             ], 404);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function getSkripsiDiajukanPadaSIKPS($nim) {
+        try {
+            $mahasiswa = $this->getUserAuth();
+
+            if ($nim != $mahasiswa['nim']) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'NIM tidak sesuai. Pastikan NIM sesuai dengan milik Anda'
+                ], 400);
+            }
+
+            $pengajuanSkripsi = PengajuanSkripsiDiterimaView::getPengajuanSkripsi($mahasiswa['nim']);
+
+            if ($pengajuanSkripsi->exists()) {
+                $pengajuanSkripsi = [
+                    'judul' => $pengajuanSkripsi['judul']
+                ];
+            } else {
+                $pengajuanSkripsi = null;
+            }
+
+            return $this->successfulResponseJSON([
+                'skripsi_diajukan' => $pengajuanSkripsi,
+            ]);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function getJadwalWisudaAktif() {
+        try {
+            $jadwalWisudaAktif = JadwalWisudaAktifView::first();
+
+            return $this->successfulResponseJSON([
+                'jadwal_wisuda' => $jadwalWisudaAktif,
+            ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
