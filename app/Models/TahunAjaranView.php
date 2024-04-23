@@ -35,7 +35,7 @@ class TahunAjaranView extends Model
     }
 
     public function scopeGetTahunAjaranWithKRS(Builder $query) {
-        return $query->with('krs')->get();
+        return $query->with('krs')->orderBy('tahun_id', 'ASC')->get();
     }
 
     /**

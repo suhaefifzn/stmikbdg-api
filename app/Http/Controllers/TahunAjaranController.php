@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\ErrorHandler;
 use App\Models\JurusanView;
 use App\Models\KampusView;
+use App\Models\Kuesioner\KuesionerPerkuliahan;
 use Illuminate\Http\Request;
 
 // ? Models - view
@@ -51,46 +52,43 @@ class TahunAjaranController extends Controller
                 }
             })->flatten();
 
-            /**
-             * Grouping berdasarkan jns_mhs dan kd_kampus
-             */
-            $tempGroupedTahunAjaran = [];
-            foreach ($tahunAjaranArr as $item) {
-                $key = $item['jns_mhs'];
-                $key2 = $item['kd_kampus'];
-                $tempGroupedTahunAjaran[$key][$key2][] = $item;
-            }
+            $filteredTahunAjaran = [];
 
-            $groupedTahunAjaran = [];
-            foreach ($tempGroupedTahunAjaran as $jnsMhs) {
-                foreach ($jnsMhs as $key => $kdKampus) {
-                    $tahunIdArr = collect($kdKampus)->pluck('tahun_id')->filter()->toArray();
-                    $tahunIds = implode('-', $tahunIdArr);
-                    $tempJnsMhs = $kdKampus[0]['jns_mhs'];
-                    $tempKdKampus = $kdKampus[0]['kd_kampus'];
-                    $tempSmt = $kdKampus[0]['smt'];
+            foreach ($tahunAjaranArr as $index => $item) {
+                $jurusan = JurusanView::where('jur_id', $item['jur_id'])->first();
+                $kampus = KampusView::where('kd_kampus', $item['kd_kampus'])
+                    ->select('kd_kampus', 'lokasi', 'alamat')
+                    ->first();
 
-                    $formattedItem = [
-                        'tahun' => $kdKampus[0]['tahun'],
-                        'tahun_ids' => $tahunIds,
-                        'jns_mhs' => $tempJnsMhs == 'R' ? 'Reguler'
-                            : ($tempJnsMhs == 'E' ? 'Eksekutif'
-                                : 'Karyawan'),
-                        'sts_ta' => $kdKampus[0]['sts_ta'],
-                        'smt' => $tempSmt,
-                        'ket_smt' => $tempSmt == 1 ? 'Ganjil'
-                            : ($tempSmt == 2 ? 'Genap'
-                                : 'Tambahan'),
-                        'kd_kampus' => $tempKdKampus,
-                        'detail_kampus' => KampusView::getDetailKampus($tempKdKampus)
-                    ];
+                /**
+                 * cek kuesioner tersedia untuk tahun ajarannya
+                 */
+                $kuesioner = KuesionerPerkuliahan::where('tahun_id', $item['tahun_id'])->first();
+                $isKuesionerAvailable = $kuesioner ? true : false;
 
-                    array_push($groupedTahunAjaran, $formattedItem);
-                }
+                $tahunAjaran = [
+                    'tahun_id' => $item['tahun_id'],
+                    'jur_id' => $item['jur_id'],
+                    'tahun' => $item['tahun'],
+                    'smt' => $item['smt'],
+                    'jns_mhs' => $item['jns_mhs'],
+                    'kd_kampus' => $item['kd_kampus'],
+                    'sts_ta' => 'B',
+                    'uraian' => trim($item['uraian']),
+                    'ket_smt' => $item['smt'] == 1 ? 'Ganjil'
+                        : ($item['smt'] == 2 ? 'Genap' : 'Tambahan'),
+                    'ket_jns_mhs' => $item['jns_mhs'] == 'R' ? 'Reguler'
+                        : ($item['jns_mhs'] == 'K' ? 'Karyawan' : 'Eksekutif'),
+                    'detail_jurusan' => $jurusan,
+                    'detail_kampus' => $kampus,
+                    'kuesioner_open' => $isKuesionerAvailable,
+                ];
+
+                $filteredTahunAjaran[$index] = $tahunAjaran;
             }
 
             return $this->successfulResponseJSON([
-                'tahun_ajaran_aktif' => $groupedTahunAjaran
+                'tahun_ajaran' => $filteredTahunAjaran
             ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);

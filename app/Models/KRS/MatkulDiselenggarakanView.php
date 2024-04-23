@@ -46,13 +46,13 @@ class MatkulDiselenggarakanView extends Model
             ->get();
     }
 
-    public function scopeGetMatkulWithKelasKuliah(Builder $query, $tahunIdArr, $jnsMhs, $kdKampus, $semester = null) {
-        return $query->whereIn('tahun_id', $tahunIdArr)
+    public function scopeGetMatkulWithKelasKuliah(Builder $query, $tahunId, $jnsMhs, $kdKampus, $semester = null) {
+        return $query->where('tahun_id', $tahunId)
             ->when($semester, function ($query) use ($semester) {
                 $query->where('semester', $semester);
             })
-            ->with(['kelasKuliah' => function ($query) use ($tahunIdArr, $jnsMhs, $kdKampus) {
-                $query->whereIn('tahun_id', $tahunIdArr)
+            ->with(['kelasKuliah' => function ($query) use ($tahunId, $jnsMhs, $kdKampus) {
+                $query->where('tahun_id', $tahunId)
                     ->where('jns_mhs', $jnsMhs)
                     ->where('kd_kampus', $kdKampus)
                     ->select('kelas_kuliah_id', 'tahun_id', 'mk_id', 'jur_id', 'smt', 'jml_sks', 'kelas_kuliah', 'jns_mhs', 'pengajar_id', 'sts_kelas', 'kjoin_kelas', 'join_kelas_kuliah_id')

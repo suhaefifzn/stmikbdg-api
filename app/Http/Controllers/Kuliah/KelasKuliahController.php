@@ -119,6 +119,11 @@ class KelasKuliahController extends Controller {
                         'kelas_kuliah' => $orderedKelasKuliahByNamaHari
                     ]);
                 }
+
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Status KRS belum mengajukan atau masih dalam tahap pengajuan'
+                ], 404);
             }
 
             return $this->successfulResponseJSON([
