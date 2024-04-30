@@ -20,7 +20,15 @@ Route::prefix('/kuesioner')
         Route::prefix('/mahasiswa')
             ->middleware('auth.mahasiswa')
             ->group(function () {
-                Route::get('/mata-kuliah', [KuesionerController::class, 'getMatkulByLastKRSMahasiswa']);
+                // kuesioner perkuliahan
+                Route::controller(KuesionerController::class)
+                    ->prefix('/perkuliahan')
+                    ->group(function () {
+                        Route::get('/list-matkul', 'getMatkulByLastKRSMahasiswa');
+                        Route::get('/pertanyaan', 'getPertanyaanForMatkul');
+                        Route::post('/pertanyaan/kirim-jawaban', 'addJawabanMahasiswa');
+                        Route::post('/pertanyaan/kirim-saran', 'addSaranForMatkul');
+                    });
             });
 
         // admin

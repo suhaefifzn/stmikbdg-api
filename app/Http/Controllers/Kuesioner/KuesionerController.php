@@ -10,16 +10,26 @@ use Illuminate\Http\Request;
 use App\Models\KelasKuliah\KelasKuliahJoinView;
 use App\Models\TahunAjaranView;
 use App\Models\KRS\MatkulDiselenggarakanView;
+use App\Models\Users\DosenView;
+use App\Models\Kuesioner\PertanyaanView;
 
 // ? Models - Tables
 use App\Models\KRS\KRS;
 use App\Models\KRS\KRSMatkul;
+use App\Models\Kuesioner\JawabanKuesionerPerkuliahan;
 use App\Models\Kuesioner\KuesionerPerkuliahan;
+use App\Models\Kuesioner\KuesionerPerkuliahanMahasiswa;
+use App\Models\Kuesioner\PointsView;
+use App\Models\Kuesioner\SaranKuesionerPerkuliahan;
 
 class KuesionerController extends Controller
 {
     /**
-     * untuk mahasiswa get daftar mata kuliah
+     * * Class ini digunakan untuk mengelola Kuesioner Perkuliahan
+     */
+
+    /**
+     * mahasiswa get daftar mata kuliah
      */
     public function getMatkulByLastKRSMahasiswa() {
         try {
@@ -59,8 +69,13 @@ class KuesionerController extends Controller
 
                     $item['kuesioner_open'] = $isKuesionerOpen;
 
-                    // sementara hingga ada db
-                    $item['sts_isi_kuesioner'] = false;
+                    /**
+                     * cek telah mengisi kuesioner atau belum
+                     */
+                    $kuesionerPerkuliahanMahasiswa = KuesionerPerkuliahanMahasiswa::where('mhs_id', $mahasiswa['mhs_id'])
+                        ->where('kelas_kuliah_id', $kelasKuliah['kelas_kuliah_id'])
+                        ->first();
+                    $item['sts_isi_kuesioner'] = $kuesionerPerkuliahanMahasiswa ? true : false;
 
                     $krsMatkul[$index] = $item;
                 }
@@ -82,7 +97,270 @@ class KuesionerController extends Controller
     }
 
     /**
-     * untuk admin get daftar mata kuliah
+     * mahasiswa list pertanyaan dan detail kelas dari matkulnya
+     */
+    public function getPertanyaanForMatkul(Request $request) {
+        try {
+            /**
+             * jika terdapat nilai query params kelas_kuliah_id
+             */
+            if ($request->query('kelas_kuliah_id')) {
+                /**
+                 * cek kelas kuliah id
+                 */
+                $kelasKuliah = KelasKuliahJoinView::getDataKelasKuliahForKuesionerPerkuliahan((int) $request->query('kelas_kuliah_id'));
+                
+                /**
+                 * kelas kuliah ada
+                 */
+                if ($kelasKuliah->exists()) {
+                    /**
+                     * get kueioner perkuliahan id yang dibuka
+                     * berdasarkan tahun id di kelas kuliah
+                     */
+                    $kuesionerPerkuliahan = KuesionerPerkuliahan::where('tahun_id', $kelasKuliah['tahun_id'])
+                        ->select('kuesioner_perkuliahan_id')
+                        ->first();
+
+                    /**
+                     * get data matkul
+                     */
+                    $matkul = MatkulDiselenggarakanView::where('mk_id', $kelasKuliah['mk_id'])
+                        ->where('tahun_id', $kelasKuliah['tahun_id'])
+                        ->select('mk_id', 'kd_mk', 'nm_mk')
+                        ->first();
+
+                    /**
+                     * cek data pengajar
+                     */
+                    $pengajar = null;
+
+                    if (!$kelasKuliah['pengajar_id'] and $kelasKuliah['kjoin_kelas']) {
+                        $joinKelasKuliah = KelasKuliahJoinView::getDataKelasKuliahForKuesionerPerkuliahan($kelasKuliah['join_kelas_kuliah_id']);
+                        $pengajar = self::trimNamaDosen(
+                                DosenView::where('dosen_id', $joinKelasKuliah['pengajar_id'])
+                                    ->select('dosen_id', 'kd_dosen', 'nm_dosen', 'gelar')
+                                    ->first()
+                            );
+                    } else {
+                        $pengajar = self::trimNamaDosen(
+                               DosenView::where('dosen_id', $kelasKuliah['pengajar_id'])
+                                    ->select('dosen_id', 'kd_dosen', 'nm_dosen', 'gelar')
+                                    ->first()
+                            );
+                    }
+
+                    /**
+                     * get data pertanyaan kuesioner perkuliahan
+                     * * kd_jenis_pertanyaan 'P'
+                     */
+                    $listPertanyaan = PertanyaanView::where('kd_jenis_pertanyaan', 'P')->get()->groupBy('kelompok');
+
+                    /**
+                     * format untuk response
+                     */
+                    $responseFormat = [
+                        'kuesioner_perkuliahan_id' => $kuesionerPerkuliahan['kuesioner_perkuliahan_id'],
+                        'kelas_kuliah_id' => $kelasKuliah['kelas_kuliah_id'],
+                        'tahun_id' => $kelasKuliah['tahun_id'],
+                        'mk_id' => $matkul['mk_id'],
+                        'pengajar_id' => $pengajar['dosen_id'],
+                        'kd_mk' => $matkul['kd_mk'],
+                        'nm_mk' => $matkul['nm_mk'],
+                        'kd_dosen' => $pengajar['kd_dosen'],
+                        'nm_dosen' => $pengajar['nm_dosen'],
+                        'list_pertanyaan' => $listPertanyaan,
+                    ];
+
+                    return $this->successfulResponseJSON([
+                        'kuesioner' => $responseFormat,
+                    ]);
+                }
+            }
+
+            /**
+             * tidak ada kelas_kuliah_id
+             */
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Nilai kelas_kuliah_id tidak ditemukan'
+            ], 404);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    /**
+     * mahasiswa kirim jawaban
+     */
+    public function addJawabanMahasiswa(Request $request) {
+        try {
+            $mahasiswa = $this->getUserAuth();
+
+            $request->validate([
+                'kuesioner_perkuliahan_id' => 'required',
+                'kelas_kuliah_id' => 'required',
+                'list_jawaban' => 'required|array'
+            ]);
+
+            /**
+             * cek kuesioner perkuliahan id
+             */
+            $kuesionerPerkuliahan = KuesionerPerkuliahan::where('kuesioner_perkuliahan_id', (int) $request->kuesioner_perkuliahan_id)
+                ->first();
+
+            if (!$kuesionerPerkuliahan) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Nilai kuesioner_perkuliahan_id tidak ditemukan'
+                ], 404);
+            }
+
+            /**
+             * cek kelas kuliah
+             */
+            $kelasKuliah = KelasKuliahJoinView::where('kelas_kuliah_id', (int) $request->kelas_kuliah_id)
+                ->first();
+
+            if (!$kelasKuliah) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Nilai kelas_kuliah_id tidak ditemukan'
+                ], 404);
+            }
+
+            /**
+             * cek dan get pengajar id matkul berdasarkan kelas kuliah
+             */
+            $pengajarId = null;
+
+            if (!$kelasKuliah['pengajar_id'] and $kelasKuliah['kjoin_kelas']) {
+                $joinKelasKuliah = KelasKuliahJoinView::getDataKelasKuliahForKuesionerPerkuliahan($kelasKuliah['join_kelas_kuliah_id']);
+                $pengajar = DosenView::where('dosen_id', $joinKelasKuliah['pengajar_id'])
+                    ->select('dosen_id')
+                    ->first();
+                $pengajarId = $pengajar['dosen_id'];
+            } else {
+                $pengajarId = $kelasKuliah['pengajar_id'];
+            }
+
+            /**
+             * cek jika tahun id kelas kuliah tidak sama dengan tahun id kuesioner yang dibuka
+             */
+            if ($kuesionerPerkuliahan['tahun_id'] != $kelasKuliah['tahun_id']) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Nilai tahun_id yang ada di kuesioner perkuliahan tidak sama dengan yang dimiliki kelas kuliah'
+                ], 400);
+            }
+
+            /**
+             * set data mahasiswa mengisi kuesioner
+             */
+            $dataKuesionerMahasiswa = [
+                'kuesioner_perkuliahan_id' => $kuesionerPerkuliahan['kuesioner_perkuliahan_id'],
+                'tahun_id' => $kuesionerPerkuliahan['tahun_id'],
+                'mk_id' => $kelasKuliah['mk_id'],
+                'kelas_kuliah_id' => $kelasKuliah['kelas_kuliah_id'],
+                'pengajar_id' => $pengajarId,
+                'mhs_id' => $mahasiswa['mhs_id'],
+            ];
+
+            /**
+             * cek total pertanyaan yang dijawab dan kemungkinan adanya
+             * pertanyaan id yang tidak ada di db diinputkan.
+             * total jawaban harus sama dengan total pertanyaan kuesioner perkuliahan
+             */
+            $countPertanyaan = PertanyaanView::where('kd_jenis_pertanyaan', 'P')->get()->count();
+            $tempPertanyaanId = collect($request->list_jawaban)->pluck('pertanyaan_id')->toArray();
+            $countJawaban = PertanyaanView::whereIn('pertanyaan_id', $tempPertanyaanId)
+                ->where('kd_jenis_pertanyaan', 'P')
+                ->get()
+                ->count();
+
+            if ($countJawaban != $countPertanyaan) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Mohon jawab semua pertanyaan kuesioner perkuliahan yang diberikan'
+                ], 400);
+            }
+
+            $kuesionerPerkuliahanMahasiswaId = KuesionerPerkuliahanMahasiswa::create($dataKuesionerMahasiswa)
+                ->kuesioner_perkuliahan_mahasiswa_id;
+
+            /**
+             * set data jawaban mahasiswa untuk setiap pertanyaan
+             */
+            $listJawaban = self::setDataJawaban($request->list_jawaban, $kuesionerPerkuliahanMahasiswaId);
+
+            JawabanKuesionerPerkuliahan::insert($listJawaban);
+            
+            return $this->successfulResponseJSON([
+                'kuesioner' => [
+                    'kuesioner_perkuliahan_mahasiswa_id' => $kuesionerPerkuliahanMahasiswaId,
+                ]
+            ], 'Jawaban berhasil dikirim');
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function addSaranForMatkul(Request $request) {
+        try {
+            $request->validate([
+                'kuesioner_perkuliahan_mahasiswa_id' => 'required',
+                'saran' => 'string|min:10',
+            ]);
+
+            /**
+             * cek kuesioner perkuliahan mahasiswa id
+             */
+            $kuesionerPerkuliahanMahasiswa = KuesionerPerkuliahanMahasiswa::where(
+                'kuesioner_perkuliahan_mahasiswa_id', (int) $request->kuesioner_perkuliahan_mahasiswa_id
+            )->first();
+
+            if (!$kuesionerPerkuliahanMahasiswa) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Nilai kuesioner_perkuliahan_mahasiswa_id tidak ditemukan'
+                ], 404);
+            }
+
+            /**
+             * pastikan belum pernah mengirim saran
+             */
+            $hasSaran = SaranKuesionerPerkuliahan::where(
+                'kuesioner_perkuliahan_mahasiswa_id', $kuesionerPerkuliahanMahasiswa['kuesioner_perkuliahan_mahasiswa_id']
+            )->first();
+
+            if ($hasSaran) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Anda telah mengirim saran untuk perkuliahan tersebut'
+                ], 400);
+            }
+
+            /**
+             * set data saran
+             */
+            $saran = [
+                'kuesioner_perkuliahan_mahasiswa_id' => $kuesionerPerkuliahanMahasiswa['kuesioner_perkuliahan_mahasiswa_id'],
+                'saran' => $request->saran,
+            ];
+
+            SaranKuesionerPerkuliahan::insert($saran);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Saran berhasil dikirim'
+            ], 200);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    /**
+     * admin get daftar mata kuliah
      */
     public function getMatkulByTahunAjaran(Request $request) {
         try {
@@ -153,7 +431,7 @@ class KuesionerController extends Controller
             }
 
             return $this->successfulResponseJSON([
-                'mata_kuliah' => $listMatkul,
+                'matakuliah' => $listMatkul,
             ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
@@ -205,7 +483,26 @@ class KuesionerController extends Controller
         }
     }
 
-    private function  newFormattedItemForGetMatkulByTahunAjaran($item, $totalMahasiswa, $kelasKuliahIds) {
+    private function setDataJawaban($listJawaban, $kuesionerPerkuliahanMahasiswaId) {
+        $formattedListJawaban = [];
+
+        foreach ($listJawaban as $item) {
+            $point = PointsView::where('kd_point', strtoupper($item['jawaban']))->first();
+
+            $newItem = [
+                'kuesioner_perkuliahan_mahasiswa_id' => $kuesionerPerkuliahanMahasiswaId,
+                'pertanyaan_id' => $item['pertanyaan_id'],
+                'point_id' => $point['point_id'],
+                'kd_point' => $point['kd_point'],
+            ];
+
+            array_push($formattedListJawaban, $newItem);
+        }
+
+        return $formattedListJawaban;
+    }
+
+    private function newFormattedItemForGetMatkulByTahunAjaran($item, $totalMahasiswa, $kelasKuliahIds) {
         $dataKuesionerArr = [
             'tahun_id' => (integer) $item['tahun_id'],
             'kelas_kuliah_ids' => $kelasKuliahIds,
