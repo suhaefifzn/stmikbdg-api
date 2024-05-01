@@ -101,6 +101,8 @@ class KuesionerController extends Controller
      */
     public function getPertanyaanForMatkul(Request $request) {
         try {
+            $mahasiswa = $this->getUserAuth();
+            
             /**
              * jika terdapat nilai query params kelas_kuliah_id
              */
@@ -115,12 +117,33 @@ class KuesionerController extends Controller
                  */
                 if ($kelasKuliah->exists()) {
                     /**
+                     * cek kemungkinan mahasiswa telah mengisi kuesioner
+                     */
+                    $kuesionerPerkuliahanMahasiswa = KuesionerPerkuliahanMahasiswa::where('kelas_kuliah_id', $kelasKuliah['kelas_kuliah_id'])
+                        ->where('mhs_id', $mahasiswa['mhs_id'])
+                        ->first();
+
+                    if ($kuesionerPerkuliahanMahasiswa) {
+                        return response()->json([
+                            'status' => 'fail',
+                            'message' => 'Anda telah mengisi kuesioner perkuliahan untuk matkul tersebut'
+                        ], 400);
+                    }
+
+                    /**
                      * get kueioner perkuliahan id yang dibuka
                      * berdasarkan tahun id di kelas kuliah
                      */
                     $kuesionerPerkuliahan = KuesionerPerkuliahan::where('tahun_id', $kelasKuliah['tahun_id'])
                         ->select('kuesioner_perkuliahan_id')
                         ->first();
+
+                    if (!$kuesionerPerkuliahan) {
+                        return response()->json([
+                            'status' => 'fail',
+                            'message' => 'Kuesioner perkuliahan untuk tahun ajaran aktif sekarang belum dibuka'
+                        ], 400);
+                    }
 
                     /**
                      * get data matkul
@@ -265,6 +288,22 @@ class KuesionerController extends Controller
                 'pengajar_id' => $pengajarId,
                 'mhs_id' => $mahasiswa['mhs_id'],
             ];
+
+            /**
+             * cek kemungkinan mahasiswa telah mengisi kuesioner
+             */
+            $hasKuesionerPerkuliahan = KuesionerPerkuliahanMahasiswa::where(
+                    'kuesioner_perkuliahan_id', $kuesionerPerkuliahan['kuesioner_perkuliahan_id']
+                )->where('kelas_kuliah_id', $kelasKuliah['kelas_kuliah_id'])
+                ->where('mhs_id', $mahasiswa['mhs_id'])
+                ->first();
+
+            if ($hasKuesionerPerkuliahan) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Anda telah mengisi kuesioner perkuliahan untuk matkul tersebut'
+                ], 400);
+            }
 
             /**
              * cek total pertanyaan yang dijawab dan kemungkinan adanya
@@ -457,6 +496,18 @@ class KuesionerController extends Controller
                     'status' => 'fail',
                     'message' => 'Nilai tahun_id tidak ditemukan'
                 ], 404);
+            }
+
+            /**
+             * cek kemungkinan kuesioner pada tahun yang diinput telah dibuka
+             */
+            $kuesioner = KuesionerPerkuliahan::where('tahun_id', $tahunAjaran['tahun_id'])->first();
+
+            if ($kuesioner) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Kuesioner pada tahun ajaran tersebut sudah pernah dibuka'
+                ], 400);
             }
 
             $data = [

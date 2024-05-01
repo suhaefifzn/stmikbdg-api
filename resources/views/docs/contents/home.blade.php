@@ -9,6 +9,7 @@
         <div class="alert alert-danger">
             <b>Riwayat Update:</b><br>
             <ul>
+                <li>Rabu, 01-05-2024 | <a href="/docs/api/kuesioner" class="text-decoration-none">Update API Sistem Kuesioner</a></li>
                 <li>Kamis, 04-04-2024 | <a href="/docs/api/pengajuan-wisuda" class="text-decoration-none">Update API Sistem Pengajuan Pendaftaran Wisuda</a></li>
             </ul>
         </div>
