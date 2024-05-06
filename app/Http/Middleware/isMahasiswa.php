@@ -15,7 +15,7 @@ class isMahasiswa
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && !auth()->user()->is_dosen) {
+        if (auth()->check() && auth()->user()->is_mhs) {
             return $next($request);
         } else {
             return response()->json([

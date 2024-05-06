@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\Kuesioner\JenisPertanyaanController;
 use App\Http\Controllers\Kuesioner\KelompokPertanyaanController;
+use App\Http\Controllers\Kuesioner\KuesionerKegiatanController;
 use App\Http\Controllers\Kuesioner\PertanyaanController;
 
 /**
@@ -28,6 +29,16 @@ Route::prefix('/kuesioner')
                         Route::get('/pertanyaan', 'getPertanyaanForMatkul');
                         Route::post('/pertanyaan/kirim-jawaban', 'addJawabanMahasiswa');
                         Route::post('/pertanyaan/kirim-saran', 'addSaranForMatkul');
+                    });
+
+                // kuesioner kegiatan
+                Route::controller(KuesionerKegiatanController::class)
+                    ->prefix('/kegiatan')
+                    ->group(function () {
+                        Route::get('/list', 'getListKuesionerByMahasiswa');
+                        Route::get('/pertanyaan', 'getPertanyaanKuesioner');
+                        Route::post('/pertanyaan/kirim-jawaban', 'addJawabanMahasiswa');
+                        Route::post('/pertanyaan/kirim-saran', 'addSaranForKegiatan');
                     });
             });
 
@@ -63,6 +74,14 @@ Route::prefix('/kuesioner')
                                 Route::get('/', 'getPertanyaanByJenisId');
                                 Route::get('/detail/{pertanyaan_id}', 'getOnePertanyaanById');
                             });
+                    });
+
+                // kuesioner kegiatan
+                Route::controller(KuesionerKegiatanController::class)
+                    ->prefix('/kegiatan')
+                    ->group(function () {
+                        Route::post('/add', 'addKuesioner');
+                        Route::get('/list', 'getListKuesioner');
                     });
             });
     });

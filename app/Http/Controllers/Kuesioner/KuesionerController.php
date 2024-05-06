@@ -348,7 +348,7 @@ class KuesionerController extends Controller
         try {
             $request->validate([
                 'kuesioner_perkuliahan_mahasiswa_id' => 'required',
-                'saran' => 'string|min:10',
+                'saran' => 'required|string|min:10',
             ]);
 
             /**
@@ -375,7 +375,7 @@ class KuesionerController extends Controller
             if ($hasSaran) {
                 return response()->json([
                     'status' => 'fail',
-                    'message' => 'Anda telah mengirim saran untuk perkuliahan tersebut'
+                    'message' => 'Anda sudah pernah mengirim saran untuk perkuliahan tersebut'
                 ], 400);
             }
 
@@ -392,7 +392,7 @@ class KuesionerController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Saran berhasil dikirim'
-            ], 200);
+            ], 201);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
