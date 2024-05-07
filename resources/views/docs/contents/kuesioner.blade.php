@@ -387,105 +387,6 @@
     "tahun_id": 280
 }</code></pre>
 
-    <h5 class="mt-5">(ADM) Kuesioner Perkuliahan - Get List Jenis Pertanyaan</h5>
-    <hr>
-    <p>
-        Untuk melihat jenis pertanyaan yang tersedia, kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/pertanyaan/jenis</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Jika berhasil akan memberikan response:
-    </p>
-    <pre><code class="language-json bg-primary-subtle">{
-    "status": "success",
-    "data": {
-        "jenis_pertanyaan": [
-            {
-                "jenis_pertanyaan_id": 1,
-                "nama": "Perkuliahan",
-                "kd_jenis_pertanyaan": "P"
-            },
-            {
-                "jenis_pertanyaan_id": 2,
-                "nama": "Kegiatan Kampus",
-                "kd_jenis_pertanyaan": "K"
-            }
-        ]
-    }
-}</code></pre>
-
-    <h5 class="mt-5">(ADM) Kuesioner Perkuliahan - Get List Kelompok Pertanyaan</h5>
-    <hr>
-    <p>
-        Setelah jenis, pertanyaan-pertanyaan yang ada dikelompokkan lagi menjadi beberapa bagian. Untuk melihat terdapat kelompok pertanyaan apa saja, kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/pertanyaan/kelompok</span> dan tambahkan query parameter <span class="badge bg-secondary">jenis_id</span>. Query parameter <span class="badge bg-secondary">jenis_id</span> didapat dari list jenis pertanyaan. Contoh lengkapnya adalah seperti <span class="badge bg-dark">/kuesioner/pertanyaan/kelompok?jenis_id=1</span>. Response:
-    </p>
-    <pre><code class="language-json bg-primary-subtle">{
-    "status": "success",
-    "data": {
-        "kelompok_pertanyaan": [
-            {
-                "kelompok_pertanyaan_id": 1,
-                "jenis_pertanyaan_id": 1,
-                "jenis": "Perkuliahan",
-                "nama": "Teknologi Pembelajaran"
-            },
-            {
-                "kelompok_pertanyaan_id": 2,
-                "jenis_pertanyaan_id": 1,
-                "jenis": "Perkuliahan",
-                "nama": "Kegiatan Awal Pembelajaran"
-            },
-            {
-                "kelompok_pertanyaan_id": 3,
-                "jenis_pertanyaan_id": 1,
-                "jenis": "Perkuliahan",
-                "nama": "Pelaksanaan Pembelajaran"
-            }
-        ]
-    }
-}</code></pre>
-
-    <h5 class="mt-5">(ADM) Kuesioner Perkuliahan - Get List Pertanyaan</h5>
-    <hr>
-    <p>
-        Untuk melihat list pertanyaan yang tersedia, kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/pertanyaan</span> dengan menyertakan query parameter <span class="badge bg-secondary">jenis_id</span>. Kirimkan menggunakan HTTP method <span class="badge bg-info">get</span>. Contohnya, <span class="badge bg-dark">/kuesioner/pertanyaan?jenis_id=2</span>. Hasilnya:
-    </p>
-    <pre><code class="language-json bg-primary-subtle">{
-    "status": "success",
-    "data": {
-        "list_pertanyaan": {
-            "Kepuasan Mahasiswa": [
-                {
-                    "pertanyaan_id": 23,
-                    "jenis_pertanyaan_id": 2,
-                    "kelompok_pertanyaan_id": 4,
-                    "kd_jenis_pertanyaan": "K",
-                    "jenis": "Kegiatan Kampus",
-                    "kelompok": "Kepuasan Mahasiswa",
-                    "pertanyaan": "Apakah anda setuju kegiatan ini bermanfaat bagi anda?"
-                },
-                // pertanyaan lain disembunyikan
-            ]
-        }
-    }
-}</code></pre>
-
-    <h5 class="mt-5">(ADM) Kuesioner Perkuliahan - Get Detail Pertanyaan</h5>
-    <hr>
-    <p>
-        Untuk mendapatkan detail pertanyaan tertentu, kirimkan permintaan dengan menggunakan HTTP method <span class="badge bg-info">get</span> ke <span class="badge bg-dark">/kuesioner/pertanyaan/detail/{pertanyaan_id}</span>. Ganti <b>{pertanyaan_id}</b> dengan nilai <b>pertanyaan_id</b> yang didapat saat get list pertanyaan. Seperti <span class="badge bg-dark">/kuesioner/pertanyaan/detail/23</span>, hasilnya:
-    </p>
-    <pre><code class="language-json bg-primary-subtle">{
-    "status": "success",
-    "data": {
-        "pertanyaan": {
-            "pertanyaan_id": 23,
-            "jenis_pertanyaan_id": 2,
-            "kelompok_pertanyaan_id": 4,
-            "kd_jenis_pertanyaan": "K",
-            "jenis": "Kegiatan Kampus",
-            "kelompok": "Kepuasan Mahasiswa",
-            "pertanyaan": "Apakah anda setuju kegiatan ini bermanfaat bagi anda?"
-        }
-    }
-}</code></pre>
-
     <h5 class="mt-5">(ADM) Kuesioner Kegiatan - Add Kuesioner</h5>
     <hr>
     <p>
@@ -522,6 +423,106 @@
         ]
     }
 }</code></pre>
+
+    <h5 class="mt-5">(ADM) Get List Jenis Pertanyaan</h5>
+    <hr>
+    <p>
+        Untuk melihat jenis pertanyaan yang tersedia, kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/pertanyaan/jenis</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Jika berhasil akan memberikan response:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "jenis_pertanyaan": [
+            {
+                "jenis_pertanyaan_id": 1,
+                "nama": "Perkuliahan",
+                "kd_jenis_pertanyaan": "P"
+            },
+            {
+                "jenis_pertanyaan_id": 2,
+                "nama": "Kegiatan Kampus",
+                "kd_jenis_pertanyaan": "K"
+            }
+        ]
+    }
+}</code></pre>
+
+    <h5 class="mt-5">(ADM) Get List Kelompok Pertanyaan</h5>
+    <hr>
+    <p>
+        Setelah jenis, pertanyaan-pertanyaan yang ada dikelompokkan lagi menjadi beberapa bagian. Untuk melihat terdapat kelompok pertanyaan apa saja, kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/pertanyaan/kelompok</span> dan tambahkan query parameter <span class="badge bg-secondary">jenis_id</span>. Query parameter <span class="badge bg-secondary">jenis_id</span> didapat dari list jenis pertanyaan. Contoh lengkapnya adalah seperti <span class="badge bg-dark">/kuesioner/pertanyaan/kelompok?jenis_id=1</span>. Response:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "kelompok_pertanyaan": [
+            {
+                "kelompok_pertanyaan_id": 1,
+                "jenis_pertanyaan_id": 1,
+                "jenis": "Perkuliahan",
+                "nama": "Teknologi Pembelajaran"
+            },
+            {
+                "kelompok_pertanyaan_id": 2,
+                "jenis_pertanyaan_id": 1,
+                "jenis": "Perkuliahan",
+                "nama": "Kegiatan Awal Pembelajaran"
+            },
+            {
+                "kelompok_pertanyaan_id": 3,
+                "jenis_pertanyaan_id": 1,
+                "jenis": "Perkuliahan",
+                "nama": "Pelaksanaan Pembelajaran"
+            }
+        ]
+    }
+}</code></pre>
+
+    <h5 class="mt-5">(ADM) Get List Pertanyaan</h5>
+    <hr>
+    <p>
+        Untuk melihat list pertanyaan yang tersedia, kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/pertanyaan</span> dengan menyertakan query parameter <span class="badge bg-secondary">jenis_id</span>. Kirimkan menggunakan HTTP method <span class="badge bg-info">get</span>. Contohnya, <span class="badge bg-dark">/kuesioner/pertanyaan?jenis_id=2</span>. Hasilnya:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "list_pertanyaan": {
+            "Kepuasan Mahasiswa": [
+                {
+                    "pertanyaan_id": 23,
+                    "jenis_pertanyaan_id": 2,
+                    "kelompok_pertanyaan_id": 4,
+                    "kd_jenis_pertanyaan": "K",
+                    "jenis": "Kegiatan Kampus",
+                    "kelompok": "Kepuasan Mahasiswa",
+                    "pertanyaan": "Apakah anda setuju kegiatan ini bermanfaat bagi anda?"
+                },
+                // pertanyaan lain disembunyikan
+            ]
+        }
+    }
+}</code></pre>
+
+    <h5 class="mt-5">(ADM) Get Detail Pertanyaan</h5>
+    <hr>
+    <p>
+        Untuk mendapatkan detail pertanyaan tertentu, kirimkan permintaan dengan menggunakan HTTP method <span class="badge bg-info">get</span> ke <span class="badge bg-dark">/kuesioner/pertanyaan/detail/{pertanyaan_id}</span>. Ganti <b>{pertanyaan_id}</b> dengan nilai <b>pertanyaan_id</b> yang didapat saat get list pertanyaan. Seperti <span class="badge bg-dark">/kuesioner/pertanyaan/detail/23</span>, hasilnya:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "pertanyaan": {
+            "pertanyaan_id": 23,
+            "jenis_pertanyaan_id": 2,
+            "kelompok_pertanyaan_id": 4,
+            "kd_jenis_pertanyaan": "K",
+            "jenis": "Kegiatan Kampus",
+            "kelompok": "Kepuasan Mahasiswa",
+            "pertanyaan": "Apakah anda setuju kegiatan ini bermanfaat bagi anda?"
+        }
+    }
+}</code></pre>
+
 
     <h5 class="mt-5">(ADM) Add Pertanyaan</h5>
     <hr>

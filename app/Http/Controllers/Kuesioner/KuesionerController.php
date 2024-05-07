@@ -432,7 +432,6 @@ class KuesionerController extends Controller
                 }
 
                 /**
-                 * ! Kode di bawah ini sementara karena desain db belum ada
                  * Cek Data Kuesioner
                  */
 
