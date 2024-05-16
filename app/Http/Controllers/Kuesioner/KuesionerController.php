@@ -12,6 +12,8 @@ use App\Models\TahunAjaranView;
 use App\Models\KRS\MatkulDiselenggarakanView;
 use App\Models\Users\DosenView;
 use App\Models\Kuesioner\PertanyaanView;
+use App\Models\Kuesioner\PointsView;
+use App\Models\Kuesioner\JawabanKuesionerPerkuliahanView;
 
 // ? Models - Tables
 use App\Models\KRS\KRS;
@@ -19,7 +21,6 @@ use App\Models\KRS\KRSMatkul;
 use App\Models\Kuesioner\JawabanKuesionerPerkuliahan;
 use App\Models\Kuesioner\KuesionerPerkuliahan;
 use App\Models\Kuesioner\KuesionerPerkuliahanMahasiswa;
-use App\Models\Kuesioner\PointsView;
 use App\Models\Kuesioner\SaranKuesionerPerkuliahan;
 
 class KuesionerController extends Controller
@@ -344,6 +345,9 @@ class KuesionerController extends Controller
         }
     }
 
+    /**
+     * mahasiswa kirim saran untuk matkul
+     */
     public function addSaranForMatkul(Request $request) {
         try {
             $request->validate([
@@ -434,12 +438,12 @@ class KuesionerController extends Controller
                 /**
                  * Cek Data Kuesioner
                  */
-
                 if (count($item['kelasKuliah']) > 0) {
                     /**
                      * Hitung total mahasiswa yang mengambil mata kuliahnya
                      */
                     $totalMahasiswa = 0;
+                    $totalTerisi = 0;
                     $tempJoinedKelasKuliahIds = null;
                     $tempAllKelasKuliahIdArr = [];
                     $tempKelasKuliahArr = [];
@@ -455,14 +459,19 @@ class KuesionerController extends Controller
                         $tempJoinedKelasKuliahIds = implode('-', $tempAllKelasKuliahIdArr);
                     }
 
-                    // count total mahasiswa
+                    /**
+                     * hitung total mahasiswa yang mengambil matkul
+                     * dan total yang telah mengisi kuesioner
+                     */
                     $totalMahasiswa = KRSMatkul::getKRSMatkulDisejutuiByKelasKuliahIdArr($tempAllKelasKuliahIdArr)->count();
+                    $totalTerisi = KuesionerPerkuliahanMahasiswa::where('tahun_id', (int) $request->query('tahun_id'))
+                        ->whereIn('kelas_kuliah_id', $tempAllKelasKuliahIdArr)->get()->count();
                 }
 
                 $item['kelas_kuliah'] = implode('-', $tempKelasKuliahArr);
                 $item['tahun_id'] = $tahunId;
                 $newFormattedItem = self::newFormattedItemForGetMatkulByTahunAjaran(
-                    $item, $totalMahasiswa, $tempJoinedKelasKuliahIds
+                    $item, $totalMahasiswa, $totalTerisi, $tempJoinedKelasKuliahIds
                 );
 
                 $listMatkul[$key] = $newFormattedItem;
@@ -533,6 +542,88 @@ class KuesionerController extends Controller
         }
     }
 
+    /**
+     * admin get rata-rata jawaban kuesioner by kelas kuliah id or matkul
+     */
+    public function getAverageJawabanKuesioner(Request $request) {
+        try {
+            $tahunId = $request->query('tahun_id');
+            $kelasKuliahIds = $request->query('kelas_kuliah_ids'); // contoh nilai: 3092-2164
+
+            /**
+             * cek data jawaban kuesioner perkuliahan
+             * berdasarkan tahun id dan kelas kuliah id
+             */
+            $explodedKelasKuliahIds = explode('-', $kelasKuliahIds);
+            $jawabanKuesionerExists = JawabanKuesionerPerkuliahanView::where('tahun_id', (int) $tahunId)
+                ->whereIn('kelas_kuliah_id', $explodedKelasKuliahIds)->first();
+
+            if (!$jawabanKuesionerExists) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Data jawaban kuesioner tidak ditemukan'
+                ], 404);
+            }
+
+            $listPertanyaanDanJawaban = self::setJawabanToPertanyaan($tahunId, $explodedKelasKuliahIds);
+            $countMahasiswaMengisi = KuesionerPerkuliahanMahasiswa::where('tahun_id', (int) $tahunId)
+                ->whereIn('kelas_kuliah_id', $explodedKelasKuliahIds)->get()->count();
+            $countMahasiswaMengambilMatkul = KRSMatkul::getKRSMatkulDisejutuiByKelasKuliahIdArr($explodedKelasKuliahIds)->count();
+            $matkul = MatkulDiselenggarakanView::where('tahun_id', (int) $tahunId)
+                ->where('mk_id', $jawabanKuesionerExists['mk_id'])
+                ->select('tahun_id', 'kd_mk', 'nm_mk', 'semester', 'sks')
+                ->first();
+            $pengajar = self::trimNamaDosen(DosenView::where('dosen_id', $jawabanKuesionerExists['pengajar_id'])->first());
+
+            $responseFormat = [
+                'tahun_id' => $matkul['tahun_id'],
+                'kd_mk' => $matkul['kd_mk'],
+                'nm_mk' => $matkul['nm_mk'],
+                'sks' => $matkul['sks'],
+                'semester' => $matkul['semester'],
+                'dosen' => $pengajar['nm_dosen'],
+                'total_mahasiswa' => $countMahasiswaMengambilMatkul,
+                'total_mahasiswa_mengisi_kuesioner' => $countMahasiswaMengisi,
+                'pertanyaan_dan_jawaban' => $listPertanyaanDanJawaban,
+            ];
+
+            return $this->successfulResponseJSON([
+                'kuesioner_perkuliahan' => $responseFormat,
+            ]);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function getAllPilihanJawaban() {
+        try {
+            $allPilihanJawaban = PointsView::all();
+
+            return $this->successfulResponseJSON([
+                'pilihan_jawaban' => $allPilihanJawaban
+            ]);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    private function setJawabanToPertanyaan($tahunId, $kelasKuliahIdArr) {
+        $listPertanyaan = PertanyaanView::where('kd_jenis_pertanyaan', 'P')->get();
+
+        foreach ($listPertanyaan as $index => $item) {
+            $mutu = JawabanKuesionerPerkuliahanView::where('tahun_id', (int) $tahunId)
+                ->whereIn('kelas_kuliah_id', $kelasKuliahIdArr)
+                ->where('pertanyaan_id', $item['pertanyaan_id'])
+                ->avg('mutu');
+
+            $point = PointsView::where('mutu', round($mutu))->first();
+            $item['jawaban'] = $point;
+            $listPertanyaan[$index] = $item;
+        }
+
+        return $listPertanyaan;
+    }
+
     private function setDataJawaban($listJawaban, $kuesionerPerkuliahanMahasiswaId) {
         $formattedListJawaban = [];
 
@@ -552,11 +643,12 @@ class KuesionerController extends Controller
         return $formattedListJawaban;
     }
 
-    private function newFormattedItemForGetMatkulByTahunAjaran($item, $totalMahasiswa, $kelasKuliahIds) {
+    private function newFormattedItemForGetMatkulByTahunAjaran($item, $totalMahasiswa, $totalTerisi, $kelasKuliahIds) {
         $dataKuesionerArr = [
             'tahun_id' => (integer) $item['tahun_id'],
             'kelas_kuliah_ids' => $kelasKuliahIds,
             'total_mahasiswa' => $totalMahasiswa,
+            'total_mahasiswa_mengisi_kuesioner' => $totalTerisi,
             'kelas_kuliah' => $item['kelas_kuliah'],
             'sts_open' => false, // sementara, karena belum ada db
         ];

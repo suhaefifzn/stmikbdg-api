@@ -1,12 +1,22 @@
 <?php
 
+use App\Http\Controllers\SIKPS\SIKPSController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Users\MahasiswaController;
 
 /**
  * Routes yang ada di sini digunakan pada SIKPS.
  */
 
 // ? Get all data skripsi mahasiswa
-// Route::get('/sikps/mahasiswa', [MahasiswaController::class, 'getAllMahasiswa'])
-//     ->middleware(['auth.jwt', 'auth.developer']);
+Route::prefix('/sikps')
+    ->middleware('auth.jwt')
+    ->group(function () {
+        // mahasiswa
+        Route::controller(SIKPSController::class)
+            ->prefix('/mahasiswa')
+            ->middleware('auth.mahasiswa')
+            ->group(function () {
+                Route::get('/pengajuan/all', 'getAllPengajuanSkripsiDiterima');
+                Route::post('/pengajuan/deteksi/add', 'addHasilDeteksi');
+            });
+    });

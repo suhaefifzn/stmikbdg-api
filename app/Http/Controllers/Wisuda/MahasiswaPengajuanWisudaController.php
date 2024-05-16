@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Wisuda;
 
 use App\Exceptions\ErrorHandler;
 use App\Http\Controllers\Controller;
+use App\Models\JurusanView;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -60,9 +61,15 @@ class MahasiswaPengajuanWisudaController extends Controller
                 ], 400);
             }
 
+            /**
+             * get jurusan mahasiswa
+             */
+            $jurusan = JurusanView::where('jur_id', $mahasiswa['jur_id'])->select('jur_id', 'kd_jur')->first();
+
             $pengajuan = [
                 'nim' => $request->nim,
-                'nama' => $request->nama,
+                'nama' => $mahasiswa['nama'],
+                'kd_jur' => $jurusan['kd_jur'],
                 'nik' => $request->nik,
                 'tempat_lahir' => $request->tempat_lahir,
                 'tgl_lahir' => $request->tgl_lahir,

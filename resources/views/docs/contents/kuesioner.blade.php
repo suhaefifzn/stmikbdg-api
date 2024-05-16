@@ -112,6 +112,7 @@
         }
     }
 }</code></pre>
+
     <h5 class="mt-5">(MHS) Kuesioner Perkuliahan - Kirim Jawaban</h5>
     <hr>
     <p>
@@ -269,6 +270,49 @@
     "saran": "Test isi saran kuesioner kegiatan"
 }</code></pre>
 
+    <h5 class="mt-5">(MHS) Get All Pilihan Jawaban</h5>
+    <hr>
+    <p>
+        Kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/mahasiswa/pertanyaan/pilihan-jawaban</span> dengan HTTP method <span class="badge bg-info">get</span> untuk mendapatkan list pilihan jawaban kuesioner yang nantinya akan digunakan untuk memilih jawaban setiap pertanyaan. Response:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "pilihan_jawaban": [
+            {
+                "point_id": 1,
+                "kd_point": "N",
+                "ket_point": "Netral",
+                "mutu": 3
+            },
+            {
+                "point_id": 2,
+                "kd_point": "STS",
+                "ket_point": "Sangat Tidak Setuju",
+                "mutu": 1
+            },
+            {
+                "point_id": 3,
+                "kd_point": "TS",
+                "ket_point": "Tidak Setuju",
+                "mutu": 2
+            },
+            {
+                "point_id": 4,
+                "kd_point": "S",
+                "ket_point": "Setuju",
+                "mutu": 4
+            },
+            {
+                "point_id": 5,
+                "kd_point": "SS",
+                "ket_point": "Sangat Setuju",
+                "mutu": 5
+            }
+        ]
+    }
+}</code></pre>
+
     {{-- Admin - kuesioner perkuliahan --}}
     <h5 class="mt-5">(ADM) Kuesioner Perkuliahan - Get Tahun Ajaran</h5>
     <hr>
@@ -338,6 +382,7 @@
                     "tahun_id": 280,
                     "kelas_kuliah_ids": "2146",
                     "total_mahasiswa": 29,
+                    "total_mahasiswa_mengisi_kuesioner": 0,
                     "kelas_kuliah": "A",
                     "sts_open": false
                 },
@@ -363,6 +408,7 @@
                     "tahun_id": 280,
                     "kelas_kuliah_ids": "2147",
                     "total_mahasiswa": 26,
+                    "total_mahasiswa_mengisi_kuesioner": 0,
                     "kelas_kuliah": "A",
                     "sts_open": false
                 },
@@ -385,6 +431,45 @@
     </p>
     <pre><code class="language-json bg-primary-subtle">{
     "tahun_id": 280
+}</code></pre>
+
+    <h5 class="mt-5">(ADM) Kuesioner Perkuliahan - Get Rata-rata Jawaban</h5>
+    <hr>
+    <p>
+        Kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/perkuliahan/jawaban/rata-rata</span> dengan menggunakan query parameter <span class="badge bg-secondary">tahun_id</span> dan <span class="badge bg-secondary">kelas_kuliah_id</span>, kirimkan dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Contohnya, <span class="badge bg-dark">/kuesioner/perkuliahan/jawaban/rata-rata?tahun_id=335&kelas_kuliah_ids=3092</span>. Hasilnya:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "kuesioner_perkuliahan": {
+            "tahun_id": 335,
+            "kd_mk": "IF1710",
+            "nm_mk": "Pengolahan Citra",
+            "sks": 3,
+            "semester": 7,
+            "dosen": "Mina Ismu Rahayu, M.T",
+            "total_mahasiswa": 28,
+            "total_mahasiswa_mengisi_kuesioner": 2,
+            "pertanyaan_dan_jawaban": [
+                {
+                    "pertanyaan_id": 1,
+                    "jenis_pertanyaan_id": 1,
+                    "kelompok_pertanyaan_id": 1,
+                    "kd_jenis_pertanyaan": "P",
+                    "jenis": "Perkuliahan",
+                    "kelompok": "Teknologi Pembelajaran",
+                    "pertanyaan": "Apakah seluruh proses perkuliahan telah memiliki aktivitas kelas pembelajaran online (Google Meet/Zoom/Discord) pada saat jam perkuliahan?",
+                    "jawaban": {
+                        "point_id": 5,
+                        "kd_point": "SS",
+                        "ket_point": "Sangat Setuju",
+                        "mutu": 5
+                    }
+                },
+                // pertanyaan dan jawaban lain disembunyikan
+            ]
+        }
+    }
 }</code></pre>
 
     <h5 class="mt-5">(ADM) Kuesioner Kegiatan - Add Kuesioner</h5>
@@ -421,6 +506,44 @@
             },
             // kuesioner kegiatan lain disembunyikan
         ]
+    }
+}</code></pre>
+
+    <h5 class="mt-5">(ADM) Kuesioner Kegiatan - Get Rata-rata Jawaban</h5>
+    <br>
+    <p>
+        Untuk melihat rata-rata jawaban dari satu kuesioner kegiatan yang telah diisi oleh mahasiswa, kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/kegiatan/jawaban/rata-rata?kuesioner_kegiatan_id={nilai_kuesioner_kegiatan_id}</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Ganti <b>{nilai_kuesioner_kegiatan_id}</b> dengan nilai dari properti kuesioner_kegiatan_id yang didapat di response get list kuesioner kegiatan. Contohnya, <span class="badge bg-dark">/kuesioner/kegiatan/jawaban/rata-rata?kuesioner_kegiatan_id=1</span>. Jika berhasil API akan memberikan response seperti:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "kuesioner_kegiatan": {
+            "kuesioner_kegiatan_id": 1,
+            "tahun": 2024,
+            "tanggal_mulai": "2024-01-19",
+            "tanggal_akhir": "2024-02-20",
+            "organisasi": "HIMA SISTEM INFORMASI",
+            "kegiatan": "INSPIRA-SI SPORT",
+            "total_mahasiswa_mengisi_kuesioner": 1,
+            "pertanyaan_dan_jawaban": [
+                {
+                    "pertanyaan_id": 23,
+                    "jenis_pertanyaan_id": 2,
+                    "kelompok_pertanyaan_id": 4,
+                    "kd_jenis_pertanyaan": "K",
+                    "jenis": "Kegiatan Kampus",
+                    "kelompok": "Kepuasan Mahasiswa",
+                    "pertanyaan": "Apakah anda setuju kegiatan ini bermanfaat bagi anda?",
+                    "jawaban": {
+                        "point_id": 4,
+                        "kd_point": "S",
+                        "ket_point": "Setuju",
+                        "mutu": 4
+                    }
+                },
+                // pertanyaan dan jawaban lainnya disembunyikan
+            ]
+        }
     }
 }</code></pre>
 

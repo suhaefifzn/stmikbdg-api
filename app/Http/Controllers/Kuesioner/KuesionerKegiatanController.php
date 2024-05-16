@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Kuesioner;
 use App\Exceptions\ErrorHandler;
 use App\Http\Controllers\Controller;
 use App\Models\Kuesioner\JawabanKuesionerKegiatan;
+use App\Models\Kuesioner\JawabanKuesionerKegiatanView;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -68,6 +69,41 @@ class KuesionerKegiatanController extends Controller
             return ErrorHandler::handle($e);
         }
     }
+
+    /**
+     * admin get rata-rata jawaban kuesioner
+     * by kuesioner_kegiatan_id
+     */
+    public function getAverageJawabanKuesioner(Request $request) {
+        try {
+            $kuesionerKegiatanId = $request->query('kuesioner_kegiatan_id');
+
+            /**
+             * cek nilai query parameter kuesioner kegiatan id
+             */
+            $kuesionerKegiatan = KuesionerKegiatan::where('kuesioner_kegiatan_id', (int) $kuesionerKegiatanId)->first();
+
+            if (!$kuesionerKegiatan) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Nilai kuesioner_kegiatan_id tidak ditemukan',
+                ], 404);
+            }
+
+            $listPertanyaanDanJawaban = self::setJawabanToPertanyaan($kuesionerKegiatanId);
+            $countMahasiswaMengisi = KuesionerKegiatanMahasiswa::where('kuesioner_kegiatan_id', $kuesionerKegiatan['kuesioner_kegiatan_id'])
+                ->count();
+            $kuesionerKegiatan['total_mahasiswa_mengisi_kuesioner'] = $countMahasiswaMengisi;
+            $kuesionerKegiatan['pertanyaan_dan_jawaban'] = $listPertanyaanDanJawaban;
+
+            return $this->successfulResponseJSON([
+                'kuesioner_kegiatan' => $kuesionerKegiatan,
+            ]);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
 
     /**
      * mahasiswa get list kuesioner kegiatan
@@ -316,5 +352,20 @@ class KuesionerKegiatanController extends Controller
         }
 
         return $formattedListJawaban;
+    }
+
+    private function setJawabanToPertanyaan($kuesionerKegiatanId) {
+        $listPertanyaan = PertanyaanView::where('kd_jenis_pertanyaan', 'K')->get();
+
+        foreach ($listPertanyaan as $index => $item) {
+            $mutu = JawabanKuesionerKegiatanView::where('kuesioner_kegiatan_id', (int) $kuesionerKegiatanId)
+                ->where('pertanyaan_id', $item['pertanyaan_id'])
+                ->avg('mutu');
+            $point = PointsView::where('mutu', round($mutu))->first();
+            $item['jawaban'] = $point;
+            $listPertanyaan[$index] = $item;
+        }
+
+        return $listPertanyaan;
     }
 }

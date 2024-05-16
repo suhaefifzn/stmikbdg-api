@@ -21,6 +21,8 @@ Route::prefix('/kuesioner')
         Route::prefix('/mahasiswa')
             ->middleware('auth.mahasiswa')
             ->group(function () {
+                Route::get('/pertanyaan/pilihan-jawaban', [KuesionerController::class, 'getAllPilihanJawaban']);
+
                 // kuesioner perkuliahan
                 Route::controller(KuesionerController::class)
                     ->prefix('/perkuliahan')
@@ -46,10 +48,15 @@ Route::prefix('/kuesioner')
         Route::middleware('auth.admin')
             ->group(function () {
                 Route::get('/tahun-ajaran', [TahunAjaranController::class, 'getTahunAjaranAktifForKuesioner']);
-                Route::get('/perkuliahan', [KuesionerController::class, 'getMatkulByTahunAjaran']);
-
-                // buka kuesioner perkuliahan by tahun ajaran
-                Route::post('/perkuliahan/open', [KuesionerController::class, 'openKuesionerPerkuliahan']);
+                
+                // kuesioner perkuliahan
+                Route::controller(KuesionerController::class)
+                    ->prefix('/perkuliahan')
+                    ->group(function () {
+                        Route::get('/', 'getMatkulByTahunAjaran');
+                        Route::post('/open', 'openKuesionerPerkuliahan');
+                        Route::get('/jawaban/rata-rata', 'getAverageJawabanKuesioner');
+                    });
 
                 // pertanyaan
                 Route::prefix('/pertanyaan')
@@ -82,6 +89,7 @@ Route::prefix('/kuesioner')
                     ->group(function () {
                         Route::post('/add', 'addKuesioner');
                         Route::get('/list', 'getListKuesioner');
+                        Route::get('/jawaban/rata-rata', 'getAverageJawabanKuesioner');
                     });
             });
     });
