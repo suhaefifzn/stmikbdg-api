@@ -46,7 +46,7 @@ class DocsController extends Controller
 
     public function sikps() {
         return view('docs.contents.sikps', [
-            'title' => 'SIKPS'
+            'title' => 'SIKPS - Sistem Deteksi'
         ]);
     }
 

@@ -178,8 +178,51 @@
     "message": "Saran berhasil dikirim"
 }</code></pre>
 
+    <h5 class="mt-5">(MHS) Get Pilihan Jawaban</h5>
+    <hr>
+    <p>
+        Untuk melihat daftar pilihan jawaban tersedia yang digunakan untuk input tipe radio. Kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/mahasiswa/pertanyaan/pilihan-jawaban</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Hasilnya:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "pilihan_jawaban": [
+            {
+                "point_id": 5,
+                "kd_point": "SS",
+                "ket_point": "Sangat Setuju",
+                "mutu": 5
+            },
+            {
+                "point_id": 4,
+                "kd_point": "S",
+                "ket_point": "Setuju",
+                "mutu": 4
+            },
+            {
+                "point_id": 3,
+                "kd_point": "N",
+                "ket_point": "Netral",
+                "mutu": 3
+            },
+            {
+                "point_id": 2,
+                "kd_point": "TS",
+                "ket_point": "Tidak Setuju",
+                "mutu": 2
+            },
+            {
+                "point_id": 1,
+                "kd_point": "STS",
+                "ket_point": "Sangat Tidak Setuju",
+                "mutu": 1
+            }
+        ]
+    }
+}</code></pre>
+
     {{-- Mahasiswa - Kuesioner Kegiatan --}}
-    <h5 class="mt-5">(MHS) Kuesioner Kegiatan - Get List Kegiatan</h5>
+   <!-- <h5 class="mt-5">(MHS) Kuesioner Kegiatan - Get List Kegiatan</h5>
     <hr>
     <p>
         Kirimkan permintaan dengan menggunakan HTTP method <span class="badge bg-info">get</span> ke <span class="badge bg-dark">/kuesioner/mahasiswa/kegiatan/list</span>. Response:
@@ -356,7 +399,7 @@
 }</code></pre>
     <p>
         Perhatikan nilai <b>kuesioner_open</b>, jika isinya adalah true maka kuesioner perkuliahan pada tahun tersebut telah dibuka, artinya setiap mahasiswa yang berada pada tahun ajaran tersebut sudah dapat mengisi kuesioner setiap matkul yang ada pada tahun ajaran itu. Dan jika isinya adalah false, berarti kuesioner perkuliahan pada tahun ajaran tersebut belum dibuka dan mahasiswa tidak dapat mengisi kuesioner.
-    </p>
+    </p>-->
 
     <h5 class="mt-5">(ADM) Kuesioner Perkuliahan - Get Matkul Berdasarkan Tahun Ajaran</h5>
     <hr>
@@ -472,7 +515,7 @@
     }
 }</code></pre>
 
-    <h5 class="mt-5">(ADM) Kuesioner Kegiatan - Add Kuesioner</h5>
+    <!--<h5 class="mt-5">(ADM) Kuesioner Kegiatan - Add Kuesioner</h5>
     <hr>
     <p>
         Berdasarkan hasil diskusi, bahwa kegiatan kampus tidak berdasarkan pada tahun ajaran dan belum terdapat tabel yang menyimpan data kegiatan tersebut. Sehingga untuk membuka kuesionernya perlu ditambahkan data kegiatan kampus terlebih dahulu.
@@ -545,7 +588,7 @@
             ]
         }
     }
-}</code></pre>
+}</code></pre>-->
 
     <h5 class="mt-5">(ADM) Get List Jenis Pertanyaan</h5>
     <hr>
