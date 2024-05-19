@@ -37,6 +37,7 @@ class MahasiswaPengajuanWisudaController extends Controller
                 'file_bukti_pembayaran' => 'required|string',
                 'file_ktp' => 'required|string',
                 'file_bukti_pembayaran_sumbangan' => 'required|string',
+                'file_ijazah' => 'required|string'
             ]);
 
             /**
@@ -100,6 +101,7 @@ class MahasiswaPengajuanWisudaController extends Controller
                 'file_ktp' => $request->file_ktp,
                 'file_bukti_pembayaran' => $request->file_bukti_pembayaran,
                 'file_bukti_pembayaran_sumbangan' => $request->file_bukti_pembayaran_sumbangan,
+                'file_ijazah' => $request->file_ijazah
             ];
 
             $createFileId = File::create($files)->file_id;
@@ -135,6 +137,7 @@ class MahasiswaPengajuanWisudaController extends Controller
                 'file_bukti_pembayaran' => 'required|string',
                 'file_ktp' => 'required|string',
                 'file_bukti_pembayaran_sumbangan' => 'required|string',
+                'file_ijazah' => 'required|string'
             ]);
 
             /**
@@ -205,6 +208,7 @@ class MahasiswaPengajuanWisudaController extends Controller
                 'file_ktp' => $request->file_ktp,
                 'file_bukti_pembayaran' => $request->file_bukti_pembayaran,
                 'file_bukti_pembayaran_sumbangan' => $request->file_bukti_pembayaran_sumbangan,
+                'file_ijazah' => $request->file_ijazah
             ];
 
             File::updateFiles((integer) $request->pengajuan_id, $files);

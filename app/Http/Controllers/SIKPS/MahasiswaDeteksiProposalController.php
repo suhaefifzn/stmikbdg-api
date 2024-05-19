@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SIKPS;
 
 use App\Exceptions\ErrorHandler;
 use App\Http\Controllers\Controller;
+use App\Models\SIKPS\Fingerprints;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -149,6 +150,18 @@ class MahasiswaDeteksiProposalController extends Controller
                 'status' => 'fail',
                 'message' => 'Proposal tidak ditemukan'
             ], 404);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function getAllFingerprints() {
+        try {
+            $allFingerprints = Fingerprints::orderBy('fingerprint_id', 'DESC')->get();
+
+            return $this->successfulResponseJSON([
+                'fingerprints' => $allFingerprints,
+            ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
