@@ -38,6 +38,7 @@
     "file_bukti_pembayaran": "asdasd.pdf",
     "file_ktp": "ktp.pdf",
     "file_bukti_pembayaran_sumbangan": "asdasdlk.pdf",
+    "file_ijazah": "ijazah.jpg",
     "judul_skripsi": "INTEGRASI SISTEM STMIK BANDUNG DALAM BENTUK API (APPLICATION PROGRAMMING INTERFACE)"
 }</code></pre>
     <div class="alert alert-warning">
@@ -72,6 +73,7 @@
             "file_bukti_pembayaran": "asdasd.pdf",
             "file_ktp": "ktp.pdf",
             "file_bukti_pembayaran_sumbangan": "asdasdlk.pdf",
+            "file_ijazah": "ijazah.jpg",
             "is_bayar": null,
             "is_ditolak": null,
             "ditolak_alasan": null,
@@ -121,6 +123,7 @@
     "file_bukti_pembayaran": "edit-asdasd.pdf",
     "file_ktp": "edit-ktp.pdf",
     "file_bukti_pembayaran_sumbangan": "edit-asdasdlk.pdf",
+    "file_ijazah": "ijazah.jpg",
     "judul_skripsi": "EDIT JUDUL INTEGRASI SISTEM STMIK BANDUNG DALAM BENTUK API (APPLICATION PROGRAMMING INTERFACE)g"
 }</code></pre>
     <p>
@@ -208,6 +211,7 @@
             "file_bukti_pembayaran": "edit-asdasd.pdf",
             "file_ktp": "edit-ktp.pdf",
             "file_bukti_pembayaran_sumbangan": "edit-asdasdlk.pdf",
+            "file_ijazah": "ijazah.jpg",
             "is_bayar": null,
             "is_ditolak": null,
             "ditolak_alasan": null,
@@ -218,7 +222,7 @@
     }
 }</code></pre>
 
-    <h5 class="mt-4">
+    <!--<h5 class="mt-4">
         (ADM) Edit Pengajuan Pendaftaran Wisuda Milik Mahasiswa
     </h5>
     <hr>
@@ -238,12 +242,13 @@
     "file_bukti_pembayaran": "contoh-edit-by-admin-asdajskhd.pdf",
     "file_ktp": "contoh-edit-by-admin-ktp.pdf",
     "file_bukti_pembayaran_sumbangan": "edit-by-admin-asdasdlk.pdf",
+    "file_ijazah": "ijazah.jpg",
     "judul_skripsi": "CONTOH DIEDIT SAMA ADMIN"
 }</code></pre>
     <div class="alert alert-warning">
         <b>Peringatan!</b><br>
         Melakukan update atau edit terhadap pengajuan akan mengembalikan status menjadi menunggu.
-    </div>
+    </div>-->
 
     <h5 class="mt-4">
         (ADM) Verifikasi Pengajuan Pendaftaran Wisuda Milik Mahasiswa
@@ -383,6 +388,7 @@
                 "file_bukti_pembayaran": "contoh-edit-by-admin-asdajskhd.pdf",
                 "file_ktp": "contoh-edit-by-admin-ktp.pdf",
                 "file_bukti_pembayaran_sumbangan": "edit-by-admin-asdasdlk.pdf",
+                "file_ijazah": "ijazah.jpg",
                 "is_bayar": true,
                 "is_ditolak": false,
                 "ditolak_alasan": null,
@@ -409,6 +415,7 @@
                 "file_bukti_pembayaran": "sdajskhd.pdf",
                 "file_ktp": "ktp.pdf",
                 "file_bukti_pembayaran_sumbangan": "asdasdlk.pdf",
+                "file_ijazah": "ijazah.jpg",
                 "is_bayar": true,
                 "is_ditolak": false,
                 "ditolak_alasan": null,
@@ -446,6 +453,7 @@
                 "file_bukti_pembayaran": "contoh-edit-by-admin-asdajskhd.pdf",
                 "file_ktp": "contoh-edit-by-admin-ktp.pdf",
                 "file_bukti_pembayaran_sumbangan": "edit-by-admin-asdasdlk.pdf",
+                "file_ijazah": "ijazah.jpg",
                 "is_bayar": true,
                 "is_ditolak": false,
                 "ditolak_alasan": null,
@@ -470,5 +478,14 @@
         <br>
         Pada hasil diskusi juga disebutkan bahwa rekap juga harus dapat diekspor ke file excel, yang mana pengelolaan ekspor tersebut dilakukan pada sisi frontend.
     </div>
+
+    <h5 class="mt-5">(ADM) Delete Jadwal Wisuda</h5>
+    <hr>
+    <p>
+        Untuk menghapus jadwal wisuda, kirimkan permintaan ke <span class="badge bg-dark">/wisuda/pengajuan/jadwal/delete</span> dengan menggunakan HTTP method <span class="badge bg-info">delete</span> dan sertakan payload dalam bentuk JSON dengan format seperti berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "jadwal_wisuda_id": 3
+}</code></pre>
 </div>
 @endsection

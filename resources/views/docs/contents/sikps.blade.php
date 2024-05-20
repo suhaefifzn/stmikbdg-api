@@ -60,6 +60,35 @@
     "similarity_id": 4
 }</code></pre>
 
+    <h5 class="mt-5">(MHS) Get List Fingerprints</h5>
+    <hr>
+    <p>
+        Kirimkan permintaan ke <span class="badge bg-dark">/sikps/mahasiswa/deteksi/fingerprints/list</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Hasilnya:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "fingerprints": [
+            {
+                "fingerprint_id": 4,
+                "judul": "ANALISIS KUALITAS LAYANAN WEBSITE LMS STMIK BANDUNG TERHADAP KEPUASAN PENGGUNA MENGGUNAKAN METODE WEBQUAL 4.0 DAN IMPORTANCE PERFORMANCE ANALYSIS (IPA)",
+                "file_dokumen": "http://103.119.67.164:18088/sikps/proposal/153/stream",
+                "n_gram": "NUJLEg3KFPTkBuqx4CxtGLFfkaQU7PnyCEU4W0EShG98CmNBgTp5nqQZDmzXaN6qGw6GS7m9L6fvUqda4BC7hwgriahtSfNEfvWe5qWE0rZwVcVReYZaucukSmH2TQEd",
+                "hashing": "WzN?JijQ%EWtbBtqM,H&bkG&eAwmVrpwm4i+b?}%(x95R4P(Tj-TLDpj(JnK:7VC-RJtVu[Kw7{1uk(fFizqG-=YKxG;tu9}F6cWx=tun}uCEzCw.{J$u+P)i3x{dmNr",
+                "winnowing": "1jbau7WzeZawdYyUx8Tv67uwXvMYcNL54Z1Vf0N7eqBWcP6gbWip8rx4LYXYW6BA4CLkYqHTDtvYArbXnqCmbS8E2KnS1JGQcxxZgK7SjXVnK3C8DCg8DyFAvg62fPcN",
+                "fingerprint": "ua8]Ggp,H+Hnuq)8@C?7yyBWABUUcjC!@7)7x.HX!2[j8pD/:Cx89F(7mTy0899}T-VMGCM7#!]iTC*_+#gC4:y,r2PigMG*tTt@(9xviyH19X;LN:WFqXF+wmU9pbG)",
+                "total_fingerprint": 128,
+                "total_ngram": 128,
+                "total_hash": 128,
+                "total_window": 128,
+                "is_generated": false,
+                "created_at": "2024-05-20 07:05:26.126"
+            },
+            // list fingerprint lainnya ...
+        ]
+    }
+}</code></pre>
+
     <h5 class="mt-5">(ADM) Add Fingerprint Proposal</h5>
     <hr>
     <p>

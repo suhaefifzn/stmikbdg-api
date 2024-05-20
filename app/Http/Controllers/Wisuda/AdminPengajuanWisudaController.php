@@ -6,6 +6,7 @@ use App\Exceptions\ErrorHandler;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 // ? Models - Views
 use App\Models\Wisuda\PengajuanWisudaView;
@@ -78,6 +79,10 @@ class AdminPengajuanWisudaController extends Controller
         }
     }
 
+    /**
+     * ! perlu didiskusikan kembali
+     * kenapa admin dapat edit pengajuan milik mahasiswa? - di mockup
+     */
     public function updatePengajuan(Request $request, $nim) {
         try {
             $request->validate([
@@ -93,6 +98,7 @@ class AdminPengajuanWisudaController extends Controller
                 'file_bukti_pembayaran' => 'required|string',
                 'file_ktp' => 'required|string',
                 'file_bukti_pembayaran_sumbangan' => 'required|string',
+                'file_ijazah' => 'required|string',
                 'judul_skripsi' => 'required|string'
             ]);
 
@@ -157,6 +163,7 @@ class AdminPengajuanWisudaController extends Controller
                 'file_ktp' => $request->file_ktp,
                 'file_bukti_pembayaran' => $request->file_bukti_pembayaran,
                 'file_bukti_pembayaran_sumbangan' => $request->file_bukti_pembayaran_sumbangan,
+                'file_ijazah' => $request->file_ijazah
             ];
 
             File::updateFiles((integer) $request->pengajuan_id, $files);
@@ -235,7 +242,11 @@ class AdminPengajuanWisudaController extends Controller
 
                 $status = StatusView::getDetailStatus('S');
                 $jadwalWisudaAktif = JadwalWisudaAktifView::first();
+
                 $pengajuan['jadwal_wisuda_id'] = $jadwalWisudaAktif['jadwal_wisuda_id'];
+                $pengajuan['tgl_wisuda'] = $jadwalWisudaAktif['tgl_wisuda'];
+                $pengajuan['tahun_wisuda'] = $jadwalWisudaAktif['tahun'];
+                $pengajuan['angkatan_wisuda'] = $jadwalWisudaAktif['angkatan_wisuda'];
                 $pengajuan['status_id'] = $status['status_id'];
             } else {
                 $request->validate([
@@ -351,6 +362,45 @@ class AdminPengajuanWisudaController extends Controller
                 'status' => 'success',
                 'message' => 'Jadwal wisuda berhasil diperbarui'
             ], 200);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function deleteJadwalWisuda(Request $request) {
+        try {
+            $jadwalWisudaId = $request->jadwal_wisuda_id;
+
+            if ($jadwalWisudaId) {
+                $jadwalWisuda = JadwalWisudaAllView::where('jadwal_wisuda_id', (int) $jadwalWisudaId)->first();
+
+                if ($jadwalWisuda) {
+                    DB::beginTransaction();
+
+                    $delete = JadwalWisuda::where('jadwal_wisuda_id', (int) $jadwalWisudaId)->delete();
+
+                    if ($delete) {
+                        DB::commit();
+
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => 'Jadwal wisuda berhasil dihapus'
+                        ], 200);
+                    }
+
+                    DB::rollBack();
+
+                    return response()->json([
+                        'status' => 'fail',
+                        'message' => 'Jadwal wisuda gagal dihapus'
+                    ], 500);
+                }
+            }
+
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Jadwal wisuda tidak ditemukan'
+            ], 404);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }

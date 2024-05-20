@@ -9,9 +9,9 @@
         <div class="alert alert-danger">
             <b>Riwayat Update:</b><br>
             <ul>
-                <li>Sabtu, 18-05-2024 | <a href="/docs/api/sikps" class="text-decoration-none">Sistem Deteksi Kemiripan Proposal Skripsi</a></li>
-                <li>Kamis, 16-05-2024 | <a href="/docs/api/kuesioner" class="text-decoration-none">Sistem Kuesioner</a></li>
-                <li>Kamis, 16-05-2024 | <a href="/docs/api/pengajuan-wisuda" class="text-decoration-none">Sistem Pengajuan Pendaftaran Wisuda</a></li>
+                <li>Senin, 20-05-2024 | <a href="/docs/api/pengajuan-wisuda" class="text-decoration-none">Pengajuan Pendaftaran Wisuda</a></li>
+                <li>Minggu, 19-05-2024 | <a href="/docs/api/sikps" class="text-decoration-none">Deteksi Kemiripan Proposal Skripsi</a></li>
+                <li>Kamis, 16-05-2024 | <a href="/docs/api/kuesioner" class="text-decoration-none">Kuesioner</a></li>
             </ul>
         </div>
         <div class="alert alert-warning">
