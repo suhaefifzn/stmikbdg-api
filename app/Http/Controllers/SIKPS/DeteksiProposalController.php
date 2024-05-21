@@ -24,6 +24,15 @@ class DeteksiProposalController extends Controller
 
             DB::beginTransaction();
 
+            /**
+             * jika fingerprints adalah hasil generate
+             * dari original SIKPS API. Maka hapus semua fingerprints
+             * yang memiliki nilai is_generated = true pada tabel
+             */
+            if ($request->fingerprints[0]['is_generated']) {
+                Fingerprints::where('is_generated', true)->delete();
+            }
+            
             $insert = Fingerprints::insert($request->fingerprints);
 
             if ($insert) {

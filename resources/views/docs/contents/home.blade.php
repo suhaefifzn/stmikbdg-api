@@ -9,8 +9,8 @@
         <div class="alert alert-danger">
             <b>Riwayat Update:</b><br>
             <ul>
-                <li>Senin, 20-05-2024 | <a href="/docs/api/pengajuan-wisuda" class="text-decoration-none">Pengajuan Pendaftaran Wisuda</a></li>
-                <li>Minggu, 19-05-2024 | <a href="/docs/api/sikps" class="text-decoration-none">Deteksi Kemiripan Proposal Skripsi</a></li>
+                <li>Senin, 21-05-2024 | <a href="/docs/api/pengajuan-wisuda" class="text-decoration-none">Pengajuan Pendaftaran Wisuda</a></li>
+                <li>Minggu, 21-05-2024 | <a href="/docs/api/sikps" class="text-decoration-none">Deteksi Kemiripan Proposal Skripsi</a></li>
                 <li>Kamis, 16-05-2024 | <a href="/docs/api/kuesioner" class="text-decoration-none">Kuesioner</a></li>
             </ul>
         </div>

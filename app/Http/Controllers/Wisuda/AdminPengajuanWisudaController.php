@@ -220,6 +220,8 @@ class AdminPengajuanWisudaController extends Controller
                 ], 400);
             }
 
+            DB::beginTransaction();
+
             /**
              * Cek mahasiswa dan pengajuannya
              */
@@ -261,13 +263,27 @@ class AdminPengajuanWisudaController extends Controller
                 $pengajuan['status_id'] =$status['status_id'];
             }
 
-            PengajuanWisuda::updatePengajuan((integer) $request->pengajuan_id, (string) $request->nim, $pengajuan);
+            $update = PengajuanWisuda::updatePengajuan(
+                (integer) $request->pengajuan_id, (string) $request->nim, $pengajuan
+            );
+
+            if ($update) {
+                DB::commit();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Status pengajuan wisuda mahasiswa dengan NIM ' . $request->nim . ' berhasil diperbarui'
+                ], 200);
+            }
+
+            DB::rollBack();
 
             return response()->json([
-                'status' => 'success',
-                'message' => 'Status pengajuan wisuda mahasiswa dengan NIM ' . $request->nim . ' berhasil diperbarui'
-            ], 200);
+                'status' => 'fail',
+                'message' => 'Pengajuan mahasiswa gagal diverifikasi'
+            ], 500);
         } catch (\Exception $e) {
+            DB::rollBack();
             return ErrorHandler::handle($e);
         }
     }
@@ -336,6 +352,8 @@ class AdminPengajuanWisudaController extends Controller
                 'angkatan_wisuda' => 'required',
             ]);
 
+            DB::beginTransaction();
+
             $oldJadwal = JadwalWisudaAllView::getJadwalWisuda($tahun);
 
             /**
@@ -356,13 +374,37 @@ class AdminPengajuanWisudaController extends Controller
                 'angkatan_wisuda' => (integer) $request->angkatan_wisuda,
             ];
 
-            JadwalWisuda::where('jadwal_wisuda_id', $oldJadwal['jadwal_wisuda_id'])->update($jadwal);
+            $updateJadwal = JadwalWisuda::where('jadwal_wisuda_id', $oldJadwal['jadwal_wisuda_id'])
+                ->update($jadwal);
+
+            /**
+             * update juga field tgl_wisuda, tahun_wisuda, 
+             * dan angkatan_wisuda di tabel pengajuan
+             */
+            $updatePengajuan = PengajuanWisuda::where('jadwal_wisuda_id', $oldJadwal['jadwal_wisuda_id'])
+                ->update([
+                    'tgl_wisuda' => $jadwal['tgl_wisuda'],
+                    'tahun_wisuda' => (int) $jadwal['tahun'],
+                    'angkatan_wisuda' => (int) $jadwal['angkatan_wisuda']
+                ]);
+            
+            if ($updateJadwal and $updatePengajuan) {
+                DB::commit();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Jadwal wisuda berhasil diperbarui'
+                ], 200);
+            }
+
+            DB::rollBack();
 
             return response()->json([
-                'status' => 'success',
-                'message' => 'Jadwal wisuda berhasil diperbarui'
-            ], 200);
+                'status' => 'fail',
+                'message' => 'Jadwal wisuda gagal diperbarui',
+            ], 500);
         } catch (\Exception $e) {
+            DB::rollBack();
             return ErrorHandler::handle($e);
         }
     }
