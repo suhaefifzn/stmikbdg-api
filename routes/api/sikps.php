@@ -23,6 +23,7 @@ Route::prefix('/sikps')
                 Route::delete('/fingerprints/delete', 'deleteFingerprint');
                 Route::put('/fingerprints/update', 'updateFingerprint');
                 Route::get('/riwayat', 'getAllRiwayatDeteksi');
+                Route::delete('/fingerprints/generated/delete', 'deleteAllGeneratedFingerprints');
             });
 
         // mahasiswa

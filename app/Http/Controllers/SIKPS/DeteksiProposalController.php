@@ -23,15 +23,6 @@ class DeteksiProposalController extends Controller
             ]);
 
             DB::beginTransaction();
-
-            /**
-             * jika fingerprints adalah hasil generate
-             * dari original SIKPS API. Maka hapus semua fingerprints
-             * yang memiliki nilai is_generated = true pada tabel
-             */
-            if ($request->fingerprints[0]['is_generated']) {
-                Fingerprints::where('is_generated', true)->delete();
-            }
             
             $insert = Fingerprints::insert($request->fingerprints);
 
@@ -180,6 +171,33 @@ class DeteksiProposalController extends Controller
                 'hasil_deteksi' => $listHasilDeteksi
             ]);
         } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function deleteAllGeneratedFingerprints() {
+        try{
+            DB::beginTransaction();
+
+            $delete = Fingerprints::where('is_generated', true)->delete();
+
+            if ($delete) {
+                DB::commit();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Generated fingerprints berhasil dihapus'
+                ], 200);
+            }
+
+            DB::rollBack();
+
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Generated fingerprints gagal dihapus'
+            ], 500);
+        } catch (\Exception $e) {
+            DB::rollBack();
             return ErrorHandler::handle($e);
         }
     }
