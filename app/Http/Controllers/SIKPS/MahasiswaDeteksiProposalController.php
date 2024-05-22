@@ -23,7 +23,8 @@ class MahasiswaDeteksiProposalController extends Controller
                 'nm_mhs' => 'required|string',
                 'judul' => 'required|string',
                 'file' => 'required|string',
-                'persentase_kemiripan' => 'required'
+                'persentase_kemiripan' => 'required',
+                'original_name' => 'required|string',
             ]);
 
             $data['created_at'] = now();
@@ -79,7 +80,8 @@ class MahasiswaDeteksiProposalController extends Controller
                     $data = $request->validate([
                         'judul' => 'required|string',
                         'file' => 'required|string',
-                        'persentase_kemiripan' => 'required'
+                        'persentase_kemiripan' => 'required',
+                        'original_name' => 'required|string',
                     ]);
 
                     $data['created_at'] = now();
@@ -157,11 +159,45 @@ class MahasiswaDeteksiProposalController extends Controller
 
     public function getAllFingerprints() {
         try {
-            $allFingerprints = Fingerprints::orderBy('fingerprint_id', 'DESC')->get();
+            $allFingerprints = Fingerprints::orderBy('fingerprint_id', 'DESC')->paginate(8);
 
-            return $this->successfulResponseJSON([
-                'fingerprints' => $allFingerprints,
-            ]);
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'fingerprints' => $allFingerprints->items(),
+                ],
+                'meta' => [
+                    'current_page' => $allFingerprints->currentPage(),
+                    'per_page' => $allFingerprints->perPage(),
+                    'total' => $allFingerprints->total(),
+                    'last_page' => $allFingerprints->lastPage(),
+                    'next_page_url' => $allFingerprints->nextPageUrl(),
+                    'prev_page_url' => $allFingerprints->previousPageUrl(),
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function getDetail(Request $request) {
+        try {
+            $similarityId = $request->similarity_id;
+
+            if ($similarityId) {
+                $similarity = Similarities::where('similarity_id', (int) $request->similarity_id)->first();
+
+                if ($similarity) {
+                    return $this->successfulResponseJSON([
+                        'similarity' => $similarity
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Proposal tidak ditemukan'
+            ], 404);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }

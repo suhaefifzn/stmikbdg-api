@@ -23,7 +23,7 @@ class DeteksiProposalController extends Controller
             ]);
 
             DB::beginTransaction();
-            
+
             $insert = Fingerprints::insert($request->fingerprints);
 
             if ($insert) {
@@ -50,7 +50,9 @@ class DeteksiProposalController extends Controller
 
     public function getAllFingerprints() {
         try {
-            $fingerprints = Fingerprints::orderBy('fingerprint_id', 'DESC')->get();
+            $fingerprints = Fingerprints::select('fingerprint_id', 'judul', 'file_dokumen')
+                ->orderBy('fingerprint_id', 'DESC')
+                ->get();
 
             return $this->successfulResponseJSON([
                 'fingerprints' => $fingerprints
@@ -70,12 +72,12 @@ class DeteksiProposalController extends Controller
                 if ($fingerprint) {
                     DB::beginTransaction();
                     $delete = Fingerprints::where('fingerprint_id', (int) $fingerprintId)->delete();
-                    
+
                     if ($delete) {
                         DB::commit();
 
                         return response()->json([
-                            'status' => 'success', 
+                            'status' => 'success',
                             'message' => 'Fingerprint proposal berhasil dihapus'
                         ], 200);
                     }
@@ -100,39 +102,47 @@ class DeteksiProposalController extends Controller
                 $fingerprint = Fingerprints::where('fingerprint_id', (int) $fingerprintId)->first();
 
                 if ($fingerprint) {
-                    $request->validate([
-                        'judul' => 'required|string',
-                        'file_dokumen' => 'nullable|string',
-                        'n_gram' => 'required|string',
-                        'hashing' => 'required|string',
-                        'winnowing' => 'required|string',
-                        'fingerprint' => 'required|string',
-                        'total_fingerprint' => 'nullable',
-                        'total_ngram' => 'nullable',
-                        'total_hash' => 'nullable',
-                        'total_window' => 'nullable'
-                    ]);
+                    if ($request->file_dokumen) {
+                        $request->validate([
+                            'judul' => 'required|string',
+                            'file_dokumen' => 'required|string',
+                            'n_gram' => 'required|string',
+                            'hashing' => 'required|string',
+                            'winnowing' => 'required|string',
+                            'fingerprint' => 'required|string',
+                            'total_fingerprint' => 'required',
+                            'total_ngram' => 'required',
+                            'total_hash' => 'required',
+                            'total_window' => 'required',
+                            'is_generated' => 'required',
+                        ]);
 
-                    $data = [
-                        'judul' => $request->judul,
-                        'n_gram' => $request->n_gram,
-                        'hashing' => $request->hashing,
-                        'winnowing' => $request->winnowing,
-                        'fingerprint' => $request->fingerprint,
-                        'total_fingerprint' => $request->total_fingerprint,
-                        'total_ngram' => $request->total_ngram,
-                        'total_hash' => $request->total_hash,
-                        'total_window' => $request->total_window,
-                        'created_at' => now(),
-                    ];
+                        $data = [
+                            'judul' => $request->judul,
+                            'file_dokumen' => $request->file_dokumen,
+                            'n_gram' => $request->n_gram,
+                            'hashing' => $request->hashing,
+                            'winnowing' => $request->winnowing,
+                            'fingerprint' => $request->fingerprint,
+                            'total_fingerprint' => $request->total_fingerprint,
+                            'total_ngram' => $request->total_ngram,
+                            'total_hash' => $request->total_hash,
+                            'total_window' => $request->total_window,
+                            'is_generated' => $request->is_generated,
+                            'created_at' => now(),
+                        ];
+                    } else {
+                        $request->validate([
+                            'judul' => 'required|string',
+                        ]);
+
+                        $data = [
+                            'judul' => $request->judul,
+                        ];
+                    }
 
                     DB::beginTransaction();
 
-                    if ($request->file_dokumen) {
-                        $data['file_dokumen'] = $request->file_dokumen;
-                        $data['is_generated'] = false;
-                    }
-                    
                     $update = Fingerprints::where('fingerprint_id', $fingerprintId)->update($data);
 
                     if ($update) {
@@ -198,6 +208,31 @@ class DeteksiProposalController extends Controller
             ], 500);
         } catch (\Exception $e) {
             DB::rollBack();
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function getDetail(Request $request) {
+        try {
+            $fingerprintId = $request->fingerprint_id;
+
+            if ($fingerprintId) {
+                $fingerprint = Fingerprints::where('fingerprint_id', (int) $fingerprintId)
+                    ->select('fingerprint_id', 'judul', 'file_dokumen', 'is_generated')
+                    ->first();
+
+                if ($fingerprint) {
+                    return $this->successfulResponseJSON([
+                        'fingerprint' => $fingerprint,
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Proposal tidak ditemukan',
+            ], 404);
+        } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
     }

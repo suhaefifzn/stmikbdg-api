@@ -86,6 +86,38 @@
             },
             // list fingerprint lainnya ...
         ]
+    },
+    "meta": {
+        "current_page": 1,
+        "per_page": 8,
+        "total": 441,
+        "last_page": 56,
+        "next_page_url": "http://stmikbdg-api.test/api/sikps/mahasiswa/deteksi/fingerprints/list?page=2",
+        "prev_page_url": null
+    }
+}</code></pre>
+    <p>
+        Karena bisa saja list fingerprint memiliki ukuran yang besar, sehingga JSON tidak dapat memuat seluruh fingerprint sekaligus. Maka dibuatkan pagination, perhatikanlah pada nilai <b>meta</b> yang ada pada response di atas. Contoh penggunaannya adalah dengan menambahkan query <span class="badge bg-secondary">page</span>, sehingga url menjadi seperti <span class="badge bg-dark">/sikps/mahasiswa/deteksi/fingerprints/list?page=1</span>.
+    </p>
+
+    <h5 class="mt-5">(MHS) Get Detail Proposal Hasil Deteksi</h5>
+    <hr>
+    <p>
+        Untuk mendapatkan detail proposal yang sudah pernah dideteksi kemiripannya, lakukan permintaan dengan menggunakan HTTP method <span class="badge bg-info">get</span> ke <span class="badge bg-dark">/sikps/mahasiswa/deteksi/hasil/detail?similarity_id=11</span>. Ganti nilai <b>similarity_id</b> dengan similarity_id yang didapat dari get hasil deteksi.
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "similarity": {
+            "similarity_id": 11,
+            "nim": "1220001",
+            "nm_mhs": "Suhaefi Fauzian",
+            "judul": "Test Judul",
+            "file": "proposal.pdf",
+            "persentase_kemiripan": "24",
+            "original_name": "proposal.pdf",
+            "created_at": "2024-05-22 00:14:44.9"
+        }
     }
 }</code></pre>
 
@@ -148,6 +180,22 @@
     }
 }</code></pre>
 
+    <h5 class="mt-5">(ADM) Get Detail Fingerprint Proposal</h5>
+    <hr>
+    <p>
+        Kirimkan permintaan ke <span class="badge bg-dark">/sikps/deteksi/fingerprints/detail?fingerprint_id=1594</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span> untuk mendapatkan detail umum dari fingerprint yang ada. Ganti nilai <b>fingerprint_id</b> dengan nilai fingerprint_id yang tersedia setelah get list fingerprint.
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "fingerprint": {
+            "fingerprint_id": 1594,
+            "judul": "Test Ini Isinya Judul",
+            "file_dokumen": "http://sistem-deteksi.test/proposal/stream?file=sL5HIcypgysrHj9FmoKOuLygisNu43nA.pdf"
+        }
+    }
+}</code></pre>
+
     <h5 class="mt-5">(ADM) Update Fingerprint Proposal</h5>
     <hr>
     <p>
@@ -167,7 +215,7 @@
     "total_window": 128
 }</code></pre>
     <p>
-        Apabila <b>file_dokumen</b> tidak berubah maka jangan sertakan nilai tersebut.
+        Apabila <b>file_dokumen</b> tidak berubah maka jangan sertakan nilai tersebut dan cukup sertakan nilai <b>judul</b> saja.
     </p>
 
     <h5 class="mt-5">(ADM) Hapus Fingerprint Proposal</h5>
@@ -200,5 +248,11 @@
         ]
     }
 }</code></pre>
+
+    <h5 class="mt-5">(ADM) Delete Semua Generated Fingerprint</h5>
+    <hr>
+    <p>
+        Digunakan untuk menghapus semua fingerprint generate dari web SIKPS. Perlu diperhatikan, penggunaan route ini hanya dilakukan jika ingin generate ulang fingerprint proposal dari web SIKPS. Kirimkan permintaan ke <span class="badge bg-dark">/sikps/deteksi/fingerprints/generated/delete</span> dengan menggunakan HTTP method <span class="badge bg-info">delete</span>.
+    </p>
 </div>
 @endsection

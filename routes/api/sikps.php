@@ -22,6 +22,7 @@ Route::prefix('/sikps')
                 Route::get('/fingerprints/list', 'getAllFingerprints');
                 Route::delete('/fingerprints/delete', 'deleteFingerprint');
                 Route::put('/fingerprints/update', 'updateFingerprint');
+                Route::get('/fingerprints/detail', 'getDetail');
                 Route::get('/riwayat', 'getAllRiwayatDeteksi');
                 Route::delete('/fingerprints/generated/delete', 'deleteAllGeneratedFingerprints');
             });
@@ -37,6 +38,7 @@ Route::prefix('/sikps')
                         Route::get('/hasil/list', 'getListHasilDeteksi');
                         Route::put('/hasil/update', 'updateProposal');
                         Route::delete('/hasil/delete', 'deleteProposal');
+                        Route::get('/hasil/detail', 'getDetail');
                         Route::get('/fingerprints/list', 'getAllFingerprints');
                     });
             });
