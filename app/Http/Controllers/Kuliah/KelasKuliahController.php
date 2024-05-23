@@ -58,9 +58,16 @@ class KelasKuliahController extends Controller {
                     return self::filterKelasKuliahByHari($orderedKelasKuliahByNamaHari, $filterHari);
             }
 
+            // ubah ke array
+            $transformedResponse = [];
+
+            foreach ($orderedKelasKuliahByNamaHari as $key => $item) {
+                $transformedResponse[] = [$key => $item];
+            }
+
             // semua jadwal
             return $this->successfulResponseJSON([
-                'kelas_kuliah' => $orderedKelasKuliahByNamaHari
+                'kelas_kuliah' => $transformedResponse,
             ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
@@ -114,9 +121,16 @@ class KelasKuliahController extends Controller {
                         return self::filterKelasKuliahByHari($orderedKelasKuliahByNamaHari, $filterHari);
                     }
 
+                    // ubah ke array
+                    $transformedResponse = [];
+
+                    foreach ($orderedKelasKuliahByNamaHari as $key => $item) {
+                        $transformedResponse[] = [$key => $item];
+                    }
+
                     // semua jadwal
                     return $this->successfulResponseJSON([
-                        'kelas_kuliah' => $orderedKelasKuliahByNamaHari
+                        'kelas_kuliah' => $transformedResponse
                     ]);
                 }
 
@@ -139,7 +153,7 @@ class KelasKuliahController extends Controller {
 
         return $this->successfulResponseJSON([
             'kelas_kuliah' => [
-                $ucHari => $kelasKuliah[$ucHari] ?? [],
+                [ $ucHari => $kelasKuliah[$ucHari] ?? [] ],
             ]
         ]);
     }
