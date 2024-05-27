@@ -30,9 +30,9 @@ class Pertemuan extends Model
     }
 
     public function scopeGetKelasDibuka(Builder $query, $kelasKuliah) {
-        return $query->where('kelas_kuliah_id', $kelasKuliah['kelas_kuliah_id'])
+        return $query->where('kelas_kuliah_id', $kelasKuliah['data_kelas']['kelas_kuliah_id'])
             ->where('jns_pert', $kelasKuliah['jadwal']['jns_pert'])
-            ->where('dosen_id', $kelasKuliah['pengajar_id'])
+            ->where('dosen_id', $kelasKuliah['data_kelas']['pengajar_id'])
             ->where('kelas_dibuka', true)
             ->first();
     }

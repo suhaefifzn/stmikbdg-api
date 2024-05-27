@@ -14,60 +14,102 @@
     <pre><code class="language-json bg-primary-subtle">{
     "status": "success",
     "data": {
-        "kelas_kuliah": {
-            "Selasa": [
-                {
-                    "kelas_kuliah_id": 3268,
-                    "tahun_id": 349,
-                    "jur_id": 27,
-                    "mk_id": 62,
-                    "join_kelas_kuliah_id": null,
-                    "kjoin_kelas": false,
-                    "kelas_kuliah": "A",
-                    "jns_mhs": "R",
-                    "sts_kelas": "B",
-                    "pengajar_id": 562,
-                    "join_jur": null,
-                    "riwayat_pertemuan": [
-                        {
-                            "pertemuan_id": 79,
+        "kelas_kuliah": [
+            {
+                "Jumat": [
+                    {
+                        "data_kelas": {
+                            "kelas_kuliah_id": 3262,
+                            "tahun_id": 349,
+                            "jur_id": 27,
+                            "mk_id": 47,
+                            "join_kelas_kuliah_id": null,
+                            "kjoin_kelas": false,
+                            "kelas_kuliah": "A",
+                            "jns_mhs": "R",
+                            "sts_kelas": "B",
+                            "pengajar_id": 573,
+                            "join_jur": null
+                        },
+                        "dosen": {
+                            "dosen_id": 573,
+                            "kd_dosen": "IF054",
+                            "nm_dosen": "Mina Ismu Rahayu, M.T",
+                            "gelar": "M.T"
+                        },
+                        "matakuliah": {
+                            "mk_id": 47,
+                            "kur_id": 82,
+                            "kd_mk": "KD1621",
+                            "nm_mk": "Pemrograman 6 ",
+                            "semester": 6,
+                            "sks": 3,
+                            "sts_mk": "A",
+                            "smt": 2,
+                            "kd_kur": "MIS120"
+                        },
+                        "riwayat_pertemuan": [],
+                        "jadwal": {
+                            "kelas_kuliah_id": 3262,
+                            "mk_id": 47,
+                            "dosen_id": 573,
+                            "tanggal": "2024-05-31",
                             "jns_pert": "T1",
-                            "create_time": "2024-03-19 13:35:06"
-                        }
-                    ],
-                    "jadwal": {
-                        "kelas_kuliah_id": 3268,
-                        "mk_id": 62,
-                        "dosen_id": 562,
-                        "tanggal": "2024-03-19",
-                        "jns_pert": "T1",
-                        "jam": "09:30-11:10",
-                        "kd_ruang": "31",
-                        "nm_hari": "Selasa",
-                        "tanggal_lokal": "19 Maret 2024"
+                            "jam": "07:50-10:20",
+                            "kd_ruang": "11",
+                            "nm_hari": "Jumat",
+                            "tanggal_lokal": "31 Mei 2024"
+                        },
+                        "kelas_dibuka": false
                     },
-                    "dosen": {
-                        "dosen_id": 562,
-                        "kd_dosen": "IF043",
-                        "nm_dosen": "Dani Pradana Kartaputra, S.Si., M.T",
-                        "gelar": ", S.Si., M.T"
-                    },
-                    "kelas_dibuka": false,
-                    "matakuliah": {
-                        "mk_id": 62,
-                        "kur_id": 82,
-                        "kd_mk": "KU1813",
-                        "nm_mk": "HAKI &Etika Profesi",
-                        "semester": 8,
-                        "sks": 2,
-                        "sts_mk": "A",
-                        "smt": 2,
-                        "kd_kur": "MIS120"
+                    {
+                        "data_kelas": {
+                            "kelas_kuliah_id": 3287,
+                            "tahun_id": 348,
+                            "jur_id": 23,
+                            "mk_id": 122,
+                            "join_kelas_kuliah_id": 3262,
+                            "kjoin_kelas": true,
+                            "kelas_kuliah": "A",
+                            "jns_mhs": "R",
+                            "sts_kelas": "B",
+                            "pengajar_id": 573,
+                            "join_jur": "MIS1"
+                        },
+                        "dosen": {
+                            "dosen_id": 573,
+                            "kd_dosen": "IF054",
+                            "nm_dosen": "Mina Ismu Rahayu, M.T",
+                            "gelar": "M.T"
+                        },
+                        "matakuliah": {
+                            "mk_id": 122,
+                            "kur_id": 83,
+                            "kd_mk": "KD1621",
+                            "nm_mk": "Pemrograman 6 ",
+                            "semester": 6,
+                            "sks": 3,
+                            "sts_mk": "A",
+                            "smt": 2,
+                            "kd_kur": "IFS120"
+                        },
+                        "riwayat_pertemuan": [],
+                        "jadwal": {
+                            "kelas_kuliah_id": 3262,
+                            "mk_id": 47,
+                            "dosen_id": 573,
+                            "tanggal": "2024-05-31",
+                            "jns_pert": "T1",
+                            "jam": "07:50-10:20",
+                            "kd_ruang": "11",
+                            "nm_hari": "Jumat",
+                            "tanggal_lokal": "31 Mei 2024"
+                        },
+                        "kelas_dibuka": false
                     }
-                }
-                // jadwal lain disembunyikan
-            ]
-        }
+                ]
+            }
+        ]
     }
 }</code></pre>
     <p>

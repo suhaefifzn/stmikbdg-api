@@ -44,10 +44,28 @@ class KelasKuliahController extends Controller {
 
                 // get riwayat pertemuan
                 $riwayatPertemuan = Pertemuan::getRiwayatPertemuanKelasKuliahByDosen($item['kelas_kuliah_id'], $dosen['dosen_id']);
-                $item['riwayat_pertemuan'] = $riwayatPertemuan;
+
+                $formattedItem = [
+                    'data_kelas' => [
+                        'kelas_kuliah_id' => $item['kelas_kuliah_id'],
+                        'tahun_id' => $item['tahun_id'],
+                        'jur_id' => $item['jur_id'],
+                        'mk_id' => $item['mk_id'],
+                        'join_kelas_kuliah_id' => $item['join_kelas_kuliah_id'],
+                        'kjoin_kelas' => $item['kjoin_kelas'],
+                        'kelas_kuliah' => $item['kelas_kuliah'],
+                        'jns_mhs' => $item['jns_mhs'],
+                        'sts_kelas' => $item['sts_kelas'],
+                        'pengajar_id' => $item['pengajar_id'],
+                        'join_jur' => $item['join_jur'],
+                    ],
+                    'dosen' => $item['dosen'],
+                    'matakuliah' => $item['matakuliah'],
+                    'riwayat_pertemuan' => $riwayatPertemuan,
+                ];
 
                 // atur response properti kelas dan jadwal
-                $kelasKuliah[$index] = self::setKelasKuliahAndJadwalProperties($item, $jadwal);
+                $kelasKuliah[$index] = self::setKelasKuliahAndJadwalProperties($formattedItem, $jadwal);
             }
 
             // urutkan berdasarkan nama hari, Senin, Selasa, ... Minggu, Unknown
@@ -108,9 +126,26 @@ class KelasKuliahController extends Controller {
                                 ->get();
                         }
 
-                        $item['riwayat_presensi'] = $riwayatPresensi;
+                        $formattedItem = [
+                            'data_kelas' => [
+                                'kelas_kuliah_id' => $item['kelas_kuliah_id'],
+                                'tahun_id' => $item['tahun_id'],
+                                'jur_id' => $item['jur_id'],
+                                'mk_id' => $item['mk_id'],
+                                'join_kelas_kuliah_id' => $item['join_kelas_kuliah_id'],
+                                'kjoin_kelas' => $item['kjoin_kelas'],
+                                'kelas_kuliah' => $item['kelas_kuliah'],
+                                'jns_mhs' => $item['jns_mhs'],
+                                'sts_kelas' => $item['sts_kelas'],
+                                'pengajar_id' => $item['pengajar_id'],
+                                'join_jur' => $item['join_jur'],
+                            ],
+                            'dosen' => $item['dosen'],
+                            'matakuliah' => $item['matakuliah'],
+                            'riwayat_presensi' => $riwayatPresensi
+                        ];
 
-                        $kelasKuliah[$index] = self::setKelasKuliahAndJadwalProperties($item, $jadwal);
+                        $kelasKuliah[$index] = self::setKelasKuliahAndJadwalProperties($formattedItem, $jadwal);
                     }
 
                     // urutkan berdasarkan nama hari, Senin, Selasa, ... Minggu, Unknown
@@ -159,8 +194,8 @@ class KelasKuliahController extends Controller {
     }
 
     private function setKelasKuliahAndJadwalProperties($objKelasKuliah, $objJadwal) {
-        if ($objKelasKuliah['join_jur']) {
-            $objKelasKuliah['join_jur'] = trim($objKelasKuliah['join_jur']);
+        if ($objKelasKuliah['data_kelas']['join_jur']) {
+            $objKelasKuliah['data_kelas']['join_jur'] = trim($objKelasKuliah['data_kelas']['join_jur']);
         }
 
         $objKelasKuliah['jadwal'] = $objJadwal->exists() ? $objJadwal : null;

@@ -14,88 +14,58 @@
     <pre><code class="language-json bg-primary-subtle">{
     "status": "success",
     "data": {
-        "kelas_kuliah": {
-            "Selasa": [
-                {
-                    "kelas_kuliah_id": 3294,
-                    "tahun_id": 348,
-                    "jur_id": 23,
-                    "mk_id": 137,
-                    "join_kelas_kuliah_id": 3268,
-                    "kjoin_kelas": true,
-                    "kelas_kuliah": "A",
-                    "jns_mhs": "R",
-                    "sts_kelas": "B",
-                    "pengajar_id": 562,
-                    "join_jur": "MIS1",
-                    "dosen": {
-                        "dosen_id": 562,
-                        "kd_dosen": "IF043",
-                        "nm_dosen": "Dani Pradana Kartaputra, S.Si., M.T",
-                        "gelar": ", S.Si., M.T"
-                    },
-                    "matakuliah": {
-                        "mk_id": 137,
-                        "kur_id": 83,
-                        "kd_mk": "KU1813",
-                        "nm_mk": "HAKI &Etika Profesi",
-                        "semester": 8,
-                        "sks": 2,
-                        "sts_mk": "A",
-                        "smt": 2,
-                        "kd_kur": "IFS120"
-                    },
-                    "riwayat_presensi": [
-                        {
-                            "masuk": null
-                        }
-                    ],
-                    "jadwal": {
-                        "kelas_kuliah_id": 3294,
-                        "mk_id": 137,
-                        "mhs_id": 15534,
-                        "dosen_id": 562,
-                        "tanggal": "2024-03-19",
-                        "jns_pert": "T1",
-                        "jam": "09:30-11:10",
-                        "kd_ruang": "31",
-                        "nm_hari": "Selasa",
-                        "tanggal_lokal": "19 Maret 2024"
-                    },
-                    "kelas_dibuka": false
-                }
-            ],
-            "Unknown": [
-                {
-                    "kelas_kuliah_id": 3295,
-                    "tahun_id": 348,
-                    "jur_id": 23,
-                    "mk_id": 136,
-                    "join_kelas_kuliah_id": null,
-                    "kjoin_kelas": false,
-                    "kelas_kuliah": "A",
-                    "jns_mhs": "R",
-                    "sts_kelas": "B",
-                    "pengajar_id": null,
-                    "join_jur": null,
-                    "dosen": null,
-                    "matakuliah": {
-                        "mk_id": 136,
-                        "kur_id": 83,
-                        "kd_mk": "IF1800",
-                        "nm_mk": "Skripsi",
-                        "semester": 8,
-                        "sks": 6,
-                        "sts_mk": "A",
-                        "smt": 2,
-                        "kd_kur": "IFS120"
-                    },
-                    "jadwal": null,
-                    "kelas_dibuka": false
-                }
-            ]
-            // kelas kuliah lain disembunyikan
-        }
+        "kelas_kuliah": [
+            {
+                "Selasa": [
+                    {
+                        "data_kelas": {
+                            "kelas_kuliah_id": 3294,
+                            "tahun_id": 348,
+                            "jur_id": 23,
+                            "mk_id": 137,
+                            "join_kelas_kuliah_id": 3268,
+                            "kjoin_kelas": true,
+                            "kelas_kuliah": "A",
+                            "jns_mhs": "R",
+                            "sts_kelas": "B",
+                            "pengajar_id": 562,
+                            "join_jur": "MIS1"
+                        },
+                        "dosen": {
+                            "dosen_id": 562,
+                            "kd_dosen": "IF043",
+                            "nm_dosen": "Dani Pradana Kartaputra, S.Si., M.T",
+                            "gelar": ", S.Si., M.T"
+                        },
+                        "matakuliah": {
+                            "mk_id": 137,
+                            "kur_id": 83,
+                            "kd_mk": "KU1813",
+                            "nm_mk": "HAKI &Etika Profesi",
+                            "semester": 8,
+                            "sks": 2,
+                            "sts_mk": "A",
+                            "smt": 2,
+                            "kd_kur": "IFS120"
+                        },
+                        "riwayat_presensi": [],
+                        "jadwal": {
+                            "kelas_kuliah_id": 3294,
+                            "mk_id": 137,
+                            "mhs_id": 15534,
+                            "dosen_id": 562,
+                            "tanggal": "2024-05-28",
+                            "jns_pert": "T1",
+                            "jam": "09:30-11:10",
+                            "kd_ruang": "31",
+                            "nm_hari": "Selasa",
+                            "tanggal_lokal": "28 Mei 2024"
+                        },
+                        "kelas_dibuka": false
+                    }
+                ]
+            }
+        ]
     }
 }</code></pre>
     <p>
