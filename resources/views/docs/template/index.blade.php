@@ -23,6 +23,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+
+    <style>
+        #goToTop {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            outline: none;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+        }
+
+        #goToTop svg {
+            width: 24px;
+            height: 24px;
+        }
+    </style>
 </head>
     <body>
         @include('docs.template.nav')
@@ -35,15 +60,42 @@
             &copy; {{ date('Y') === '2024' ? '2024' : '2024 - ' . date('Y') }}. STMIK Bandung
         </footer>
 
+        {{-- Go to top --}}
+        <button id="goToTop">
+            <i data-feather="arrow-up"></i>
+        </button>
+
         {{-- Bootstrap --}}
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
         {{-- Feather Icons --}}
         <script>
-            feather.replace()
+            feather.replace();
         </script>
 
         {{-- Highlight Code --}}
         <script>hljs.highlightAll();</script>
+
+        {{-- Go to Top --}}
+        <script>
+            $(document).ready(function() {
+                if ($(window).scrollTop() < 100) {
+                    $('#goToTop').fadeOut();
+                }
+
+                $(window).scroll(function() {
+                    if ($(this).scrollTop() > 100) {
+                        $('#goToTop').fadeIn();
+                    } else {
+                        $('#goToTop').fadeOut();
+                    }
+                });
+
+                $('#goToTop').click(function() {
+                    $('html, body').animate({ scrollTop: 0 }, 800);
+                    return false;
+                });
+            });
+        </script>
     </body>
 </html>

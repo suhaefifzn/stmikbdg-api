@@ -37,6 +37,7 @@
             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Web</a>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="/docs/api/sikps">SIKPS</a></li>
+                <li><a class="dropdown-item" href="/docs/api/antrian">Antrian</a></li>
                 <li><a class="dropdown-item" href="/docs/api/kuesioner">Kuesioner</a></li>
                 <li><a class="dropdown-item" href="/docs/api/marketing">Marketing</a></li>
                 <li><a class="dropdown-item" href="/docs/api/berita-acara">Berita Acara</a></li>

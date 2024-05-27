@@ -105,4 +105,18 @@ class Controller extends BaseController
             return ErrorHandler::handle($e);
         }
     }
+
+    public function failedResponseJSON($message = 'Gagal', $statusCode = 500) {
+        return response()->json([
+            'status' => 'fail',
+            'message' => $message,
+        ], $statusCode);
+    }
+
+    public function successfulResponseJSONV2($message = 'Sukses', $statusCode = 200) {
+        return response()->json([
+            'status' => 'success',
+            'message' => $message,
+        ], $statusCode);
+    }
 }

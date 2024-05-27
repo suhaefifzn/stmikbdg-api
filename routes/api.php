@@ -21,6 +21,9 @@ require __DIR__.'/api/sikps.php';
 // ? Pengajuan Wisuda Routes
 require __DIR__.'/api/wisuda.php';
 
+// ? Antrian
+require __DIR__.'/api/antrian.php';
+
 // ? ACL Routes
 require __DIR__.'/api/acl.php';
 

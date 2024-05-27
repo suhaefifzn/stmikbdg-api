@@ -110,6 +110,36 @@ class DocsController extends Controller
         ]);
     }
 
+    public function antrian() {
+        return view('docs.contents.antrian.index', [
+            'title' => 'Antrian'
+        ]);
+    }
+
+    public function antrianTabs($tabName) {
+        switch (strtolower($tabName)) {
+            case 'dosen':
+                $content = view('docs.contents.antrian.dosen')->render();
+                break;
+            case 'bimbingan':
+                $content = view('docs.contents.antrian.bimbingan')->render();
+                break;
+            case 'sidang':
+                $content = view('docs.contents.antrian.sidang')->render();
+                break;
+            case 'tamu':
+                $content = view('docs.contents.antrian.tamu')->render();
+                break;
+            default:
+                $content = 'Tab not found.';
+                break;
+        }
+
+        return response()->json([
+            'content' => $content,
+        ]);
+    }
+
     public function authenticate(Request $request) {
         $credentials = $request->validate([
             'email' => 'required|email',

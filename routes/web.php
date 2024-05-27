@@ -39,6 +39,10 @@ Route::controller(DocsController::class)
         Route::get('/berita-acara', 'beritaAcara');
         Route::get('/penomoran-surat', 'surat');
         Route::get('/pengajuan-wisuda', 'pengajuanWisuda');
+
+        // ? 27-05-2024 - New design
+        Route::get('/antrian', 'antrian');
+        Route::get('/antrian/tabs/{name}', 'antrianTabs');
     });
 
 // ? Auth
