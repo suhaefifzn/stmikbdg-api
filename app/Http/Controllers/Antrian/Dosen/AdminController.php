@@ -125,16 +125,20 @@ class AdminController extends Controller
                 $dosen = Dosen::where('dosen_id', $request->dosen_id)->first();
 
                 if ($dosen) {
-                    $data = $request->validate([
+                    $request->validate([
                         'kd_dosen' => 'required|string',
                         'nm_dosen' => 'required|string',
                         'no_card' => 'required|string',
                     ]);
 
-                    $data['created_at'] = Carbon::now();
+                    $data = [
+                        'kd_dosen' => strtoupper($request->kd_dosen),
+                        'nm_dosen' => strtoupper($request->nm_dosen),
+                        'no_card' => $request->no_card,
+                        'created_at' => Carbon::now()
+                    ];
 
                     DB::beginTransaction();
-
                     $update = Dosen::where('dosen_id', $request->dosen_id)->update($data);
 
                     if ($update) {

@@ -83,9 +83,9 @@ class AdminController extends Controller
 
             DB::beginTransaction();
             $insert = Tamu::insert([
-                'nama' => $request->nama,
+                'nama' => strtoupper($request->nama),
                 'alamat' => $request->alamat,
-                'pihak_tujuan' => $request->pihak_tujuan,
+                'pihak_tujuan' => strtoupper($request->pihak_tujuan),
                 'tgl' => Carbon::createFromFormat('d-m-Y', $request->tgl),
                 'keperluan' => $request->keperluan,
                 'created_at' => Carbon::now()
@@ -113,7 +113,7 @@ class AdminController extends Controller
             $tamu = Tamu::where('tamu_id', $request->tamu_id)->first();
 
             if ($tamu) {
-                $data = $request->validate([
+                $request->validate([
                     'nama' => 'required|string',
                     'alamat' => 'required|string',
                     'pihak_tujuan' => 'required|string',
@@ -121,7 +121,14 @@ class AdminController extends Controller
                     'keperluan' => 'required|string'
                 ]);
 
-                $data['created_at'] = Carbon::now();
+                $data = [
+                    'nama' => strtoupper($request->nama),
+                    'alamat' => $request->alamat,
+                    'pihak_tujuan' => strtoupper($request->pihak_tujuan),
+                    'tgl' => Carbon::createFromFormat('d-m-Y', $request->tgl),
+                    'keperluan' => $request->keperluan,
+                    'created_at' => Carbon::now()
+                ];
 
                 DB::beginTransaction();
                 $update = Tamu::where('tamu_id', $request->tamu_id)->update($data);

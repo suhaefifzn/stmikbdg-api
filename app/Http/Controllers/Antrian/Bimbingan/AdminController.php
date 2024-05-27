@@ -37,8 +37,8 @@ class AdminController extends Controller
              * insert ke db
              */
             $data = [
-                'nim' => (string) $request->nim,
-                'nm_mhs' => (string) $request->nm_mhs,
+                'nim' => $request->nim,
+                'nm_mhs' => $request->nm_mhs,
                 'dosen_id' => $dosen['dosen_id'],
                 'kd_dosen' => $dosen['kd_dosen'],
                 'nm_dosen' => $dosen['nm_dosen'],
@@ -143,8 +143,7 @@ class AdminController extends Controller
                 
                 $data = [
                     'nim' => $request->nim,
-                    'nm_mhs' => $request->nm_mhs,
-                    'nm_dosen' => $request->dosen_pembimbing,
+                    'nm_mhs' => strtoupper($request->nm_mhs),
                     'tgl_bimbingan' => Carbon::createFromFormat('d-m-Y', $request->tgl_bimbingan),
                     'created_at' => Carbon::now()
                 ];
@@ -152,7 +151,8 @@ class AdminController extends Controller
                 /**
                  * cek nama dosen
                  */
-                $dosen = Dosen::where('nm_dosen', 'like', '%' . strtoupper($data['nm_dosen']) . '%')->first();
+                $dosen = Dosen::where('nm_dosen', 'like', '%' . strtoupper($request->dosen_pembimbing) . '%')
+                    ->first();
 
                 if (!$dosen) {
                     return $this->failedResponseJSON('Data dosen tidak ditemukan', 404);
