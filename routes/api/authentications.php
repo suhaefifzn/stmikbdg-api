@@ -30,4 +30,7 @@ Route::controller(AuthController::class)
         // * check token and site access
         Route::get('/check', 'validateToken');
         Route::get('/check/site', 'validateUserSiteAccess');
+
+        // * get site info
+        Route::get('/detail/site', 'getSite');
     });

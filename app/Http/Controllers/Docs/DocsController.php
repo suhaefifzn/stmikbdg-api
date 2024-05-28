@@ -11,8 +11,29 @@ use Illuminate\Support\Facades\Http;
 class DocsController extends Controller
 {
     public function home() {
-        return view('docs.contents.home', [
+        return view('docs.contents.home.index', [
             'title' => 'Home',
+        ]);
+    }
+
+    public function homeTabs($tabName) {
+        switch (strtolower($tabName)) {
+            case 'update':
+                $content = view('docs.contents.home.update')->render();
+                break;
+            case 'penggunaan':
+                $content = view('docs.contents.home.penggunaan')->render();
+                break;
+            case 'lainnya':
+                $content = view('docs.contents.home.lainnya')->render();
+                break;
+            default:
+                $content = 'Tab not found.';
+                break;
+        }
+
+        return response()->json([
+            'content' => $content,
         ]);
     }
 
@@ -45,14 +66,50 @@ class DocsController extends Controller
     }
 
     public function sikps() {
-        return view('docs.contents.sikps', [
-            'title' => 'SIKPS - Sistem Deteksi'
+        return view('docs.contents.deteksi-proposal.index', [
+            'title' => 'SIKPS - Deteksi Proposal'
+        ]);
+    }
+
+    public function sikpsTabs($tabName) {
+        switch (strtolower($tabName)) {
+            case 'admin':
+                $content = view('docs.contents.deteksi-proposal.admin')->render();
+                break;
+            case 'mahasiswa':
+                $content = view('docs.contents.deteksi-proposal.mahasiswa')->render();
+                break;
+            default:
+                $content = 'Tab not found.';
+                break;
+        }
+
+        return response()->json([
+            'content' => $content,
         ]);
     }
 
     public function kuesioner() {
-        return view('docs.contents.kuesioner', [
+        return view('docs.contents.kuesioner.index', [
             'title' => 'Kuesioner'
+        ]);
+    }
+
+    public function kuesionerTabs($tabName) {
+        switch (strtolower($tabName)) {
+            case 'admin':
+                $content = view('docs.contents.kuesioner.admin')->render();
+                break;
+            case 'mahasiswa':
+                $content = view('docs.contents.kuesioner.mahasiswa')->render();
+                break;
+            default:
+                $content = 'Tab not found.';
+                break;
+        }
+
+        return response()->json([
+            'content' => $content,
         ]);
     }
 
@@ -105,8 +162,26 @@ class DocsController extends Controller
     }
 
     public function pengajuanWisuda() {
-        return view('docs.contents.wisuda', [
+        return view('docs.contents.pengajuan-wisuda.index', [
             'title' => 'Pengajuan Wisuda'
+        ]);
+    }
+
+    public function pengajuanWisudaTabs($tabName) {
+        switch (strtolower($tabName)) {
+            case 'admin':
+                $content = view('docs.contents.pengajuan-wisuda.admin')->render();
+                break;
+            case 'mahasiswa':
+                $content = view('docs.contents.pengajuan-wisuda.mahasiswa')->render();
+                break;
+            default:
+                $content = 'Tab not found.';
+                break;
+        }
+
+        return response()->json([
+            'content' => $content,
         ]);
     }
 

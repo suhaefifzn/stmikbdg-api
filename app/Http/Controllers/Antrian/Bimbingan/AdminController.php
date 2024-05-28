@@ -38,7 +38,7 @@ class AdminController extends Controller
              */
             $data = [
                 'nim' => $request->nim,
-                'nm_mhs' => $request->nm_mhs,
+                'nm_mhs' => strtoupper($request->nm_mhs),
                 'dosen_id' => $dosen['dosen_id'],
                 'kd_dosen' => $dosen['kd_dosen'],
                 'nm_dosen' => $dosen['nm_dosen'],
@@ -140,7 +140,7 @@ class AdminController extends Controller
                     'dosen_pembimbing' => 'required|string',
                     'tgl_bimbingan' => 'required|string',
                 ]);
-                
+
                 $data = [
                     'nim' => $request->nim,
                     'nm_mhs' => strtoupper($request->nm_mhs),

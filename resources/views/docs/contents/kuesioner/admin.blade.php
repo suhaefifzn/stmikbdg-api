@@ -1,0 +1,362 @@
+<section>
+    <h5 class="mt-4 mb-3 fw-bold">(ADM) Kuesioner Perkuliahan - Get Tahun Ajaran</h5>
+    <p>
+        Kirim permintaan ke <span class="badge bg-dark">/kuesioner/tahun-ajaran</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Jika berhasil API akan memberikan response berisi list tahun ajaran aktif seperti berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "tahun_ajaran": [
+            {
+                "tahun_id": 280,
+                "jur_id": 23,
+                "tahun": 2022,
+                "smt": 1,
+                "jns_mhs": "R",
+                "kd_kampus": "A",
+                "sts_ta": "B",
+                "uraian": "IFS1 / 2022 / Ganjil / Reguler",
+                "ket_smt": "Ganjil",
+                "ket_jns_mhs": "Reguler",
+                "detail_jurusan": {
+                    "jur_id": 23,
+                    "fak_id": 0,
+                    "kd_jur": "12",
+                    "nama_jurusan": "S1 - TEKNIK INFORMATIKA",
+                    "nm_singkat": "IFS1 ",
+                    "prodi": "S1",
+                    "k_aktif": true
+                },
+                "detail_kampus": {
+                    "kd_kampus": "A",
+                    "lokasi": "Kampus Utama",
+                    "alamat": "Cikutra"
+                },
+                "kuesioner_open": true
+            }
+            // tahun ajaran aktif lainnya disembunyikan
+        ]
+    }
+}</code></pre>
+    <p>
+        Perhatikan nilai <b>kuesioner_open</b>, jika isinya adalah true maka kuesioner perkuliahan pada tahun tersebut telah dibuka, artinya setiap mahasiswa yang berada pada tahun ajaran tersebut sudah dapat mengisi kuesioner setiap matkul yang ada pada tahun ajaran itu. Dan jika isinya adalah false, berarti kuesioner perkuliahan pada tahun ajaran tersebut belum dibuka dan mahasiswa tidak dapat mengisi kuesioner.
+    </p>
+</section>
+
+<section>
+    <h5 class="mt-5 mb-3 fw-bold">(ADM) Kuesioner Perkuliahan - Get Matkul Berdasarkan Tahun Ajaran</h5>
+    <p>
+        Kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/perkuliahan</span> dan tambahkan query parameter <span class="badge bg-secondary">tahun_id</span>, <span class="badge bg-secondary">jns_mhs</span>, dan <span class="badge bg-secondary">kd_kampus</span>. Nilai-nilai query parameter tersebut diperoleh dari tahun ajaran yang tersedia pada response get tahun ajaran untuk kuesioner. Contoh penggunaannya menjadi seperti <span class="badge bg-dark">/kuesioner/perkuliahan?tahun_id=280&jns_mhs=R&kd_kampus=A</span>, jika permintaan berhasil API akan memberikan response seperti berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "matakuliah": [
+            {
+                "mk_id": 81,
+                "kur_id": 83,
+                "jur_id": 23,
+                "tahun_id": 280,
+                "kd_mk": "IF1101",
+                "nm_mk": "Fisika 1",
+                "semester": 1,
+                "sks": 2,
+                "kd_kampus": "A",
+                "jns_mhs": "R",
+                "detail_kuesioner": {
+                    "tahun_id": 280,
+                    "kelas_kuliah_ids": "2146",
+                    "total_mahasiswa": 29,
+                    "total_mahasiswa_mengisi_kuesioner": 0,
+                    "kelas_kuliah": "A",
+                    "sts_open": false
+                },
+                "detail_dosen": {
+                    "dosen_id": 581,
+                    "kd_dosen": "IF062",
+                    "nm_dosen": "KOESHANDOYO ARIONO,",
+                    "gelar": "S.T"
+                }
+            },
+            {
+                "mk_id": 82,
+                "kur_id": 83,
+                "jur_id": 23,
+                "tahun_id": 280,
+                "kd_mk": "IF1102",
+                "nm_mk": "Pengantar Teknik Informatika",
+                "semester": 1,
+                "sks": 2,
+                "kd_kampus": "A",
+                "jns_mhs": "R",
+                "detail_kuesioner": {
+                    "tahun_id": 280,
+                    "kelas_kuliah_ids": "2147",
+                    "total_mahasiswa": 26,
+                    "total_mahasiswa_mengisi_kuesioner": 0,
+                    "kelas_kuliah": "A",
+                    "sts_open": false
+                },
+                "detail_dosen": {
+                    "dosen_id": 706,
+                    "kd_dosen": "KA   ",
+                    "nm_dosen": "Khoirida Aelani, M.T.",
+                    "gelar": "M.T"
+                }
+            }
+            // matkul lain disembunyikan
+        ]
+    }
+}</code></pre>
+</section>
+
+<section>
+    <h5 class="mt-5 mb-3 fw-bold">(ADM) Kuesioner Perkuliahan - Buka Kuesioner</h5>
+    <p>
+        Kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/perkuliahan/open</span> dengan menggunakan HTTP method <span class="badge bg-info">post</span> dan sertakan payload dalam body dengan format JSON seperti berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "tahun_id": 280
+}</code></pre>
+</section>
+
+<!--<section>
+    <h5 class="mt-5 mb-3 fw-bold">(ADM) Kuesioner Perkuliahan - Get Rata-rata Jawaban</h5>
+    <p>
+        Kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/perkuliahan/jawaban/rata-rata</span> dengan menggunakan query parameter <span class="badge bg-secondary">tahun_id</span> dan <span class="badge bg-secondary">kelas_kuliah_id</span>, kirimkan dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Contohnya, <span class="badge bg-dark">/kuesioner/perkuliahan/jawaban/rata-rata?tahun_id=335&kelas_kuliah_ids=3092</span>. Hasilnya:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "kuesioner_perkuliahan": {
+            "tahun_id": 335,
+            "kd_mk": "IF1710",
+            "nm_mk": "Pengolahan Citra",
+            "sks": 3,
+            "semester": 7,
+            "dosen": "Mina Ismu Rahayu, M.T",
+            "total_mahasiswa": 28,
+            "total_mahasiswa_mengisi_kuesioner": 2,
+            "pertanyaan_dan_jawaban": [
+                {
+                    "pertanyaan_id": 1,
+                    "jenis_pertanyaan_id": 1,
+                    "kelompok_pertanyaan_id": 1,
+                    "kd_jenis_pertanyaan": "P",
+                    "jenis": "Perkuliahan",
+                    "kelompok": "Teknologi Pembelajaran",
+                    "pertanyaan": "Apakah seluruh proses perkuliahan telah memiliki aktivitas kelas pembelajaran online (Google Meet/Zoom/Discord) pada saat jam perkuliahan?",
+                    "jawaban": {
+                        "point_id": 5,
+                        "kd_point": "SS",
+                        "ket_point": "Sangat Setuju",
+                        "mutu": 5
+                    }
+                },
+                // pertanyaan dan jawaban lain disembunyikan
+            ]
+        }
+    }
+}</code></pre>
+</section>-->
+
+<!--<h5 class="mt-5 mb-3 fw-bold">(ADM) Kuesioner Kegiatan - Add Kuesioner</h5>
+<p>
+    Berdasarkan hasil diskusi, bahwa kegiatan kampus tidak berdasarkan pada tahun ajaran dan belum terdapat tabel yang menyimpan data kegiatan tersebut. Sehingga untuk membuka kuesionernya perlu ditambahkan data kegiatan kampus terlebih dahulu.
+</p>
+<p>
+    Kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/kegiatan/add</span> dengan menggunakan HTTP method <span class="badge bg-info">post</span> dan sertakan payload seperti berikut:
+</p>
+<pre><code class="language-json bg-primary-subtle">{
+"tanggal_mulai": "19-01-2024",
+"tanggal_akhir": "20-02-2024",
+"organisasi": "HIMA SISTEM INFORMASI",
+"kegiatan": "INSPIRA-SI SPORT"
+}</code></pre>
+
+<h5 class="mt-5 mb-3 fw-bold">(ADM) Kuesioner Kegiatan - Get List Kuesioner</h5>
+<p>
+    Untuk mendapatkan list kuesioner kegiatan yang telah ada, kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/kegiatan/list</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Hasilnya:
+</p>
+<pre><code class="language-json bg-primary-subtle">{
+"status": "success",
+"data": {
+    "kuesioner_kegiatan": [
+        {
+            "kuesioner_kegiatan_id": 1,
+            "tahun": 2024,
+            "tanggal_mulai": "2024-01-19",
+            "tanggal_akhir": "2024-02-20",
+            "organisasi": "HIMA SISTEM INFORMASI",
+            "kegiatan": "INSPIRA-SI SPORT"
+        },
+        // kuesioner kegiatan lain disembunyikan
+    ]
+}
+}</code></pre>
+
+<h5 class="mt-5 mb-3 fw-bold">(ADM) Kuesioner Kegiatan - Get Rata-rata Jawaban</h5>
+<br>
+<p>
+    Untuk melihat rata-rata jawaban dari satu kuesioner kegiatan yang telah diisi oleh mahasiswa, kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/kegiatan/jawaban/rata-rata?kuesioner_kegiatan_id={nilai_kuesioner_kegiatan_id}</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Ganti <b>{nilai_kuesioner_kegiatan_id}</b> dengan nilai dari properti kuesioner_kegiatan_id yang didapat di response get list kuesioner kegiatan. Contohnya, <span class="badge bg-dark">/kuesioner/kegiatan/jawaban/rata-rata?kuesioner_kegiatan_id=1</span>. Jika berhasil API akan memberikan response seperti:
+</p>
+<pre><code class="language-json bg-primary-subtle">{
+"status": "success",
+"data": {
+    "kuesioner_kegiatan": {
+        "kuesioner_kegiatan_id": 1,
+        "tahun": 2024,
+        "tanggal_mulai": "2024-01-19",
+        "tanggal_akhir": "2024-02-20",
+        "organisasi": "HIMA SISTEM INFORMASI",
+        "kegiatan": "INSPIRA-SI SPORT",
+        "total_mahasiswa_mengisi_kuesioner": 1,
+        "pertanyaan_dan_jawaban": [
+            {
+                "pertanyaan_id": 23,
+                "jenis_pertanyaan_id": 2,
+                "kelompok_pertanyaan_id": 4,
+                "kd_jenis_pertanyaan": "K",
+                "jenis": "Kegiatan Kampus",
+                "kelompok": "Kepuasan Mahasiswa",
+                "pertanyaan": "Apakah anda setuju kegiatan ini bermanfaat bagi anda?",
+                "jawaban": {
+                    "point_id": 4,
+                    "kd_point": "S",
+                    "ket_point": "Setuju",
+                    "mutu": 4
+                }
+            },
+            // pertanyaan dan jawaban lainnya disembunyikan
+        ]
+    }
+}
+}</code></pre>-->
+
+<!--<section>
+    <h5 class="mt-5 mb-3 fw-bold">(ADM) Get List Jenis Pertanyaan</h5>
+    <p>
+        Untuk melihat jenis pertanyaan yang tersedia, kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/pertanyaan/jenis</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Jika berhasil akan memberikan response:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "jenis_pertanyaan": [
+            {
+                "jenis_pertanyaan_id": 1,
+                "nama": "Perkuliahan",
+                "kd_jenis_pertanyaan": "P"
+            },
+            {
+                "jenis_pertanyaan_id": 2,
+                "nama": "Kegiatan Kampus",
+                "kd_jenis_pertanyaan": "K"
+            }
+        ]
+    }
+}</code></pre>
+</section>-->
+
+<!--<section>
+    <h5 class="mt-5 mb-3 fw-bold">(ADM) Get List Kelompok Pertanyaan</h5>
+    <p>
+        Setelah jenis, pertanyaan-pertanyaan yang ada dikelompokkan lagi menjadi beberapa bagian. Untuk melihat terdapat kelompok pertanyaan apa saja, kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/pertanyaan/kelompok</span> dan tambahkan query parameter <span class="badge bg-secondary">jenis_id</span>. Query parameter <span class="badge bg-secondary">jenis_id</span> didapat dari list jenis pertanyaan. Contoh lengkapnya adalah seperti <span class="badge bg-dark">/kuesioner/pertanyaan/kelompok?jenis_id=1</span>. Response:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "kelompok_pertanyaan": [
+            {
+                "kelompok_pertanyaan_id": 1,
+                "jenis_pertanyaan_id": 1,
+                "jenis": "Perkuliahan",
+                "nama": "Teknologi Pembelajaran"
+            },
+            {
+                "kelompok_pertanyaan_id": 2,
+                "jenis_pertanyaan_id": 1,
+                "jenis": "Perkuliahan",
+                "nama": "Kegiatan Awal Pembelajaran"
+            },
+            {
+                "kelompok_pertanyaan_id": 3,
+                "jenis_pertanyaan_id": 1,
+                "jenis": "Perkuliahan",
+                "nama": "Pelaksanaan Pembelajaran"
+            }
+        ]
+    }
+}</code></pre>
+</section>-->
+
+<!--<section>
+    <h5 class="mt-5 mb-3 fw-bold">(ADM) Get List Pertanyaan</h5>
+    <p>
+        Untuk melihat list pertanyaan yang tersedia, kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/pertanyaan</span> dengan menyertakan query parameter <span class="badge bg-secondary">jenis_id</span>. Kirimkan menggunakan HTTP method <span class="badge bg-info">get</span>. Contohnya, <span class="badge bg-dark">/kuesioner/pertanyaan?jenis_id=2</span>. Hasilnya:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "list_pertanyaan": {
+            "Kepuasan Mahasiswa": [
+                {
+                    "pertanyaan_id": 23,
+                    "jenis_pertanyaan_id": 2,
+                    "kelompok_pertanyaan_id": 4,
+                    "kd_jenis_pertanyaan": "K",
+                    "jenis": "Kegiatan Kampus",
+                    "kelompok": "Kepuasan Mahasiswa",
+                    "pertanyaan": "Apakah anda setuju kegiatan ini bermanfaat bagi anda?"
+                },
+                // pertanyaan lain disembunyikan
+            ]
+        }
+    }
+}</code></pre>
+</section>-->
+
+<!--<section>
+    <h5 class="mt-5 mb-3 fw-bold">(ADM) Get Detail Pertanyaan</h5>
+    <p>
+        Untuk mendapatkan detail pertanyaan tertentu, kirimkan permintaan dengan menggunakan HTTP method <span class="badge bg-info">get</span> ke <span class="badge bg-dark">/kuesioner/pertanyaan/detail/{pertanyaan_id}</span>. Ganti <b>{pertanyaan_id}</b> dengan nilai <b>pertanyaan_id</b> yang didapat saat get list pertanyaan. Seperti <span class="badge bg-dark">/kuesioner/pertanyaan/detail/23</span>, hasilnya:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "pertanyaan": {
+            "pertanyaan_id": 23,
+            "jenis_pertanyaan_id": 2,
+            "kelompok_pertanyaan_id": 4,
+            "kd_jenis_pertanyaan": "K",
+            "jenis": "Kegiatan Kampus",
+            "kelompok": "Kepuasan Mahasiswa",
+            "pertanyaan": "Apakah anda setuju kegiatan ini bermanfaat bagi anda?"
+        }
+    }
+}</code></pre>
+</section>-->
+
+<!--<section>
+    <h5 class="mt-5 mb-3 fw-bold">(ADM) Add Pertanyaan</h5>
+    <p>
+        Untuk menambahkan pertanyaan baru, kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/pertanyaan/add</span> dengan menggunakan HTTP method <span class="badge bg-info">post</span>. Kirimkan payload seperti berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "jenis_pertanyaan_id": 2,
+    "kelompok_pertanyaan_id": 4,
+    "pertanyaan": "Seberapa setuju Anda bahwa kegiatan kampus memberikan manfaat yang sebanding dengan waktu dan energi yang Anda investasikan?"
+}</code></pre>
+</section>-->
+
+<!--<section>
+    <h5 class="mt-5 mb-3 fw-bold">(ADM) Edit Pertanyaan</h5>
+    <p>
+        Kirimkan permintaan ke <span class="badge bg-dark">/kuesioner/pertanyaan/edit</span> dengan menggunakan HTTP method <span class="badge bg-info">put</span>. Kirimkan payload seperti berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "pertanyaan_id": 33,
+    "jenis_pertanyaan_id": 2,
+    "kelompok_pertanyaan_id": 4,
+    "pertanyaan": "Ada pertanyaan buat diedit gak?"
+}</code></pre>
+</section>-->

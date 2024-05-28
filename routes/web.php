@@ -23,13 +23,10 @@ Route::controller(DocsController::class)
         Route::get('/logout', 'logout')->name('docs_logout');
 
         // ? Routes sesudah login
-        Route::get('/', 'home')->name('docs_home');
         Route::get('/authentications', 'authentications');
         Route::get('/users', 'users');
         Route::get('/krs-mahasiswa', 'krsMahasiswa');
         Route::get('/krs-dosen-wali', 'krsDosenWali');
-        Route::get('/sikps', 'sikps');
-        Route::get('/kuesioner', 'kuesioner');
         Route::get('/acl', 'acl');
         Route::get('/kelas-mahasiswa', 'kelasKuliahMahasiswa');
         Route::get('/kelas-dosen', 'kelasKuliahDosen');
@@ -38,11 +35,27 @@ Route::controller(DocsController::class)
         Route::get('/marketing', 'marketing');
         Route::get('/berita-acara', 'beritaAcara');
         Route::get('/penomoran-surat', 'surat');
-        Route::get('/pengajuan-wisuda', 'pengajuanWisuda');
 
         // ? 27-05-2024 - New design
+        //* Home
+        Route::get('/', 'home')->name('docs_home');
+        Route::get('/home/tabs/{name}', 'homeTabs');
+
+        // * Antrian
         Route::get('/antrian', 'antrian');
         Route::get('/antrian/tabs/{name}', 'antrianTabs');
+
+        // * Pengajuan Wisuda
+        Route::get('/pengajuan-wisuda', 'pengajuanWisuda');
+        Route::get('/pengajuan-wisuda/tabs/{name}', 'pengajuanWisudaTabs');
+
+        // * Kuesioner
+        Route::get('/kuesioner', 'kuesioner');
+        Route::get('/kuesioner/tabs/{name}', 'kuesionerTabs');
+
+        // * SIKPS - Deteksi Proposal
+        Route::get('/sikps', 'sikps');
+        Route::get('/sikps/tabs/{name}', 'sikpsTabs');
     });
 
 // ? Auth

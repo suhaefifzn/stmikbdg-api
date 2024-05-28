@@ -7,6 +7,9 @@ use App\Exceptions\ExcelImportException;
 use App\Http\Controllers\Controller;
 use App\Imports\ImportUserSiteAccess;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 // ? Models - table
 use App\Models\Users\Site;
@@ -15,8 +18,6 @@ use App\Models\Users\UserSite;
 
 // ? Models - view
 use App\Models\Users\UserSitesView;
-use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
 
 class SiteController extends Controller
 {
@@ -99,29 +100,37 @@ class SiteController extends Controller
 
     public function postNewSite(Request $request) {
         try {
-            $request->validate([
+            $data = $request->validate([
                 'url' => 'required|string',
+                'name' => 'required|string',
+                'is_dev' => 'required|boolean',
+                'is_mhs' => 'required|boolean',
+                'is_admin' => 'required|boolean',
+                'is_dosen' => 'required|boolean',
+                'is_doswal' => 'required|boolean',
+                'is_prodi' => 'required|boolean',
             ]);
 
             $validatedURL = filter_var($request->url, FILTER_VALIDATE_URL);
+            $data['url'] = $validatedURL;
             $urlExists = Site::where('url', 'like', '%'  . $validatedURL . '%')->first();
 
             if ($urlExists) {
-                return response()->json([
-                    'status' => 'fail',
-                    'message' => 'URL sudah ada'
-                ], 400);
+                return $this->failedResponseJSON('Alamat web sudah pernah ditambahkan', 400);
             }
 
-            Site::insert([
-                'url' => $validatedURL
-            ]);
+            DB::beginTransaction();
+            $insert = Site::insert($data);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Url site berhasil ditambahkan'
-            ], 201);
+            if ($insert) {
+                DB::commit();
+                return $this->successfulResponseJSONV2('Alamat web berhasil ditambahkan', 201);
+            }
+
+            DB::rollBack();
+            return $this->failedResponseJSON('Alamat web gagal ditambahkan', 500);
         } catch (\Exception $e) {
+            DB::rollBack();
             return ErrorHandler::handle($e);
         }
     }

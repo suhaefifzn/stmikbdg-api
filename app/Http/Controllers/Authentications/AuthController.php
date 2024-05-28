@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Authentications;
 
 use App\Exceptions\ErrorHandler;
 use App\Http\Controllers\Controller;
-use App\Models\Users\User;
 use Illuminate\Http\Request;
 
 // ? JWT
@@ -13,6 +12,10 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 // ? Models - view
 use App\Models\Users\UserSitesView;
+
+// ? Models - Tables
+use App\Models\Users\Site;
+use App\Models\Users\User;
 
 class AuthController extends Controller {
     public function userLogin(Request $request) {
@@ -116,6 +119,24 @@ class AuthController extends Controller {
                     . $site
                     . "</i>.<br/>Please <a href='$site/logout' rel='noopener'><b>Logout</b></a>.",
             ], 403);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function getSite(Request $request) {
+        try {
+            if ($request->query('url')) {
+                $site = Site::where('url', 'like', '%' . $request->query('url') . '%')->first();
+
+                if ($site) {
+                    return $this->successfulResponseJSON([
+                        'site' => $site
+                    ]);
+                }
+            }
+
+            return $this->failedResponseJSON('Url tidak ditemukan', 404);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
