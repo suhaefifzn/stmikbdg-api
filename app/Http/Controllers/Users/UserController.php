@@ -15,6 +15,7 @@ use App\Models\Users\UserSite;
 
 // ? Models - View
 use App\Models\Users\UserView;
+use App\Models\Users\StaffMarketingView;
 
 // ? Excel
 use Maatwebsite\Excel\Facades\Excel;
@@ -180,30 +181,50 @@ class UserController extends Controller {
     public function getUserList(Request $request) {
         try {
             $isDosen = $request->query('is_dosen')
-                        ? filter_var($request->query('is_dosen'), FILTER_VALIDATE_BOOLEAN)
-                        : null;
+                ? filter_var($request->query('is_dosen'), FILTER_VALIDATE_BOOLEAN)
+                : null;
             $isAdmin = $request->query('is_admin')
-                        ? filter_var($request->query('is_admin'), FILTER_VALIDATE_BOOLEAN)
-                        : null;
+                ? filter_var($request->query('is_admin'), FILTER_VALIDATE_BOOLEAN)
+                : null;
             $isMhs = $request->query('is_mhs')
-                        ? filter_var($request->query('is_mhs'), FILTER_VALIDATE_BOOLEAN)
-                        : null;
+                ? filter_var($request->query('is_mhs'), FILTER_VALIDATE_BOOLEAN)
+                : null;
             $isDev = $request->query('is_dev')
-                        ? filter_var($request->query('is_dev'), FILTER_VALIDATE_BOOLEAN)
-                        : null;
+                ? filter_var($request->query('is_dev'), FILTER_VALIDATE_BOOLEAN)
+                : null;
+            $isStaff = $request->query('is_staff')
+                ? filter_var($request->query('is_staff'), FILTER_VALIDATE_BOOLEAN)
+                : null;
 
             // initial value
             $users = [];
 
-            if ($isDosen or $isAdmin or $isMhs or $isDev) {
-                $filter = [
-                    'is_dosen' => $isDosen,
-                    'is_admin' => $isAdmin,
-                    'is_mhs' => $isMhs,
-                    'is_dev' => $isDev,
-                ];
+            if ($isDosen or $isAdmin or $isMhs or $isDev or $isStaff) {
+                if ($isStaff and $request->query('job')) {
+                    $job = $request->query('job');
 
-                $users = UserView::getAllUsers($filter);
+                    if (strtolower($job) == 'is_marketing') {
+                        $users = StaffMarketingView::orderBy('staff_id', 'DESC')->get();
+
+                        foreach ($users as $index => $user) {
+                            $image = config('app.url')
+                                . 'storage/users/images/'
+                                . $user['image'];
+                            $user['image'] = $image;
+                            $users[$index] = $user;
+                        }
+                    }
+                } else {
+                    $filter = [
+                        'is_dosen' => $isDosen,
+                        'is_admin' => $isAdmin,
+                        'is_mhs' => $isMhs,
+                        'is_dev' => $isDev,
+                        'is_staff' => $isStaff
+                    ];
+
+                    $users = UserView::getAllUsers($filter);
+                }
             } else {
                 $users = UserView::getAllUsers();
             }
