@@ -53,6 +53,7 @@ class AuthController extends Controller {
                         'is_dev' => auth()->user()->is_dev,
                         'is_doswal' => auth()->user()->is_doswal,
                         'is_prodi' => auth()->user()->is_prodi,
+                        'is_staff' => auth()->user()->is_staff,
                     ]
                 ];
             } else {

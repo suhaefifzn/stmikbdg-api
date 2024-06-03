@@ -141,6 +141,7 @@ class UserController extends Controller {
                     'is_dev' => $account['is_dev'],
                     'is_doswal' => $account['is_doswal'],
                     'is_prodi' => $account['is_prodi'],
+                    'is_staff' => $account['is_staff']
                 ],
             ]);
         } catch (\Exception $e) {
