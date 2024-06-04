@@ -27,6 +27,9 @@ class DocsController extends Controller
             case 'lainnya':
                 $content = view('docs.contents.home.lainnya')->render();
                 break;
+            case 'upcoming':
+                $content = view('docs.contents.home.upcoming')->render();
+                break;
             default:
                 $content = 'Tab not found.';
                 break;

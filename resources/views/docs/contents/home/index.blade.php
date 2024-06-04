@@ -11,7 +11,12 @@
     <ul class="nav nav-pills">
         <li class="nav-item">
             <div class="nav-link tab-link" style="cursor: pointer" data-tab="update">
-                Log Update
+                Updated
+            </div>
+        </li>
+        <li class="nav-item">
+            <div class="nav-link tab-link" style="cursor: pointer" data-tab="upcoming">
+                Upcoming
             </div>
         </li>
         <li class="nav-item">
@@ -37,8 +42,6 @@
             e.preventDefault();
             const target = e.target;
             const tab = $(target).data('tab');
-
-            console.log(tab);
 
             $.ajax({
                 url: '/docs/api/home/tabs/' + tab,

@@ -20,6 +20,7 @@ class AdminController extends Controller
                 'nim' => 'required|string',
                 'nm_mhs' => 'required|string',
                 'dosen_pembimbing' => 'required|string',
+                'kd_dosen' => 'required|string',
                 'tgl_bimbingan' => 'required|string'
             ]);
 
@@ -27,7 +28,7 @@ class AdminController extends Controller
             /**
              * cek dosen pembimbing
              */
-            $dosen = Dosen::where('nm_dosen', 'like', '%' . strtoupper($request->dosen_pembimbing) . '%')->first();
+            $dosen = Dosen::where('kd_dosen', strtoupper($request->kd_dosen))->first();
 
             if (!$dosen) {
                 return $this->failedResponseJSON('Dosen tidak ditemukan', 404);
@@ -64,15 +65,30 @@ class AdminController extends Controller
 
     public function getAllAntrianBimbingan(Request $request) {
         try {
-            if ($request->query('sudah')) {
-                $sudah = filter_var($request->query('sudah'), FILTER_VALIDATE_BOOLEAN);
-                $allAntrian = Bimbingan::where('sudah', $sudah)->orderBy('created_at', 'DESC')->get();
+            $antrianBimbingan = null;
+            $isSudah = $request->query('is_sudah');
+            $kdDosen = $request->query('kd_dosen');
+
+            if ($isSudah and !$kdDosen) {
+                // filter is_sudah saja
+                $filteredIsSudah = filter_var($isSudah, FILTER_VALIDATE_BOOLEAN);
+                $antrianBimbingan = Bimbingan::where('is_sudah', $filteredIsSudah)->get();
+            } else if ($kdDosen and !$isSudah) {
+                // filter kd_dosen saja
+                $antrianBimbingan = Bimbingan::where('kd_dosen', $kdDosen)->get();
+            } else if ($isSudah and $kdDosen) {
+                // filter is_sudah dan kd_dosen
+                $filteredIsSudah = filter_var($isSudah, FILTER_VALIDATE_BOOLEAN);
+                $antrianBimbingan = Bimbingan::where('is_sudah', $filteredIsSudah)
+                    ->where('kd_dosen', $kdDosen)
+                    ->get();
             } else {
-                $allAntrian = Bimbingan::orderBy('created_at', 'DESC')->get();
+                // tanpa filter dan jika filter tidak sesuai
+                $antrianBimbingan = Bimbingan::orderBy('created_at', 'DESC')->get();
             }
 
             return $this->successfulResponseJSON([
-                'list_antrian' => $allAntrian,
+                'list_antrian' => $antrianBimbingan,
             ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
@@ -138,6 +154,7 @@ class AdminController extends Controller
                     'nim' => 'required|string',
                     'nm_mhs' => 'required|string',
                     'dosen_pembimbing' => 'required|string',
+                    'kd_dosen' => 'required|string',
                     'tgl_bimbingan' => 'required|string',
                 ]);
 
@@ -151,8 +168,7 @@ class AdminController extends Controller
                 /**
                  * cek nama dosen
                  */
-                $dosen = Dosen::where('nm_dosen', 'like', '%' . strtoupper($request->dosen_pembimbing) . '%')
-                    ->first();
+                $dosen = Dosen::where('kd_dosen', strtoupper($request->kd_dosen))->first();
 
                 if (!$dosen) {
                     return $this->failedResponseJSON('Data dosen tidak ditemukan', 404);
@@ -191,7 +207,7 @@ class AdminController extends Controller
 
             if ($bimbingan) {
                 $data = $request->validate([
-                    'sudah' => 'required|boolean'
+                    'is_sudah' => 'required|boolean'
                 ]);
 
                 DB::beginTransaction();

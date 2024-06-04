@@ -5,9 +5,6 @@ namespace App\Models\Antrian;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use App\Models\Antrian\Bimbingan;
-use App\Models\Antrian\Sidang;
-
 class Dosen extends Model
 {
     /**
@@ -26,19 +23,5 @@ class Dosen extends Model
     public function __construct()
     {
         $this->connection = config('myconfig.database.first_connection');
-    }
-    
-    /**
-     * relasi dosen ke tabel antrian bimbingan
-     */
-    public function antrianBimbingan() {
-        return $this->hasMany(Bimbingan::class, 'dosen_id');
-    }
-
-    /**
-     * relasi dosen ke tabel sidang
-     */
-    public function antrianSidang() {
-        return $this->hasMany(Sidang::class, 'dosen_id');
     }
 }
