@@ -27,8 +27,8 @@ class KurikulumView extends Model
 
     public function scopeGetKurikulumMahasiswa(Builder $query, array $filter) {
         return $query->where('jur_id', $filter['jur_id'])
-                        ->where('tahun', $filter['angkatan'])
-                        ->where('k_aktif', true)
-                        ->first();
+            ->where('tahun', $filter['angkatan'])
+            ->where('k_aktif', true)
+            ->first();
     }
 }

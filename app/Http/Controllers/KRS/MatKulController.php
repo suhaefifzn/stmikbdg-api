@@ -47,8 +47,8 @@ class MatKulController extends Controller
 
             $filter['tahun_id'] = $request->query('tahun_id');
             $filter['semester'] = $request->query('semester')
-                        ? $request->query('semester')
-                        : null;
+                ? $request->query('semester')
+                : null;
 
             return self::getMataKuliahByMahasiswa($filter);
         } catch (\Exception $e) {

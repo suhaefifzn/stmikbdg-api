@@ -1,13 +1,5 @@
-@extends('docs.template.index')
-@section('docs_contents')
-<h4 class="mt-4"><b>#</b> KRS - Sisi Dosen</h4>
-<hr>
-<p>
-    Alamat API yang ada di bawah ini merupakan bagian yang digunakan oleh user yang terautentikasi sebagai dosen. Digunakan untuk melihat dan update KRS terbaru dari mahasiswa.
-</p>
-<div class="m-2">
-    <h5 class="mt-4">(DSN WALI) Get List KRS Mahasiswa</h5>
-    <hr>
+<section>
+    <h5 class="mt-4 mb-3 fw-bold">(DOSWAL) Get List KRS Mahasiswa</h5>
     <p>
         Digunakan untuk mendapatkan daftar KRS terbaru yang mahasiswa ajukan. Daftar krs yang muncul adalah milik mahasiswa yang dosen walinya adalah user yang terautentikasi sebagai dosen wali yang bersangkutan. Daftar yang muncul diurutkan berdasarkan pengajuan KRS paling baru.
     </p>
@@ -179,9 +171,10 @@
         "next_page_url": null
     }
 }</code></pre>
+</section>
 
-    <h5 class="mt-4">(DSN WALI) Get Detail KRS Mahasiswa Menggunakan mhs_id and krs_id</h5>
-    <hr>
+<section>
+    <h5 class="mt-5 mb-3 fw-bold">(DOSWAL) Get Detail KRS Mahasiswa Menggunakan mhs_id and krs_id</h5>
     <p>
         Untuk mendapatkan detail dari satu KRS mahasiswa lakukan permintaan ke <span class="badge bg-dark">/krs/mahasiswa</span> dan tambahkan query pada urlnya, yaitu <span class="badge bg-secondary">mhs_id</span> yang nilainya dipilih dari list di atas dan <span class="badge bg-secondary">krs_id</span> yang merupakan nilai dari <b>krs_last_id</b> yang dipilih dari list di atas yang berada pada object yang sama dengan <b>mhs_id</b>-nya.
     </p>
@@ -244,10 +237,11 @@
     <p>
         Kemudian nilai <b>mhs_id</b>, <b>krs_id</b>, dan setiap <b>krs_mk_id</b> yang terdapat pada <b>krs_matkul</b> nantinya digunakan untuk memperbaharui KRS mahasiswa tersebut.
     </p>
+</section>
 
+<section>
     {{-- Update pengajuan KRS mahasiswa oleh dosen wali --}}
-    <h5 class="mt-4">(DSN WALI) Update KRS Mahasiswa</h5>
-    <hr>
+    <h5 class="mt-5 mb-3 fw-bold">(DOSWAL) Update KRS Mahasiswa</h5>
     <p>
         Gunakan nilai <b>mhs_id, krs_id</b>, dan <b>krs_id</b> yang didapat setelah get detail mahasiswa untuk memperbaharui KRS mahasiswa. Status KRS yang telah diajukan ditandai dengan <b>sts_krs</b> bernilai <b>P</b>. Berikutnya adalah beberapa status yang dapat digunakan untuk memperbaharui KRS mahasiswa.
     </p>
@@ -284,5 +278,4 @@
         "krs_id": 4550
     }
 }</code></pre>
-</div>
-@endsection
+</section>

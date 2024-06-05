@@ -25,8 +25,7 @@
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Android</a>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/docs/api/krs-mahasiswa">KRS - MHS</a></li>
-                <li><a class="dropdown-item" href="/docs/api/krs-dosen-wali">KRS - DOSWAL</a></li>
+                <li><a class="dropdown-item" href="/docs/api/android/krs">KRS</a></li>
                 <li><a class="dropdown-item" href="/docs/api/kelas-mahasiswa">KELAS - MHS</a></li>
                 <li><a class="dropdown-item" href="/docs/api/kelas-dosen">KELAS - DSN</a></li>
             </ul>

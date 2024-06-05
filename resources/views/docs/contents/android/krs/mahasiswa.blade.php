@@ -1,13 +1,5 @@
-@extends('docs.template.index')
-@section('docs_contents')
-<h4><b>#</b> KRS - Sisi Mahasiswa</h4>
-<hr>
-<div class="m-2">
-    <p>
-        KRS terbagi menjadi dua sisi, yaitu sisi untuk mahasiswa dan dosen. Sisi mahasiswa adalah melakukan pengajuan KRS pada batas waktu tertentu sesuai dengan tahun ajaran dan semester aktif.
-    </p>
-    <h5 class="mt-4">(MHS) Cek Tahun Ajaran Aktif</h5>
-    <hr>
+<section>
+    <h5 class="mt-4 mb-3 fw-bold">(MHS) Cek Tahun Ajaran Aktif</h5>
     <p>
         Digunakan untuk mendapatkan tahun ajaran aktif dan juga berisi informasi mengenai dibuka atau ditutupnya pengajuan KRS mahasiswa. Lakukan permintaan ke <span class="badge bg-dark">/krs/tahun-ajaran</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>, jika permintaan berhasil maka akan memberikan response dalam format JSON seperti berikut:
     </p>
@@ -41,10 +33,11 @@
     <p>
         Perhatikan nilai <b>smt</b>, jika nilainya adalah <b>1 berarti semester ganjil</b>, jika <b>2 berarti semester genap</b>, dan jika <b>3 berarti semester tambahan</b>. Kemudian gunakan nilai pada <b>tahun_id</b> untuk mendapatkan list matakuliah yang aktif di tahun ajaran tersebut dan <b>tahun_id</b> juga digunakan sebagai payload bersamaan dengan daftar matakuliah yang dipilih sebagai pengajuan KRS nantinya.
     </p>
+</section>
 
+<section>
     {{-- Check Pengajuan KRS Terakhir --}}
-    <h5 class="mt-4">(MHS) Cek Pengajuan KRS Terkahir (Alternatif Cek Tahun Ajaran)</h5>
-    <hr>
+    <h5 class="mt-5 mb-3 fw-bold">(MHS) Cek Pengajuan KRS Terkahir (Alternatif Cek Tahun Ajaran)</h5>
     <p>
         Kami menambahkan alternatif lain untuk memeriksa apakah pengajuan KRS mahasiswa dapat dilakukan atau tidak. cara ini merupakan alternatif dari cek tahun ajaran aktif. Lakukan request ke <span class="badge bg-dark">/krs/check</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Jika berhasil maka responsenya adalah:
     </p>
@@ -74,8 +67,10 @@
     <p>
         Apabila nilai dari <b>sts_krs</b> adalah <b>S</b> berarti KRS disetujui dan KRS tidak bisa diubah kecuali oleh dosen wali. Jika <b>D</b> berarti KRS berstatus sebagai draft atau saat pengajuan ditolak <b>sts_krs</b> juga akan menjadi <b>D</b>, pada status <b>D</b> mahasiswa dapat mengirim ulang pengajuan KRS baru selama dalam batas waktu pengajuan. Terakhir, jika <b>sts_krs</b> bernilai <b>P</b> berarti KRS telah diajukan dan sedang tahap review, pada tahap ini KRS ditutup sehingga mahasiswa tidak dapat mengajukan lagi sampai statusnya berubah.
     </p>
-    <h5 class="mt-4">(MHS) Cek Matakuliah Aktif</h5>
-    <hr>
+</section>
+
+<section>
+    <h5 class="mt-5 mb-3 fw-bold">(MHS) Cek Matakuliah Aktif</h5>
     <p>
         Matakuliah aktif ditentukan berdasarkan tahun ajaran aktif, maka untuk mendapatkan daftar matakuliah diperlukan nilai <b>tahun_id</b> yang diperoleh dari dua cara sebelumnya. Kirim request ke <span class="badge bg-dark">/krs/mata-kuliah</span> dan tambahkan query atau parameter <span class="badge bg-secondary">tahun_id</span> sehingga menjadi <span class="badge bg-dark">/krs/mata-kuliah?tahun_id=335</span> untuk mendapatkan seluruh daftar matakuliah. Tambahkan <span class="badge bg-secondary">semester</span> apabila ingin mendapatkan daftar matakuliah di semester tertentu, seperti <span class="badge bg-dark">/krs/mata-kuliah?tahun_id=335&semester=7</span>, kemudian gunakan HTTP method <span class="badge bg-info">get</span>. Jika sukses maka akan mengembalikan response seperti berikut:
     </p>
@@ -128,10 +123,11 @@
     <p>
         Lihatlah nilai <b>is_aktif</b> yang berada dalam properti <b>krs</b> di matakuliah Data Mining pada contoh response di atas. Jika nilai <b>is_aktif</b> adalah <b>true</b> maka matakuliah tersebut dapat dipilih untuk pengajuan KRS jika <b>false</b> maka berlaku sebaliknya. Kemudian jika nilai <b>is_checked</b> adalah <b>true</b> maka matakuliah tersebut telah dipilih dalam pengajuan KRS di tahun ajaran aktif.
     </p>
+</section>
 
+<section>
     {{-- Menyimpan KRS sebagai draft --}}
-    <h5 class="mt-4">(MHS) KRS Mahasiswa - Draft (D)</h5>
-    <hr>
+    <h5 class="mt-5 mb-3 fw-bold">(MHS) KRS Mahasiswa - Draft (D)</h5>
     <p>
         Jika masih ragu mahasiswa dapat menyimpan pengajuan KRS dengan status sebagai draft sebelum benar-benar diajukan. Simpan nilai <b>mk_id</b> berdasarkan pada matakuliah yang dipilih dalam bentuk array of objects dan juga nilai <b>tahun_id</b> berdasarkan tahun ajaran aktif sebagai payload dalam format JSON seperti berikut ini:
     </p>
@@ -160,10 +156,11 @@
         "krs_id": 4550
     }
 }</code></pre>
+</section>
 
+<section>
     {{-- Mengirim Pengajuan KRS - Status P --}}
-    <h5 class="mt-4">(MHS) KRS Mahasiswa - Pengajuan (P)</h5>
-    <hr>
+    <h5 class="mt-5 mb-3 fw-bold">(MHS) KRS Mahasiswa - Pengajuan (P)</h5>
     <p>
         Kirim data berupa payload yang sama seperti mengirim KRS sebagai draft di atas. Gunakan HTTP method <span class="badge bg-info">post</span> dan kirim payload ke <span class="badge bg-dark">/krs/mata-kuliah/pengajuan</span>. Jika berhasil akan mendapat response seperti berikut:
     </p>
@@ -177,10 +174,11 @@
     <p>
         Perlu diingat bahwa KRS yang telah diajukan tidak dapat diubah lagi. KRS baru dapat diubah jika dosen wali menolak pengajuan tersebut dan masih dalam batas waktu pengajuan KRS yang telah ditentukan.
     </p>
+</section>
 
+<section>
     {{-- Melihat draft krs --}}
-    <h5 class="mt-4">(MHS) Get Draft KRS Matakuliah</h5>
-    <hr>
+    <h5 class="mt-5 mb-3 fw-bold">(MHS) Get Draft KRS Matakuliah</h5>
     <p>
         Untuk melihat matakuliah pada KRS yang disimpan sebagai draft kirimkan request ke <span class="badge bg-dark">/krs/mata-kuliah/draft</span> menggunakan HTTP method <span class="badge bg-info">get</span>. Draft KRS hanya bisa dilihat apabila pengisian KRS masih dibuka. Berikut adalah response yang diberikan:
     </p>
@@ -221,5 +219,38 @@
         }
     }
 }</code></pre>
-</div>
-@endsection
+</section>
+
+<section>
+    <h5 class="mt-5 mb-3 fw-bold">(MHS) Get IP Semester</h5>
+    <p>
+        Digunakan untuk get IP berdasarkan pada KRS mahasiswa atau matakuliah yang telah diambil oleh mahasiswa. Kirimkan permintaan ke <span class="badge bg-dark">/krs/ip/semester</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Jika mahasiswa telah memiliki data nilai maka API akan memberikan response seperti berikut:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "ip_mahasiswa": {
+            "total_sks": 131,
+            "total_ip": 3.7222222222222223,
+            "total_nilai_a": 45,
+            "total_nilai_b": 7,
+            "total_nilai_c": 0,
+            "total_nilai_d": 0,
+            "total_nilai_e": 2,
+            "ip_per_semester": [
+                {
+                    "semester": 1,
+                    "total_sks": 19,
+                    "total_ip": 3.875,
+                    "total_nilai_a": 7,
+                    "total_nilai_b": 1,
+                    "total_nilai_c": 0,
+                    "total_nilai_d": 0,
+                    "total_nilai_e": 0
+                },
+                ...
+            ]
+        }
+    }
+}</code></pre>
+</section>

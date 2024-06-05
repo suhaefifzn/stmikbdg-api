@@ -71,7 +71,7 @@
 <section>
     <h5 class="mt-5 mb-3 fw-bold">(ADM) Add Antrian Tamu</h5>
     <p>
-        Kirimkan permintaan ke <span class="badge bg-primary">/antrian/tamu/add</span> dengan menggunakan HTTP method <span class="badge bg-info">post</span> dan sertakan payload dalam bentuk JSON dengan format seperti berikut:
+        Kirimkan permintaan ke <span class="badge bg-dark">/antrian/tamu/add</span> dengan menggunakan HTTP method <span class="badge bg-info">post</span> dan sertakan payload dalam bentuk JSON dengan format seperti berikut:
     </p>
     <pre><code class="language-json bg-primary-subtle">{
     "nama": "Suhaefi",

@@ -25,8 +25,6 @@ Route::controller(DocsController::class)
         // ? Routes sesudah login
         Route::get('/authentications', 'authentications');
         Route::get('/users', 'users');
-        Route::get('/krs-mahasiswa', 'krsMahasiswa');
-        Route::get('/krs-dosen-wali', 'krsDosenWali');
         Route::get('/acl', 'acl');
         Route::get('/kelas-mahasiswa', 'kelasKuliahMahasiswa');
         Route::get('/kelas-dosen', 'kelasKuliahDosen');
@@ -56,6 +54,10 @@ Route::controller(DocsController::class)
         // * SIKPS - Deteksi Proposal
         Route::get('/sikps', 'sikps');
         Route::get('/sikps/tabs/{name}', 'sikpsTabs');
+
+        // * Android - KRS
+        Route::get('/android/krs', 'androidKrs');
+        Route::get('/android/krs/tabs/{name}', 'androidKrsTabs');
     });
 
 // ? Auth

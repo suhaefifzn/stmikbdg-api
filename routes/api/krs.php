@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\KRS\IPController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KRS\KRSController;
 use App\Http\Controllers\KRS\KRSDosenController;
@@ -42,6 +43,12 @@ Route::prefix('krs')
                 Route::post('/mata-kuliah/pengajuan', 'addKRSMahasiswa');
                 Route::post('/mata-kuliah/draft', 'addDraftKRSMahasiswa');
                 Route::get('/mata-kuliah/draft', 'getDraftKRSMatkul');
+            });
+
+        // * IP Controller
+        Route::controller(IPController::class)
+            ->group(function () {
+                Route::get('/ip/semester', 'getIPSemester');
             });
     });
 

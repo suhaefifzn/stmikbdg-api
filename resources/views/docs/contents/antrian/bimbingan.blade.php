@@ -116,7 +116,7 @@
     <p>
         Digunakan oleh dosen untuk get list antrian bimbingan. Kirimkan permintaan ke <span class="badge bg-dark">/antrian/list/bimbingan</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. API akan memberikan response:
     </p>
-    <pre><code class="language-json bg-primary-json">{
+    <pre><code class="language-json bg-primary-subtle">{
     "status": "success",
     "data": {
         "list_antrian": [

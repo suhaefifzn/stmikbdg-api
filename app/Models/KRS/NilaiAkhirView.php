@@ -4,6 +4,7 @@ namespace App\Models\KRS;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 // ? Models - View
 use App\Models\KRS\MatKulView;
@@ -26,6 +27,13 @@ class NilaiAkhirView extends Model
 
     public function __construct() {
         $this->connection = config('myconfig.database.second_connection');
+    }
+
+    public function scopeGetNilaiAkhirByMhsId(Builder $query, int $mhsId) {
+        return $query->where('mhs_id', $mhsId)
+            ->with(['matakuliah' => function ($query) {
+                $query->select('mk_id', 'jur_id', 'kd_mk', 'nm_mk', 'semester', 'sks', 'kd_kur', 'smt');
+            }])->get();
     }
 
     /**

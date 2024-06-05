@@ -56,15 +56,27 @@ class DocsController extends Controller
         ]);
     }
 
-    public function krsMahasiswa() {
-        return view('docs.contents.krs_mhs', [
-            'title' => 'KRS - SisiMahasiswa'
+    public function androidKrs() {
+        return view('docs.contents.android.krs.index', [
+            'title' => 'KRS'
         ]);
     }
 
-    public function krsDosenWali() {
-        return view('docs.contents.krs_dosen_wali', [
-            'title' => 'KRS - Sisi Dosen Wali'
+    public function androidKrsTabs($tabName) {
+        switch (strtolower($tabName)) {
+            case 'doswal':
+                $content = view('docs.contents.android.krs.doswal')->render();
+                break;
+            case 'mahasiswa':
+                $content = view('docs.contents.android.krs.mahasiswa')->render();
+                break;
+            default:
+                $content = 'Tab not found.';
+                break;
+        }
+
+        return response()->json([
+            'content' => $content,
         ]);
     }
 

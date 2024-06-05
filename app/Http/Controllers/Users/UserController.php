@@ -131,6 +131,7 @@ class UserController extends Controller {
             return $this->successfulResponseJSON([
                 'profile' => $user,
                 'account' => [
+                    'user_id' => $account['id'],
                     'email' => $account['email'],
                     'image' => config('app.url')
                         . 'storage/users/images/'
