@@ -59,6 +59,9 @@ class KRS extends Model
         return count($result) > 0 ? $result[0] : false;
     }
 
+    /**
+     * digunakan untuk kuesioner pekuliahan
+     */
     public function scopeGetLastKRSDisetujuiWithMatkul(Builder $query, $tahunAjaranId, $mahasiswaId) {
         return $query->where('tahun_id', $tahunAjaranId)
             ->where('mhs_id', $mahasiswaId)
@@ -66,7 +69,8 @@ class KRS extends Model
             ->with(['krsMatkul' => function ($query) {
                 $query->select('krs_mk_id', 'krs_id', 'mk_id', 'kelas_kuliah_id')
                     ->with(['matakuliah' => function ($query) {
-                        $query->select('mk_id', 'kur_id', 'jur_id', 'kd_mk', 'nm_mk', 'semester', 'sks', 'kd_kur', 'smt');
+                        $query->select('mk_id', 'kur_id', 'jur_id', 'kd_mk', 'nm_mk', 'semester', 'sks', 'kd_kur', 'smt')
+                            ->whereNotIn('kd_mk', ['IF1200', 'SI1200', 'IF1400', 'SI1400', 'IF1600', 'SI1600', 'IF1800', 'SI1800']);
                     }]);
             }])->first();
     }

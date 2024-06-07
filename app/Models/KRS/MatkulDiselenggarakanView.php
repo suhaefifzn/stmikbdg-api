@@ -46,6 +46,9 @@ class MatkulDiselenggarakanView extends Model
             ->get();
     }
 
+    /**
+     * digunakan untuk kuesioner perkuliahan
+     */
     public function scopeGetMatkulWithKelasKuliah(Builder $query, $tahunId, $jnsMhs, $kdKampus, $semester = null) {
         return $query->where('tahun_id', $tahunId)
             ->when($semester, function ($query) use ($semester) {

@@ -103,7 +103,7 @@ class KuesionerController extends Controller
     public function getPertanyaanForMatkul(Request $request) {
         try {
             $mahasiswa = $this->getUserAuth();
-            
+
             /**
              * jika terdapat nilai query params kelas_kuliah_id
              */
@@ -111,8 +111,10 @@ class KuesionerController extends Controller
                 /**
                  * cek kelas kuliah id
                  */
-                $kelasKuliah = KelasKuliahJoinView::getDataKelasKuliahForKuesionerPerkuliahan((int) $request->query('kelas_kuliah_id'));
-                
+                $kelasKuliah = KelasKuliahJoinView::getDataKelasKuliahForKuesionerPerkuliahan(
+                    (int) $request->query('kelas_kuliah_id'), $mahasiswa['jns_mhs'], $mahasiswa['kd_kampus']
+                );
+
                 /**
                  * kelas kuliah ada
                  */
@@ -334,7 +336,7 @@ class KuesionerController extends Controller
             $listJawaban = self::setDataJawaban($request->list_jawaban, $kuesionerPerkuliahanMahasiswaId);
 
             JawabanKuesionerPerkuliahan::insert($listJawaban);
-            
+
             return $this->successfulResponseJSON([
                 'kuesioner' => [
                     'kuesioner_perkuliahan_mahasiswa_id' => $kuesionerPerkuliahanMahasiswaId,

@@ -44,8 +44,10 @@ class KelasKuliahJoinView extends Model
             )->first();
     }
 
-    public function scopeGetDataKelasKuliahForKuesionerPerkuliahan(Builder $query, $kelasKuliahId) {
+    public function scopeGetDataKelasKuliahForKuesionerPerkuliahan(Builder $query, $kelasKuliahId, $jnsMhs, $kdKampus) {
         return $query->where('kelas_kuliah_id', $kelasKuliahId)
+            ->where('jns_mhs', trim($jnsMhs))
+            ->where('kd_kampus', trim($kdKampus))
             ->select('kelas_kuliah_id', 'tahun_id', 'jur_id', 'mk_id', 'jns_mhs', 'kd_kampus', 'pengajar_id', 'kjoin_kelas', 'join_kelas_kuliah_id')
             ->first();
     }
