@@ -229,28 +229,73 @@
     <pre><code class="language-json bg-primary-subtle">{
     "status": "success",
     "data": {
-        "ip_mahasiswa": {
-            "total_sks": 131,
-            "total_ip": 3.7222222222222223,
-            "total_nilai_a": 45,
-            "total_nilai_b": 7,
-            "total_nilai_c": 0,
-            "total_nilai_d": 0,
-            "total_nilai_e": 2,
-            "ip_per_semester": [
-                {
-                    "semester": 1,
-                    "total_sks": 19,
-                    "total_ip": 3.875,
-                    "total_nilai_a": 7,
-                    "total_nilai_b": 1,
-                    "total_nilai_c": 0,
-                    "total_nilai_d": 0,
-                    "total_nilai_e": 0
-                },
-                ...
-            ]
-        }
+        "total_sks": 131,
+        "total_semua_ip": 3.7222222222222223,
+        "total_nilai_a": 45,
+        "total_nilai_b": 7,
+        "total_nilai_c": 0,
+        "total_nilai_d": 0,
+        "total_nilai_e": 2,
+        "ip_per_semester": [
+            {
+                "semester": 1,
+                "total_sks": 19,
+                "total_ip": 3.875,
+                "total_nilai_a": 7,
+                "total_nilai_b": 1,
+                "total_nilai_c": 0,
+                "total_nilai_d": 0,
+                "total_nilai_e": 0
+            },
+            {
+                "semester": 2,
+                "total_sks": 20,
+                "total_ip": 3.75,
+                "total_nilai_a": 6,
+                "total_nilai_b": 2,
+                "total_nilai_c": 0,
+                "total_nilai_d": 0,
+                "total_nilai_e": 0
+            },
+            ...
+        ]
+    }
+}</code></pre>
+</section>
+
+<section>
+    <h5 class="mt-5 mb-3 fw-bold">(MHS) Get Detail IP Semester</h5>
+    <p>
+        Untuk mendapatkan detail IP pada satu semester, kirimkan permintaan ke <span class="badge bg-dark">/krs/ip/semester?s={nilai_semester}</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Ganti nilai <b>{nilai_semester}</b> dengan tingkat semester yang akan dilihat detail IP-nya. Contohnya get detail IP semester 7 adalah <span class="badge bg-dark">/krs/ip/semester?s=7</span>. Jika berhasil API akan memberikan response:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "semester": 7,
+        "total_sks": 20,
+        "total_ip": 2.875,
+        "total_nilai_a": 5,
+        "total_nilai_b": 1,
+        "total_nilai_c": 0,
+        "total_nilai_d": 0,
+        "total_nilai_e": 2,
+        "matakuliah": [
+            {
+                "nm_mk": "Analisis Numerik",
+                "kd_mk": "IF1709",
+                "sks": 2,
+                "nilai": "A",
+                "mutu": 4
+            },
+            {
+                "nm_mk": "Pengolahan Citra",
+                "kd_mk": "IF1710",
+                "sks": 3,
+                "nilai": "A",
+                "mutu": 4
+            },
+            ...
+        ]
     }
 }</code></pre>
 </section>

@@ -30,10 +30,21 @@ class IPController extends Controller
                     return  $matkul['matakuliah']['semester'];
                 });
 
+                // ? jika terdapat query 's'
+                if ($request->query('s')) {
+                    $semester = (string) $request->query('s');
+                    $filteredBySemester = self::getIPBySemester($semester, $groupedBySemester);
+
+                    return response()->json([
+                        'status' => 'success',
+                        'data' => $filteredBySemester
+                    ]);
+                }
+
                 // nilai keseluruhan
                 $data = [
                     'total_sks' => $countTotalSks,
-                    'total_ip' => ((float) $countTotalMutu / $countTotal),
+                    'total_semua_ip' => ((float) $countTotalMutu / $countTotal),
                     'total_nilai_a' => isset($countNilai['A']) ? $countNilai['A'] : 0,
                     'total_nilai_b' => isset($countNilai['B']) ? $countNilai['B'] : 0,
                     'total_nilai_c' => isset($countNilai['C']) ? $countNilai['C'] : 0,
@@ -69,8 +80,9 @@ class IPController extends Controller
 
                 $data['ip_per_semester'] = $tempIPSemester;
 
-                return $this->successfulResponseJSON([
-                    'ip_mahasiswa' => $data
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $data
                 ]);
             }
 
@@ -78,5 +90,63 @@ class IPController extends Controller
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
+    }
+
+    private function getIPBySemester(string $semester, mixed $ipSemester) {
+        $ipSemesterArr = $ipSemester->toArray();
+
+        if (array_key_exists($semester, $ipSemesterArr)) {
+            $tempData = $ipSemesterArr[$semester];
+
+            // nilai keseluruhan dalam satu semester
+            $collectionData = collect($tempData);
+            $countTotalItem = $collectionData->count();
+            $countTotalMutu = $collectionData->sum('mutu');
+            $countTotalNilai = $collectionData->countBy('nilai');
+
+            $countTotalSks = $collectionData->sum(function ($matkul) {
+                return $matkul['matakuliah']['sks'];
+            });
+
+            $data = [
+                'semester' => (int) $semester,
+                'total_sks' => $countTotalSks,
+                'total_ip' => ((float) $countTotalMutu / $countTotalItem),
+                'total_nilai_a' => isset($countTotalNilai['A']) ? $countTotalNilai['A'] : 0,
+                'total_nilai_b' => isset($countTotalNilai['B']) ? $countTotalNilai['B'] : 0,
+                'total_nilai_c' => isset($countTotalNilai['C']) ? $countTotalNilai['C'] : 0,
+                'total_nilai_d' => isset($countTotalNilai['D']) ? $countTotalNilai['D'] : 0,
+                'total_nilai_e' => isset($countTotalNilai['E']) ? $countTotalNilai['E'] : 0,
+            ];
+
+            $tempMatkul = [];
+
+            foreach ($tempData as $index => $item) {
+                $newItem = [
+                    'nm_mk' => trim($item['matakuliah']['nm_mk']),
+                    'kd_mk' => trim($item['matakuliah']['kd_mk']),
+                    'sks' => $item['matakuliah']['sks'],
+                    'nilai' => $item['nilai'],
+                    'mutu' => $item['mutu'],
+                ];
+
+                array_push($tempMatkul, $newItem);
+            }
+
+            $data['matakuliah'] = $tempMatkul;
+        } else {
+            return $data = [
+                'semester' => (int) $semester,
+                'total_sks' => 0,
+                'total_ip' => 0,
+                'total_nilai_a' => 0,
+                'total_nilai_b' => 0,
+                'total_nilai_c' => 0,
+                'total_nilai_d' => 0,
+                'total_nilai_e' => 0
+            ];
+        }
+
+        return $data;
     }
 }
