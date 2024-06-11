@@ -2,7 +2,7 @@
     $apiBaseURL = config('app.url') . 'api';
 @endphp
 
-<div class="alert alert-warning">
+<div class="alert alert-info">
     <span class="fw-bold fs-6">Cara Penggunaan:</span>
     <p>
         Base URL merupakan url utama dari API. Agar request yang dilakukan sesuai dengan yang dibutuhkan maka tambahkan dengan URI atau beberapa endpoint yang ada pada menu ini. Misalnya jika ingin melakukan login untuk meminta access token, maka alamat yang digunakan untuk meminta ke API menjadi <b>Base URL + endpoint</b>, sehingga url yang digunakan untuk login adalah <b>{{ $apiBaseURL }}/authentications</b>.

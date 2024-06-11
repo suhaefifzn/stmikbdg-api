@@ -1,26 +1,23 @@
 <?php
 
 use App\Http\Controllers\Docs\DocsController;
+use App\Http\Controllers\Docs\DocsAuthController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+Route::controller(DocsAuthController::class)
+    ->group(function () {
+        Route::get('/', 'checkToken')->name('check');
+        Route::get('/docs/api/logout', 'logout')->name('logout');
+    });
 
 Route::controller(DocsController::class)
     ->prefix('/docs/api')
-    ->middleware('auth.session')
+    ->middleware('auth.docs.dev')
     ->group(function () {
-        Route::post('/authenticate', 'authenticate')->withoutMiddleware('auth.session');
-        Route::get('/login', 'login')->withoutMiddleware('auth.session')->name('docs_login');
-        Route::get('/logout', 'logout')->name('docs_logout');
+        // ? 27-05-2024 - New design
+        //* Home
+        Route::get('/home', 'home')->name('docs_home');
+        Route::get('/home/tabs/{name}', 'homeTabs');
 
         // ? Routes sesudah login
         Route::get('/authentications', 'authentications');
@@ -33,11 +30,6 @@ Route::controller(DocsController::class)
         Route::get('/marketing', 'marketing');
         Route::get('/berita-acara', 'beritaAcara');
         Route::get('/penomoran-surat', 'surat');
-
-        // ? 27-05-2024 - New design
-        //* Home
-        Route::get('/', 'home')->name('docs_home');
-        Route::get('/home/tabs/{name}', 'homeTabs');
 
         // * Antrian
         Route::get('/antrian', 'antrian');
@@ -59,8 +51,3 @@ Route::controller(DocsController::class)
         Route::get('/android/krs', 'androidKrs');
         Route::get('/android/krs/tabs/{name}', 'androidKrsTabs');
     });
-
-// ? Auth
-Route::get('/', function () {
-    return redirect()->route('docs_home');
-});

@@ -12,10 +12,6 @@
         </li>
     </ul>
     <hr>
-    <div class="alert alert-warning">
-        <b>Note:</b> masih belum selesai.
-    </div>
-    <hr>
     <div id="tabContent"></div>
 </div>
 

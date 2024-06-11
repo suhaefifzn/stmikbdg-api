@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers\Kuesioner;
 
+use Illuminate\Http\Request;
 use App\Exceptions\ErrorHandler;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 // ? Models - Views
-use App\Models\KelasKuliah\KelasKuliahJoinView;
 use App\Models\TahunAjaranView;
-use App\Models\KRS\MatkulDiselenggarakanView;
 use App\Models\Users\DosenView;
-use App\Models\Kuesioner\PertanyaanView;
 use App\Models\Kuesioner\PointsView;
+use App\Models\Kuesioner\PertanyaanView;
+use App\Models\KRS\MatkulDiselenggarakanView;
+use App\Models\KelasKuliah\KelasKuliahJoinView;
 use App\Models\Kuesioner\JawabanKuesionerPerkuliahanView;
 
 // ? Models - Tables
 use App\Models\KRS\KRS;
 use App\Models\KRS\KRSMatkul;
-use App\Models\Kuesioner\JawabanKuesionerPerkuliahan;
+use App\Models\KRS\MatKulView;
 use App\Models\Kuesioner\KuesionerPerkuliahan;
-use App\Models\Kuesioner\KuesionerPerkuliahanMahasiswa;
 use App\Models\Kuesioner\SaranKuesionerPerkuliahan;
+use App\Models\Kuesioner\JawabanKuesionerPerkuliahan;
+use App\Models\Kuesioner\KuesionerPerkuliahanMahasiswa;
 
 class KuesionerController extends Controller
 {
@@ -262,10 +263,7 @@ class KuesionerController extends Controller
 
             if (!$kelasKuliah['pengajar_id'] and $kelasKuliah['kjoin_kelas']) {
                 $joinKelasKuliah = KelasKuliahJoinView::getDataKelasKuliahForKuesionerPerkuliahan($kelasKuliah['join_kelas_kuliah_id']);
-                $pengajar = DosenView::where('dosen_id', $joinKelasKuliah['pengajar_id'])
-                    ->select('dosen_id')
-                    ->first();
-                $pengajarId = $pengajar['dosen_id'];
+                $pengajarId = $joinKelasKuliah['pengajar_id'];
             } else {
                 $pengajarId = $kelasKuliah['pengajar_id'];
             }
@@ -281,6 +279,20 @@ class KuesionerController extends Controller
             }
 
             /**
+             * get data matkul
+             */
+            $matkul = MatKulView::where('mk_id', $kelasKuliah['mk_id'])
+                ->select('mk_id', 'nm_mk', 'semester')
+                ->first();
+
+            /**
+             * get data pengajar
+             */
+            $pengajar = DosenView::where('dosen_id', $pengajarId)
+                ->select('dosen_id', 'nm_dosen')
+                ->first();
+
+            /**
              * set data mahasiswa mengisi kuesioner
              */
             $dataKuesionerMahasiswa = [
@@ -290,6 +302,10 @@ class KuesionerController extends Controller
                 'kelas_kuliah_id' => $kelasKuliah['kelas_kuliah_id'],
                 'pengajar_id' => $pengajarId,
                 'mhs_id' => $mahasiswa['mhs_id'],
+                'nm_mk' => trim($matkul['nm_mk']),
+                'nm_dosen' => trim($pengajar['nm_dosen']),
+                'nim' => $mahasiswa['nim'],
+                'semester' => $matkul['semester']
             ];
 
             /**
@@ -620,10 +636,11 @@ class KuesionerController extends Controller
 
             $point = PointsView::where('mutu', round($mutu))->first();
             $item['jawaban'] = $point;
+            $item['jawaban']['rata_rata'] = (float) $mutu;
             $listPertanyaan[$index] = $item;
         }
 
-        return $listPertanyaan;
+        return $listPertanyaan->groupBy('kelompok');
     }
 
     private function setDataJawaban($listJawaban, $kuesionerPerkuliahanMahasiswaId) {

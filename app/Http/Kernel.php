@@ -72,5 +72,8 @@ class Kernel extends HttpKernel
         'auth.session' => \App\Http\Middleware\TokenSession::class,
         'auth.dosen_wali' => \App\Http\Middleware\isDoswal::class,
         'auth.prodi' => \App\Http\Middleware\isProdi::class,
+
+        // access to documentation
+        'auth.docs.dev' => \App\Http\Middleware\isDocDev::class,
     ];
 }

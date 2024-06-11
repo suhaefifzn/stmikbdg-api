@@ -1,6 +1,6 @@
 <div class="alert alert-info">
-    <b>Update Mendatang:</b><br>
+    <b>Mendatang:</b><br>
     <ul>
-        <li>Kuesioner - Hasil Perkuliahan</li>
+        <li>Android - Pengumuman Perkuliahan</li>
     </ul>
 </div>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Kuesioner\HasilPerkuliahanController;
 use App\Http\Controllers\Kuesioner\KuesionerController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TahunAjaranController;
@@ -55,7 +56,19 @@ Route::prefix('/kuesioner')
                     ->group(function () {
                         Route::get('/', 'getMatkulByTahunAjaran');
                         Route::post('/open', 'openKuesionerPerkuliahan');
-                        Route::get('/jawaban/rata-rata', 'getAverageJawabanKuesioner');
+                        
+                        // hasil kuesiner
+                        Route::get('/hasil/rata-rata', 'getAverageJawabanKuesioner');
+                        Route::controller(HasilPerkuliahanController::class)
+                            ->prefix('/hasil')
+                            ->group(function () {
+                                Route::get('/tahun-ajaran', 'getListTahunAjaran');
+                                Route::get('/semester', 'getListSemester');
+                                Route::get('/dosen', 'getListDosen');
+                                Route::get('/matkul', 'getListMatkul');
+                                Route::get('/mahasiswa', 'getListMahasiswa');
+                                Route::get('/jawaban', 'getJawabanMahasiswa');
+                            });
                     });
 
                 // pertanyaan
