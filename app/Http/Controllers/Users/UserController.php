@@ -126,24 +126,17 @@ class UserController extends Controller {
     public function getMyProfile() {
         try {
             $user = $this->getUserAuth();
-            $account = auth()->user();
+            $account= collect(auth()->user())->filter(function ($item) {
+                return $item;
+            });
+
+            $account['image'] = config('app.url')
+                . 'storage/users/images/'
+                . auth()->user()->image;
 
             return $this->successfulResponseJSON([
                 'profile' => $user,
-                'account' => [
-                    'user_id' => $account['id'],
-                    'email' => $account['email'],
-                    'image' => config('app.url')
-                        . 'storage/users/images/'
-                        . auth()->user()->image,
-                    'is_dosen' => $account['is_dosen'],
-                    'is_admin' => $account['is_admin'],
-                    'is_mhs' => $account['is_mhs'],
-                    'is_dev' => $account['is_dev'],
-                    'is_doswal' => $account['is_doswal'],
-                    'is_prodi' => $account['is_prodi'],
-                    'is_staff' => $account['is_staff']
-                ],
+                'account' => $account
             ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);

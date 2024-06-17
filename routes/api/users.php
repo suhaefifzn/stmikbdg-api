@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Users\StaffController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Users\UserController;
 
@@ -22,4 +23,13 @@ Route::controller(UserController::class)
         Route::get('/', 'getUserList')->middleware('auth.admin');
         Route::post('/', 'addNewUser'); // buat awalan tambahin withoutMiddleware('auth.jwt')
         Route::delete('/{id}', 'deleteUserById')->middleware('auth.admin');
+
+        // ? user staff
+        Route::controller(StaffController::class)
+            ->prefix('/staff')
+            ->middleware('auth.admin')
+            ->group(function () {
+                Route::post('/add', 'addUser');
+                Route::get('/list', 'getAllStaff');
+            });
     });

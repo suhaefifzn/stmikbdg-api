@@ -250,6 +250,7 @@ class AdminPengajuanWisudaController extends Controller
                 $pengajuan['tahun_wisuda'] = $jadwalWisudaAktif['tahun'];
                 $pengajuan['angkatan_wisuda'] = $jadwalWisudaAktif['angkatan_wisuda'];
                 $pengajuan['status_id'] = $status['status_id'];
+                $pengajuan['is_verified'] = true;
             } else {
                 $request->validate([
                     'ditolak_alasan' => 'required|string',
@@ -258,9 +259,13 @@ class AdminPengajuanWisudaController extends Controller
                 $pengajuan['is_ditolak'] = true;
                 $pengajuan['ditolak_alasan'] = $request->ditolak_alasan;
                 $pengajuan['jadwal_wisuda_id'] = null;
+                $pengajuan['tgl_wisuda'] = null;
+                $pengajuan['tahun_wisuda'] = null;
+                $pengajuan['angkatan_wisuda'] = null;
 
                 $status = StatusView::getDetailStatus('T');
-                $pengajuan['status_id'] =$status['status_id'];
+                $pengajuan['status_id'] = $status['status_id'];
+                $pengajuan['is_verified'] = false;
             }
 
             $update = PengajuanWisuda::updatePengajuan(

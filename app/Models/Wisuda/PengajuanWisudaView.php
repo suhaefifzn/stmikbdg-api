@@ -31,7 +31,7 @@ class PengajuanWisudaView extends Model
 
     public function scopeGetStatusPengajuan(Builder $query, $nim) {
         return $query->where('nim', $nim)
-            ->select('pengajuan_id', 'kd_status', 'ket_status', 'tgl_wisuda', 'tgl_pengajuan')
+            ->select('pengajuan_id', 'kd_status', 'ket_status', 'tgl_wisuda', 'tgl_pengajuan', 'is_verified')
             ->orderBy('tgl_pengajuan', 'DESC')
             ->first();
     }

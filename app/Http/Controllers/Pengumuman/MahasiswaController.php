@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 // ? Models - Views
 use App\Models\KelasKuliah\KelasKuliahJoinView;
+use App\Models\Users\DosenView;
 
 // ? Models - Tables
 use App\Models\Perkuliahan\Pengumuman;
@@ -18,22 +19,33 @@ use App\Models\TahunAjaranView;
 use App\Models\Users\Mahasiswa;
 use App\Models\KRS\KRS;
 use App\Models\Perkuliahan\FCMClients;
-use App\Models\Users\DosenView;
 
 class MahasiswaController extends Controller
 {
     public function getListPengumuman(Request $request) {
         try {
             $nim = explode('-', auth()->user()->kd_user)[1];
-            $lastKrsId = Mahasiswa::where('nim', $nim)
+            $lastKrs = Mahasiswa::where('nim', $nim)
                 ->select('mhs_id', 'krs_id_last')
-                ->first()['krs_id_last'];
+                ->first();
 
             // get pengumuman by satu matkul
             $kelasKuliahId = $request->query('kelas_kuliah_id');
 
             if ($kelasKuliahId) {
-                $kelasKuliahIdArr = KRSMatkul::where('krs_id', $lastKrsId)
+                // cek krs by tahun ajaran aktif
+                $tahunAjaran = TahunAjaranView::getTahunAjaran($this->getUserAuth());
+                $krsTahunNow = KRS::where('tahun_id', $tahunAjaran['tahun_id'])->first();
+
+                if (!$krsTahunNow) {
+                    return $this->failedResponseJSON(
+                        ('Pengumuman untuk mata kuliah milik Anda belum tersedia.'
+                        . 'Pastikan KRS di tahun aktif saat ini telah disetujui')
+                        , 400
+                    );
+                }
+
+                $kelasKuliahIdArr = KRSMatkul::where('krs_id', $lastKrs['krs_id_last'])
                     ->where('kelas_kuliah_id', (int) $kelasKuliahId)
                     ->select('krs_mk_id', 'krs_id', 'kelas_kuliah_id')
                     ->pluck('kelas_kuliah_id')
@@ -43,7 +55,7 @@ class MahasiswaController extends Controller
                     return $this->failedResponseJSON('Kelas kuliah id tidak ditemukan');
                 }
             } else {
-                $kelasKuliahIdArr = KRSMatkul::where('krs_id', $lastKrsId)
+                $kelasKuliahIdArr = KRSMatkul::where('krs_id', $lastKrs['krs_id_last'])
                     ->select('krs_mk_id', 'krs_id', 'kelas_kuliah_id')
                     ->pluck('kelas_kuliah_id')
                     ->toArray();

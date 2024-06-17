@@ -35,7 +35,8 @@
     "file_ktp": "ktp.pdf",
     "file_bukti_pembayaran_sumbangan": "asdasdlk.pdf",
     "file_ijazah": "ijazah.jpg",
-    "judul_skripsi": "INTEGRASI SISTEM STMIK BANDUNG DALAM BENTUK API (APPLICATION PROGRAMMING INTERFACE)"
+    "judul_skripsi": "INTEGRASI SISTEM STMIK BANDUNG DALAM BENTUK API (APPLICATION PROGRAMMING INTERFACE)",
+    "is_verified": false, // jika diisi true, aka pengajuan tidak bisa ubah lagi
 }</code></pre>
     <div class="alert alert-warning">
         Untuk setiap file yang ada hanya kirimkan storage path dari file yang telah berhasil disimpan pada sisi frontend. Hal ini sesuai dengan kesepakatan saat diskusi.
@@ -71,6 +72,7 @@
             "file_ijazah": "ijazah.jpg",
             "is_bayar": null,
             "is_ditolak": null,
+            "is_verified": false,
             "ditolak_alasan": null,
             "tgl_sidang_akhir": "20-07-2024",
             "tgl_wisuda": null,
@@ -94,7 +96,8 @@
             "pengajuan_id": 3,
             "kd_status": "M",
             "ket_status": "Menunggu",
-            "tgl_pengajuan": "2024-04-04 14:48:44"
+            "tgl_pengajuan": "2024-04-04 14:48:44",
+            "is_verified": false
         }
     }
 }</code></pre>
@@ -121,7 +124,8 @@
     "file_ktp": "edit-ktp.pdf",
     "file_bukti_pembayaran_sumbangan": "edit-asdasdlk.pdf",
     "file_ijazah": "ijazah.jpg",
-    "judul_skripsi": "EDIT JUDUL INTEGRASI SISTEM STMIK BANDUNG DALAM BENTUK API (APPLICATION PROGRAMMING INTERFACE)"
+    "judul_skripsi": "EDIT JUDUL INTEGRASI SISTEM STMIK BANDUNG DALAM BENTUK API (APPLICATION PROGRAMMING INTERFACE)",
+    "is_verified": true
 }</code></pre>
     <p>
         Nilai <b>pengajuan_id</b> didapat dari get detail pengajuan.

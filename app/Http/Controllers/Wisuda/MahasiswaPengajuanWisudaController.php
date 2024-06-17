@@ -37,7 +37,8 @@ class MahasiswaPengajuanWisudaController extends Controller
                 'file_bukti_pembayaran' => 'required|string',
                 'file_ktp' => 'required|string',
                 'file_bukti_pembayaran_sumbangan' => 'required|string',
-                'file_ijazah' => 'required|string'
+                'file_ijazah' => 'required|string',
+                'is_verified' => 'nullable|boolean'
             ]);
 
             /**
@@ -80,6 +81,7 @@ class MahasiswaPengajuanWisudaController extends Controller
                 'judul_skripsi' => $request->judul_skripsi,
                 'is_bayar' => null, // default
                 'is_ditolak' => null, // default
+                'is_verified' => $request->is_verified ?? false,
                 'ditolak_alasan' => null, // default
             ];
 
@@ -137,7 +139,8 @@ class MahasiswaPengajuanWisudaController extends Controller
                 'file_bukti_pembayaran' => 'required|string',
                 'file_ktp' => 'required|string',
                 'file_bukti_pembayaran_sumbangan' => 'required|string',
-                'file_ijazah' => 'required|string'
+                'file_ijazah' => 'required|string',
+                'is_verified' => 'nullable|boolean'
             ]);
 
             /**
@@ -162,8 +165,13 @@ class MahasiswaPengajuanWisudaController extends Controller
 
             /**
              * Cek pengajuan sudah ada atau belum
+             * dan jika is_verified true, maka tidak bisa diubah
              */
             $oldPengajuan = PengajuanWisudaView::getPengajuan($mahasiswa['nim']);
+
+            if ($oldPengajuan['is_verified']) {
+                return $this->failedResponseJSON('Data pengajuan yang sudah diverifikasi tidak bisa diubah', 400);
+            }
 
             if (!$oldPengajuan->exists()) {
                 return response()->json([
@@ -184,6 +192,7 @@ class MahasiswaPengajuanWisudaController extends Controller
                 'judul_skripsi' => $request->judul_skripsi,
                 'is_bayar' => null, // default
                 'is_ditolak' => null, // default
+                'is_verified' => $request->is_verified ?? false,
                 'ditolak_alasan' => null, // default
             ];
 
@@ -254,7 +263,8 @@ class MahasiswaPengajuanWisudaController extends Controller
                         'pengajuan_id' => $pengajuan['pengajuan_id'],
                         'kd_status' => $pengajuan['kd_status'],
                         'ket_status' => $pengajuan['ket_status'],
-                        'tgl_pengajuan' => $pengajuan['tgl_pengajuan']
+                        'tgl_pengajuan' => $pengajuan['tgl_pengajuan'],
+                        'is_verified' => $pengajuan['is_verified']
                     ]
                 ], null, 200);
             }
