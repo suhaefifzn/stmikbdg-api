@@ -24,8 +24,12 @@ require __DIR__.'/api/wisuda.php';
 // ? Antrian
 require __DIR__.'/api/antrian.php';
 
+// ? Pengumuman
+require __DIR__.'/api/pengumuman.php';
+
 // ? ACL Routes
 require __DIR__.'/api/acl.php';
 
 // ? Additional Routes (Tambahan)
 require __DIR__.'/api/additional.php';
+require __DIR__.'/api/file.php';

@@ -19,6 +19,7 @@
                 Berikut adalah kode OTP untuk reset password akun Anda yang digunakan untuk mengakses sistem akademik di STMIK Bandung:
             </p>
             <div class="alert alert-info"><b>{{ $otp }}</b></div>
+            <br>
             <p>
                 Kode OTP hanya berlaku selama 5 menit sejak Anda berhasil mengirim permintaan untuk kode OTP.
             </p>

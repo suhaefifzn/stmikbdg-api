@@ -34,6 +34,7 @@
         },
         "platform": "android",
         "roles": {
+            "user_id": 232,
             "is_admin": false,
             "is_dosen": false,
             "is_mhs": true,
@@ -78,7 +79,7 @@
     <p>
         Apabila berhasil kode OTP akan dikirim ke alamat email tersebut. Kode OTP hanya berlaku selama 5 menit sejak user berhasil mengirimkan permintaan. Saat ini, seperti inilah isi email yang diterima:
     </p>
-    <img src="https://lh3.googleusercontent.com/drive-viewer/AKGpihbczAefFImNNGhaRGpT2bY0a5OHcT4iPtGXOkHc6_Gfldz1VPaV4FrUncjmqzESq7_G2t_uYhs_MCRvwz43CKM6TUTR4g=s2560" class="img img-fluid" alt="Format Email Kode OTP Reset Password User" />
+    <img src="/images/format_email_otp_user.png" class="img img-fluid" alt="Format Email Kode OTP Reset Password User" />
     <div class="alert alert-warning mt-3">
         <b>Note:</b> Karena belum ada kepastian mengenai layanan email yang akan digunakan, saat ini kami masih menggunakan Mailtrap untuk menangkap email yang dikirim secara otomatis dari sistem.
     </div>

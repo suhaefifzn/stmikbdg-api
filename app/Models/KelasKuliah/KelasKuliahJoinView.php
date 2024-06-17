@@ -24,6 +24,16 @@ class KelasKuliahJoinView extends Model
         $this->connection = config('myconfig.database.second_connection');
     }
 
+    public function scopeGetKelasKuliahForPengumuman(Builder $query, $dosenId, $tahunIdArr, $kelasKuliahIdArr) {
+        return $query->where('pengajar_id', $dosenId)
+            ->whereIn('tahun_id', $tahunIdArr)
+            ->whereNotIn('kelas_kuliah_id', $kelasKuliahIdArr)
+            ->select('kelas_kuliah_id', 'kd_kampus', 'jns_mhs', 'mk_id', 'tahun_id')
+            ->with(['matakuliah' => function ($query) {
+                $query->select('mk_id', 'kur_id', 'jur_id', 'kd_mk', 'nm_mk', 'kd_jur', 'semester', 'sks');
+            }])->get();
+    }
+
     public function scopeGetKelasKuliahByDosen(Builder $query, $tahunId, $dosenId) {
         return $query->where('tahun_id', $tahunId)
             ->where('pengajar_id', $dosenId)

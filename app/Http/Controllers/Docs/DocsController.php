@@ -52,6 +52,33 @@ class DocsController extends Controller
         ]);
     }
 
+    public function androidPengumuman() {
+        return view('docs.contents.android.pengumuman.index', [
+            'title' => 'KRS'
+        ]);
+    }
+
+    public function androidPengumumanTabs($tabName) {
+        switch (strtolower($tabName)) {
+            case 'admin':
+                $content = view('docs.contents.android.pengumuman.admin')->render();
+                break;
+            case 'mahasiswa':
+                $content = view('docs.contents.android.pengumuman.mahasiswa')->render();
+                break;
+            case 'dosen':
+                $content = view('docs.contents.android.pengumuman.dosen')->render();
+                break;
+            default:
+                $content = 'Tab not found.';
+                break;
+        }
+
+        return response()->json([
+            'content' => $content,
+        ]);
+    }
+
     public function androidKrs() {
         return view('docs.contents.android.krs.index', [
             'title' => 'KRS'

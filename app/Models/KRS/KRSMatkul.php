@@ -32,6 +32,15 @@ class KRSMatkul extends Model
         $this->connection = config('myconfig.database.second_connection');
     }
 
+    public function scopeGetForPengumumanMahasiswa(Builder $query, $lastKrsId) {
+        return $query->where('krs_id', $lastKrsId)
+            ->select('krs_id', 'krs_mk_id', 'kelas_kuliah_id', 'mk_id')
+            ->with('kelasKuliahJoin')
+            ->with(['matakuliah' => function ($query) {
+                $query->whereNotIn('kd_mk', ['IF1200', 'SI1200', 'IF1400', 'SI1400', 'IF1600', 'SI1600', 'IF1800', 'SI1800']);
+            }])->get();
+    }
+
     public function scopeGetKRSMatkulWithKelasKuliah(Builder $query, $krsId) {
         return $query->where('krs_id', $krsId)
             ->select('krs_mk_id', 'krs_id', 'mk_id', 'kelas_kuliah_id')

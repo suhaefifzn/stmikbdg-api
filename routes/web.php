@@ -50,4 +50,8 @@ Route::controller(DocsController::class)
         // * Android - KRS
         Route::get('/android/krs', 'androidKrs');
         Route::get('/android/krs/tabs/{name}', 'androidKrsTabs');
+
+        // * Android - KRS
+        Route::get('/android/pengumuman', 'androidPengumuman');
+        Route::get('/android/pengumuman/tabs/{name}', 'androidPengumumanTabs');
     });

@@ -12,6 +12,7 @@ use App\Models\Users\Admin;
 // ? Models - view
 use App\Models\Users\MahasiswaView;
 use App\Models\Users\Dosen;
+use App\Models\Users\StaffMarketingView;
 use Illuminate\Support\Facades\DB;
 
 class Controller extends BaseController
@@ -51,8 +52,11 @@ class Controller extends BaseController
         try {
             $isDosen = auth()->user()->is_dosen;
             $isAdmin = auth()->user()->is_admin;
+            $isMhs = auth()->user()->is_mhs;
+            $isStaff = auth()->user()->is_staff;
+
             $kdUserArr = explode('-', auth()->user()->kd_user);
-            $userIdentifier = $kdUserArr[1]; // bisa berisi kd_dosen atau nim
+            $userIdentifier = $kdUserArr[1];
 
             // user adalah dosen saja atau sekaligus admin
             if ($isDosen) {
@@ -83,14 +87,22 @@ class Controller extends BaseController
             }
 
             // user adalah mahasiswa
-            $mahasiswa = MahasiswaView::where('nim', $userIdentifier)->first();
+            if ($isMhs and !$isStaff) {
+                $mahasiswa = MahasiswaView::where('nim', $userIdentifier)->first();
 
-            // buat nm_mhs menjadi key nama
-            $tempNama = $mahasiswa['nm_mhs'];
-            unset($mahasiswa['nm_mhs']);
-            $mahasiswa['nama'] = $tempNama;
+                // buat nm_mhs menjadi key nama
+                $tempNama = $mahasiswa['nm_mhs'];
+                unset($mahasiswa['nm_mhs']);
+                $mahasiswa['nama'] = $tempNama;
 
-            return $mahasiswa;
+                return $mahasiswa;
+            }
+
+            // user adalah staf dan bukan mahasiswa
+            if ($isStaff and !$isMhs) {
+                $staff = StaffMarketingView::where('user_id', (int) $userIdentifier)->first();
+                return $staff;
+            }
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }

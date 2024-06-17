@@ -305,6 +305,7 @@ class AdminPengajuanWisudaController extends Controller
         try {
             $request->validate([
                 'tgl_wisuda' => 'required|string',
+                'angkatan_wisuda' => 'required|integer'
             ]);
 
             $carbonDate = Carbon::createFromFormat('d-m-Y', $request->tgl_wisuda);
@@ -322,16 +323,10 @@ class AdminPengajuanWisudaController extends Controller
                 ], 400);
             }
 
-            /**
-             * Get jadwal wisuda terakhir ditambahkan
-             */
-            $oldJadwal = JadwalWisudaAllView::getLatestJadwalWisuda();
-            $newAngkatanWisuda = $oldJadwal['angkatan_wisuda'] + 1;
-
             $jadwal = [
                 'tahun' => $year,
                 'tgl_wisuda' => $request->tgl_wisuda,
-                'angkatan_wisuda' => $newAngkatanWisuda,
+                'angkatan_wisuda' => $request->angkatan_wisuda,
             ];
 
             JadwalWisuda::create($jadwal);
@@ -349,10 +344,8 @@ class AdminPengajuanWisudaController extends Controller
         try {
             $request->validate([
                 'tgl_wisuda' => 'required|string',
-                'angkatan_wisuda' => 'required',
+                'angkatan_wisuda' => 'required|integer',
             ]);
-
-            DB::beginTransaction();
 
             $oldJadwal = JadwalWisudaAllView::getJadwalWisuda($tahun);
 
@@ -374,21 +367,23 @@ class AdminPengajuanWisudaController extends Controller
                 'angkatan_wisuda' => (integer) $request->angkatan_wisuda,
             ];
 
+            DB::beginTransaction();
+
             $updateJadwal = JadwalWisuda::where('jadwal_wisuda_id', $oldJadwal['jadwal_wisuda_id'])
                 ->update($jadwal);
 
             /**
-             * update juga field tgl_wisuda, tahun_wisuda, 
+             * update juga field tgl_wisuda, tahun_wisuda,
              * dan angkatan_wisuda di tabel pengajuan
              */
-            $updatePengajuan = PengajuanWisuda::where('jadwal_wisuda_id', $oldJadwal['jadwal_wisuda_id'])
+            PengajuanWisuda::where('jadwal_wisuda_id', $oldJadwal['jadwal_wisuda_id'])
                 ->update([
                     'tgl_wisuda' => $jadwal['tgl_wisuda'],
                     'tahun_wisuda' => (int) $jadwal['tahun'],
                     'angkatan_wisuda' => (int) $jadwal['angkatan_wisuda']
                 ]);
-            
-            if ($updateJadwal and $updatePengajuan) {
+
+            if ($updateJadwal) {
                 DB::commit();
 
                 return response()->json([
