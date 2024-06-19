@@ -74,6 +74,7 @@ class Kernel extends HttpKernel
         'auth.prodi' => \App\Http\Middleware\isProdi::class,
         'auth.wakil' => \App\Http\Middleware\isWakil::class,
         'auth.staff' => \App\Http\Middleware\isStaff::class,
+        'auth.staff.secretary' => \App\Http\Middleware\isSecretary::class,
         'auth.surat.users' => \App\Http\Middleware\isSuratUsers::class,
 
         // access to documentation

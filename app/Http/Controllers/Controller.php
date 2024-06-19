@@ -13,7 +13,7 @@ use App\Models\Users\Admin;
 // ? Models - view
 use App\Models\Users\MahasiswaView;
 use App\Models\Users\Dosen;
-use App\Models\Users\StaffMarketingView;
+use App\Models\Users\AllStaffView;
 
 class Controller extends BaseController
 {
@@ -91,7 +91,7 @@ class Controller extends BaseController
 
             // user adalah staff
             if ($isStaff) {
-                $staff = StaffMarketingView::where('user_id', (int) $userIdentifier)->first();
+                $staff = AllStaffView::where('user_id', auth()->user()->id)->first();
 
                 if ($staff) {
                     return $staff;

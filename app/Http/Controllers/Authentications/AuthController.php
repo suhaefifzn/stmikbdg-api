@@ -15,7 +15,6 @@ use App\Models\Users\UserSitesView;
 
 // ? Models - Tables
 use App\Models\Users\Site;
-use App\Models\Users\User;
 
 class AuthController extends Controller {
     public function userLogin(Request $request) {
@@ -39,6 +38,43 @@ class AuthController extends Controller {
             $token = auth()->setTTL($ttl)->attempt($credentials);
 
             if ($token) {
+                $roles = collect(auth()->user())->filter(function ($item) {
+                    if (is_bool($item))  {
+                        return $item;
+                    }
+                })->toArray();
+
+                if (isset($roles['is_staff'])) {
+                    $staff = $this->getUserAuth();
+                    $staffPositions = collect($staff)->filter(function ($item) {
+                        if (is_bool($item)) {
+                            return $item;
+                        }
+                    })->toArray();
+
+                    /**
+                     * keperluan untuk sistem surat
+                     * jika user is_wk dan is_staff, hapus is_staff
+                     */
+                    if (isset($roles['is_staff']) and isset($roles['is_wk'])) {
+                        unset($roles['is_staff']);
+                    }
+
+                    if (count($staffPositions) > 0) {
+                        // untuk sementara ambil sekretaris saja
+                        if (isset($staffPositions['is_secretary'])) {
+                            // $mergedRoles = array_merge($roles, [
+                            //     'is_secretary' => $staffPositions['is_secretary']
+                            // ]);
+                            $roles = [
+                                'is_secretary' => $staffPositions['is_secretary']
+                            ];
+                        }
+
+                        // $mergedRoles = array_merge(($roles->toArray()), ($staffPositions->toArray()));
+                    }
+                }
+
                 $data = [
                     'token' => [
                         'access_token' => $token,
@@ -46,15 +82,7 @@ class AuthController extends Controller {
                         'expires_in' => $platform === 'android' ? null : "$ttl minutes",
                     ],
                     'platform' => $platform,
-                    'roles' => [
-                        'is_admin' => auth()->user()->is_admin,
-                        'is_dosen' => auth()->user()->is_dosen,
-                        'is_mhs' => auth()->user()->is_mhs,
-                        'is_dev' => auth()->user()->is_dev,
-                        'is_doswal' => auth()->user()->is_doswal,
-                        'is_prodi' => auth()->user()->is_prodi,
-                        'is_staff' => auth()->user()->is_staff,
-                    ]
+                    'roles' => isset($mergedRoles) ? $mergedRoles : $roles,
                 ];
             } else {
                 return response()->json([
