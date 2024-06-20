@@ -15,6 +15,7 @@ use App\Models\Surat\ArsipLocation;
 
 // ? Models - Views
 use App\Models\Users\UserView;
+use App\Models\Users\AllStaffView;
 
 class MainController extends Controller
 {
@@ -64,5 +65,67 @@ class MainController extends Controller
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
+    }
+
+
+    public function getListStaff(Request $request) {
+        try {
+            $users = UserView::where('is_staff', true)
+                ->select('id', 'is_wk')
+                ->orderBy('is_wk', 'DESC')
+                ->get();
+
+            $listStaff = self::getAllStaff($users);
+
+            return $this->successfulResponseJSON([
+                'list_staff' => $listStaff
+            ]);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    private function getAllStaff($users) {
+        $listStaff = [];
+
+        foreach ($users as $user) {
+            $staff = AllStaffView::where('user_id', $user['id'])
+                ->select('staff_id', 'user_id', 'nama', 'is_marketing', 'is_akademik', 'is_baak', 'image')
+                ->first();
+
+            $positions = collect($staff)->filter(function ($item) {
+                if (is_bool($item)) {
+                    return $item;
+                }
+            })->toArray();
+
+            if (!$user['is_wk']) {
+                foreach ($positions as $key => $value) {
+                    $tempPositions = [];
+
+                    if ($key == 'is_marketing') {
+                        array_push($tempPositions, 'Marketing');
+                    } else if ($key == 'is_akademik') {
+                        array_push($tempPositions, 'Akademik');
+                    } else if ($key == 'is_baak') {
+                        array_push($tempPositions, 'BAAK');
+                    }
+                }
+
+                $jabatan = implode(', ', $tempPositions);
+            } else {
+                $jabatan = 'Wakil Ketua';
+            }
+
+            array_push($listStaff, [
+                'staff_id' => $staff['staff_id'],
+                'user_id' => $staff['user_id'],
+                'nama' => $staff['nama'],
+                'jabatan' => $jabatan,
+                'image' => config('app.url') . '/storage/users/images/' . $staff['image']
+            ]);
+        }
+
+        return $listStaff;
     }
 }
