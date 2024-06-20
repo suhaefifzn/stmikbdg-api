@@ -1,6 +1,7 @@
 <div class="alert alert-info">
     <b>Diperbarui:</b><br>
     <ul>
+        <li>20-06-2024 | <a href="/docs/api/surat" class="text-decoration-none fw-bold">Surat Masuk dan Keluar</a></li>
         <li>17-06-2024 | <a href="/docs/api/android/pengumuman" class="text-decoration-none fw-bold">Android - Pengumuman</a></li>
         <li>11-06-2024 | <a href="/docs/api/kuesioner" class="text-decoration-none fw-bold">Kuesioner (Admin - Hasil Kuesioner Perkuliahan)</a></li>
         <li>07-06-2024 | <a href="/docs/api/android/krs" class="text-decoration-none fw-bold">Android - IP Semester (di KRS - Mahasiswa)</a></li>

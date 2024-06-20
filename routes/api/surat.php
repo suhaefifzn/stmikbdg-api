@@ -20,7 +20,7 @@ Route::prefix('/surat')
                     });
 
                 // ? admin
-                Route::get('/arsip/surat', 'getArsip')->middleware('auth.admin');
+                Route::get('/arsip', 'getArsip')->middleware('auth.admin');
             });
 
         // ? admin - kategori
@@ -72,7 +72,7 @@ Route::prefix('/surat')
                 // ? admin
                 Route::middleware('auth.admin')
                     ->group(function () {
-                        Route::get('/list-by-admin', 'getListStatus');
+                        Route::get('/status/list-by-admin', 'getListStatus');
                         Route::get('/staff/list', 'getListStaff');
                         Route::get('/rekap', 'rekapSurat');
                     });
@@ -92,6 +92,7 @@ Route::prefix('/surat')
                         Route::get('/generate/nomor-agenda', 'getNomorAgenda');
                         Route::get('/arsip/catatan', 'getCatatanArsip');
                         Route::get('/riwayat', 'getRiwayat');
+                        Route::get('/status/list', 'getListStatus');
                     });
 
                 // ? admin

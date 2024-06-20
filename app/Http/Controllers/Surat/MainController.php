@@ -40,13 +40,8 @@ class MainController extends Controller
 
     public function getArsip() {
         try {
-            $suratMasuk = Arsip::whereNot('surat_masuk_id', null)
-                ->orderBy('tgl_arsip', 'DESC')
-                ->get();
-
-            $suratKeluar = Arsip::whereNot('surat_keluar_id', null)
-                ->orderBy('tgl_arsip', 'DESC')
-                ->get();
+            $suratMasuk = Arsip::getSuratMasukWhereNotId(null);
+            $suratKeluar = Arsip::getSuratKeluarWhereNotId(null);
 
             return $this->successfulResponseJSON([
                 'list_arsip' => [

@@ -211,7 +211,8 @@ class SuratKeluarController extends Controller
                 'perihal_sk' => 'required|string',
                 'lampiran_sk' => 'required|string',
                 'tindakan' => 'required|string',
-                'nama_file' => 'required|string'
+                'nama_file' => 'required|string',
+                'disposisi_user_id' => 'nullable|integer'
             ]);
 
             $surat = SuratKeluar::where('surat_keluar_id', $request->surat_keluar_id)->first();
@@ -223,6 +224,10 @@ class SuratKeluarController extends Controller
             $data = $request->all();
             $data['tgl_keluar'] = Carbon::createFromFormat('d-m-Y', $request->tgl_keluar);
             $data['tgl_sk'] = Carbon::createFromFormat('d-m-Y', $request->tgl_sk);
+
+            if ($request->disposisi_user_id) {
+                $data['disposisi_user_id'] = $request->disposisi_user_id;
+            }
 
             unset($data['surat_keluar_id']);
 
@@ -482,6 +487,7 @@ class SuratKeluarController extends Controller
                 $carbonDate = Carbon::createFromFormat('d-m-Y', $request->date);
                 $rekapSurat = SuratKeluar::where('tgl_sk', $carbonDate)
                     ->where('status_id', (int) $request->status_id)
+                    ->with('status')
                     ->get();
 
                 return $this->successfulResponseJSON([

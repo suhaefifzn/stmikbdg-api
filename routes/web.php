@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Docs\DocsController;
 use App\Http\Controllers\Docs\DocsAuthController;
+use App\Http\Controllers\Docs\DocSuratController;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(DocsAuthController::class)
@@ -29,7 +30,6 @@ Route::controller(DocsController::class)
         Route::get('/additional', 'additionalRoutes');
         Route::get('/marketing', 'marketing');
         Route::get('/berita-acara', 'beritaAcara');
-        Route::get('/penomoran-surat', 'surat');
 
         // * Antrian
         Route::get('/antrian', 'antrian');
@@ -54,4 +54,12 @@ Route::controller(DocsController::class)
         // * Android - KRS
         Route::get('/android/pengumuman', 'androidPengumuman');
         Route::get('/android/pengumuman/tabs/{name}', 'androidPengumumanTabs');
+
+        // * Surat
+        Route::controller(DocSuratController::class)
+            ->prefix('/surat')
+            ->group(function () {
+                Route::get('', 'index');
+                Route::get('/tabs/{name}', 'suratTabs');
+            });
     });

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Models\Surat\StatusSuratMasuk;
 use App\Models\Surat\Kategori;
+use App\Models\Surat\Disposisi;
+use App\Models\Surat\Arsip;
 
 class SuratMasuk extends Model
 {
@@ -37,5 +39,9 @@ class SuratMasuk extends Model
 
     public function disposisi() {
         return $this->hasOne(Disposisi::class, 'surat_masuk_id');
+    }
+
+    public function arsip() {
+        return $this->hasOne(Arsip::class, 'surat_masuk_id');
     }
 }

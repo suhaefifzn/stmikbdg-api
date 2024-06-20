@@ -233,8 +233,10 @@ class SuratMasukController extends Controller
                         ->with('kategori')
                         ->first();
 
-                    $disposisi = Disposisi::where('surat_masuk_id', $request->surat_masuk_id)->first();
-                    $surat['disposisi'] = $disposisi;
+                    if ($surat) {
+                        $disposisi = Disposisi::where('surat_masuk_id', $request->surat_masuk_id)->first();
+                        $surat['disposisi'] = $disposisi;
+                    }
                 } else if (auth()->user()->is_staff and $secretary) {
                     // sekretaris
                     if ($validatedPeriksa) {
@@ -564,9 +566,7 @@ class SuratMasukController extends Controller
 
     public function getSuratDisposisi() {
         try {
-            $suratDisposisi = Disposisi::orderBy('disposisi_id', 'DESC')
-                ->with('suratMasuk')
-                ->get();
+            $suratDisposisi = Disposisi::getListDisposisi();
 
             return $this->successfulResponseJSON([
                 'list_disposisi' => $suratDisposisi
@@ -587,6 +587,7 @@ class SuratMasukController extends Controller
             if ($suratMasukId) {
                 $surat = SuratMasuk::where('surat_masuk_id', (int) $suratMasukId)
                     ->orderBy('surat_masuk_id', 'DESC')
+                    ->with('status')
                     ->with('disposisi')
                     ->first();
 
@@ -601,6 +602,7 @@ class SuratMasukController extends Controller
 
             $listSurat = SuratMasuk::orderBy('surat_masuk_id', 'DESC')
                 ->with('disposisi')
+                ->with('status')
                 ->get();
 
             return $this->successfulResponseJSON([

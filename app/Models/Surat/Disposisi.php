@@ -2,8 +2,11 @@
 
 namespace App\Models\Surat;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+
+use App\Models\Surat\SuratMasuk;
 
 class Disposisi extends Model
 {
@@ -26,5 +29,12 @@ class Disposisi extends Model
 
     public function suratMasuk() {
         return $this->belongsTo(SuratMasuk::class, 'surat_masuk_id', 'surat_masuk_id');
+    }
+
+    public function scopeGetListDisposisi(Builder $query) {
+        return $query->orderBy('disposisi_id', 'DESC')
+            ->with(['suratMasuk' => function ($query) {
+                $query->with(['kategori', 'status', 'arsip']);
+            }])->get();
     }
 }
