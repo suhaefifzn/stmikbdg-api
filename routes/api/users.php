@@ -30,6 +30,7 @@ Route::controller(UserController::class)
             ->middleware('auth.admin')
             ->group(function () {
                 Route::post('/add', 'addUser');
-                Route::get('/list', 'getAllStaff');
+                Route::get('/list', 'getAllStaff')->withoutMiddleware('auth.admin');
+                Route::get('/detail', 'getStaff')->withoutMiddleware('auth.admin');
             });
     });

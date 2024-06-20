@@ -105,4 +105,26 @@ class StaffController extends Controller
             return ErrorHandler::handle($e);
         }
     }
+
+    public function getStaff(Request $request) {
+        try {
+            $userId = $request->query('user_id');
+
+            if ($userId) {
+                $staff = AllStaffView::where('user_id', $userId)->first();
+
+                if ($staff) {
+                    return $this->successfulResponseJSON([
+                        'staff' => $staff
+                    ]);
+                }
+
+                return $this->failedResponseJSON('Staff tidak ditemukan', 404);
+            }
+
+            return $this->failedResponseJSON('Query user_id diperlukan');
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
 }

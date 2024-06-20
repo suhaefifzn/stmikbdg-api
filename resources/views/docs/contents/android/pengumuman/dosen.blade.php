@@ -59,7 +59,8 @@
                 "nm_pengirim": "Admin STMIK Bandung",
                 "tgl_dikirim": "2024-06-17 19:58:54",
                 "image": "http://stmikbdg-api.test/storage/pengumuman/images/Screenshot1.png",
-                "message": "Test pengumuman oleh Admin"
+                "message": "Test pengumuman oleh Admin",
+                "avatar_pengirim": null
             },
             {
                 "pengumuman_id": 21,
@@ -68,7 +69,8 @@
                 "nm_pengirim": "Admin STMIK Bandung",
                 "tgl_dikirim": "2024-06-17 19:37:59",
                 "image": null,
-                "message": "Test pengumuman oleh Admin"
+                "message": "Test pengumuman oleh Admin",
+                "avatar_pengirim": null
             }
         ]
     }
@@ -92,7 +94,8 @@
                 "nm_pengirim": "Mina Ismu Rahayu, M.T",
                 "tgl_dikirim": "2024-06-17 18:08:47",
                 "image": null,
-                "message": "Test pengumuman mata kuliah"
+                "message": "Test pengumuman mata kuliah",
+                "avatar_pengirim": null
             }
         ]
     }
