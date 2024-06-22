@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 // ? Models - Tables
 use App\Models\Users\Staff;
@@ -14,10 +15,12 @@ use App\Models\Users\User;
 
 // ? Models - Views
 use App\Models\Users\AllStaffView;
+use App\Models\Users\UserSitesView;
+use App\Models\Users\UserView;
 
 class StaffController extends Controller
 {
-    public function addUser(Request $request) {
+    public function addStaff(Request $request) {
         try {
             $request->validate([
                 'email' => 'required|string|email|unique:users',
@@ -26,6 +29,7 @@ class StaffController extends Controller
                 'no_hp' => 'required|string',
                 'is_marketing' => 'nullable|boolean',
                 'is_akademik' => 'nullable|boolean',
+                'is_secretary' => 'nullable|boolean'
             ]);
 
             DB::beginTransaction();
@@ -37,6 +41,7 @@ class StaffController extends Controller
                 'no_hp' => $request->no_hp,
                 'is_marketing' => $request->is_marketing ?? false,
                 'is_akademik' => $request->is_akademik ?? false,
+                'is_secretary' => $request->is_secretary ?? false,
             ]);
 
             if ($insertStaff) {
@@ -47,7 +52,7 @@ class StaffController extends Controller
                     'kd_user' => $kdUser,
                     'email' => $request->email,
                     'password' => $hashedPassword,
-                    'image' => 'college_student.png',
+                    'image' => config('app.url') . 'storage/users/images/college_student.png', // default awal,
                     'is_staff' => true,
                 ];
 
@@ -89,14 +94,6 @@ class StaffController extends Controller
                 $allStaff = AllStaffView::orderBy('staff_id', 'DESC')->get();
             }
 
-            if ($allStaff->count() > 0) {
-                foreach ($allStaff as $index => $item) {
-                    $image = config('app.url') . 'storage/users/images/' . $item['image'];
-                    $item['image'] = $image;
-                    $allStaff[$index] = $item;
-                }
-            }
-
             return $this->successfulResponseJSON([
                 'total_staff' => $allStaff->count(),
                 'list_staff' => $allStaff,
@@ -106,24 +103,128 @@ class StaffController extends Controller
         }
     }
 
-    public function getStaff(Request $request) {
+    public function getAccount(Request $request) {
         try {
-            $userId = $request->query('user_id');
+            $staffId = $request->query('staff_id');
+            $staff = AllStaffView::where('staff_id', (int) $staffId)->first();
 
-            if ($userId) {
-                $staff = AllStaffView::where('user_id', $userId)->first();
+            if ($staff) {
+                $account = UserView::where('id', $staff['user_id'])->first();
 
-                if ($staff) {
-                    return $this->successfulResponseJSON([
-                        'staff' => $staff
-                    ]);
-                }
+                $filteredAccount = collect($account)->filter(function ($item) {
+                    if ($item) {
+                        return $item;
+                    }
+                });
 
-                return $this->failedResponseJSON('Staff tidak ditemukan', 404);
+                $filteredUser = collect($staff)->filter(function ($item) {
+                    if ($item) {
+                        return $item;
+                    }
+                });
+
+                $siteAccess = UserSitesView::where('user_id', $account['id'])->get();
+
+                $user = [
+                    'account' => $filteredAccount,
+                    'profile' => $filteredUser,
+                    'site_access' => $siteAccess
+                ];
+
+                return $this->successfulResponseJSON([
+                    'user' => $user
+                ]);
             }
 
-            return $this->failedResponseJSON('Query user_id diperlukan');
+            return $this->failedResponseJSON('Staff tidak ditemukan', 404);
         } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function update(Request $request) {
+        try {
+            $staffId = $request->staff_id;
+            $staff = AllStaffView::where('staff_id', (int) $staffId)->first();
+
+            if ($staff) {
+                $request->validate([
+                    'staff_id' => 'required|integer',
+                    'nama' => 'required|string',
+                    'no_hp' => 'required|string',
+                    'is_marketing' => 'nullable|boolean',
+                    'is_akademik' => 'nullable|boolean',
+                    'is_secretary' => 'nullable|boolean',
+                    'email' => [
+                        'required',
+                        'email',
+                        Rule::unique('users')->ignore($staff['user_id']),
+                    ],
+                ]);
+
+                DB::beginTransaction();
+
+                // update ke table staff dulu
+                $updateStaff = Staff::where('staff_id', (int) $staffId)
+                    ->update([
+                        'nama' => $request->nama,
+                        'email' => $request->email,
+                        'no_hp' => $request->no_hp,
+                        'is_marketing' => $request->is_marketing ?? false,
+                        'is_akademik' => $request->is_akademik ?? false,
+                        'is_secretary' => $request->is_secretary ?? false,
+                    ]);
+
+                if ($updateStaff) {
+                    $updateEmail = User::where('id', $staff['user_id'])
+                        ->update([
+                            'email' => $request->email
+                        ]);
+
+                    if ($updateEmail) {
+                        DB::commit();
+
+                        return $this->successfulResponseJSONV2('Staff berhasil diubah');
+                    }
+                }
+
+                DB::rollBack();
+
+                return $this->failedResponseJSON('Staff gagal diubah');
+            }
+
+            return $this->failedResponseJSON('Staff tidak ditemukan', 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function delete(Request $request) {
+        try {
+            $staffId = $request->staff_id;
+            $staff = AllStaffView::where('staff_id', (int) $staffId)->first();
+
+            if ($staff) {
+                DB::beginTransaction();
+
+                $deleteStaff = Staff::where('staff_id', (int) $request->staff_id)->delete();
+                $deleteAccount = User::where('id', $staff['user_id'])->delete();
+
+                if ($deleteStaff and $deleteAccount) {
+                    DB::commit();
+
+                    return $this->successfulResponseJSONV2('Staff berhasil dihapus');
+                }
+
+                DB::rollBack();
+
+                return $this->failedResponseJSON('Staff gagal dihapus');
+            }
+
+            return $this->failedResponseJSON('Staff tidak ditemukan', 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
             return ErrorHandler::handle($e);
         }
     }

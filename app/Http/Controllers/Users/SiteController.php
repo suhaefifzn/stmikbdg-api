@@ -21,12 +21,14 @@ use App\Models\Users\UserSitesView;
 
 class SiteController extends Controller
 {
-    public function getAllSites(Request $request) {
+    public function getAll(Request $request) {
         try {
             $siteId = $request->query('site_id');
 
             if ($siteId) {
-                $tempSiteUsers = UserSitesView::where('site_id', $siteId)->get();
+                $tempSiteUsers = UserSitesView::where('site_id', $siteId)
+                    ->whereNot('user_id', auth()->user()->id)
+                    ->get();
                 $siteUsers = [];
 
                 foreach ($tempSiteUsers as $index => $item) {
@@ -40,7 +42,7 @@ class SiteController extends Controller
                 ]);
             }
 
-            $sites = Site::all();
+            $sites = Site::orderBy('id', 'DESC')->get();
 
             return $this->successfulResponseJSON([
                 'sites' => $sites,
@@ -50,7 +52,7 @@ class SiteController extends Controller
         }
     }
 
-    public function postUserSite(Request $request) {
+    public function addAccess(Request $request) {
         try {
             if ($request->query('import')) {
                 if ($request->query('import') === 'excel') {
@@ -98,7 +100,7 @@ class SiteController extends Controller
         }
     }
 
-    public function postNewSite(Request $request) {
+    public function addSite(Request $request) {
         try {
             $data = $request->validate([
                 'url' => 'required|string',
@@ -135,7 +137,7 @@ class SiteController extends Controller
         }
     }
 
-    public function deleteUserSiteAccess(Request $request) {
+    public function deleteAccess(Request $request) {
         try {
             $request->validate([
                 'site_id' => 'required',
@@ -162,6 +164,7 @@ class SiteController extends Controller
         }
     }
 
+    //jangan dulu dipake
     public function importUserSiteAccessFromExcel($excel) {
         try {
             $fileName = $excel->hashName();

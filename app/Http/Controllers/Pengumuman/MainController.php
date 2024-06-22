@@ -50,7 +50,7 @@ class MainController extends Controller
                 $pengumuman['nm_pengirim'] = isset($user['gelar']) ?
                     $user['nama'] . ', ' . $user['gelar'] : $user['nama'];
                 $pengumuman['target'] = 0;
-                $pengumuman['avatar_pengirim'] = config('app.url') . 'storage/users/images/' . auth()->user()->image;
+                $pengumuman['avatar_pengirim'] = auth()->user()->image;
 
                 if ($request->image and !is_null($request->image)) {
                     $pengumuman['image'] = config('app.url')
@@ -124,7 +124,7 @@ class MainController extends Controller
                             'image' => is_null($request->image) ? null : $image,
                             'tgl_dikirim' => $tglKirim,
                             'message' => $request->message,
-                            'avatar_pengirim' => config('app.url') . 'storage/users/images/' . auth()->user()->image
+                            'avatar_pengirim' => auth()->user()->image
                         ];
 
                         array_push($pengumumanArr, $pengumuman);

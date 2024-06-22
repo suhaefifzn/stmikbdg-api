@@ -67,7 +67,6 @@ class MainController extends Controller
         }
     }
 
-
     public function getListStaff(Request $request) {
         try {
             $users = UserView::where('is_staff', true)
@@ -122,7 +121,7 @@ class MainController extends Controller
                 'user_id' => $staff['user_id'],
                 'nama' => $staff['nama'],
                 'jabatan' => $jabatan,
-                'image' => config('app.url') . '/storage/users/images/' . $staff['image']
+                'image' => $staff['image']
             ]);
         }
 

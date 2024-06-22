@@ -75,6 +75,13 @@ class Controller extends BaseController
                 }
             }
 
+            // user adalah staff
+            if ($isStaff) {
+                $staff = AllStaffView::where('user_id', auth()->user()->id)->first();
+
+                return $staff;
+            }
+
             // user adalah mahasiswa
             if ($isMhs) {
                 $mahasiswa = MahasiswaView::where('nim', $userIdentifier)->first();
@@ -86,15 +93,6 @@ class Controller extends BaseController
                     $mahasiswa['nama'] = $tempNama;
 
                     return $mahasiswa;
-                }
-            }
-
-            // user adalah staff
-            if ($isStaff) {
-                $staff = AllStaffView::where('user_id', auth()->user()->id)->first();
-
-                if ($staff) {
-                    return $staff;
                 }
             }
         } catch (\Exception $e) {

@@ -588,3 +588,25 @@
     }
 }</code></pre>
 </section>
+
+<section>
+    <h5 class="mt-5 mb-3 fw-bold">(ADM) Get List Staff</h5>
+    <p>
+        Untuk melihat daftar user yang memiliki role sebagai staff, kirimkan permintaan ke <span class="badge bg-dark">/surat/staff/list</span> dengan menggunakan HTTP method <span class="badge bg-info">get</span>. Hasilnya:
+    </p>
+    <pre><code class="language-json bg-primary-subtle">{
+    "status": "success",
+    "data": {
+        "list_staff": [
+            {
+                "staff_id": 3,
+                "user_id": 109,
+                "nama": "Karyawan",
+                "jabatan": "Akademik",
+                "image": "college_student.png"
+            },
+            ...
+        ]
+    }
+}</code></pre>
+</section>

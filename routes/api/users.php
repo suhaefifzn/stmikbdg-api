@@ -23,14 +23,4 @@ Route::controller(UserController::class)
         Route::get('/', 'getUserList')->middleware('auth.admin');
         Route::post('/', 'addNewUser'); // buat awalan tambahin withoutMiddleware('auth.jwt')
         Route::delete('/{id}', 'deleteUserById')->middleware('auth.admin');
-
-        // ? user staff
-        Route::controller(StaffController::class)
-            ->prefix('/staff')
-            ->middleware('auth.admin')
-            ->group(function () {
-                Route::post('/add', 'addUser');
-                Route::get('/list', 'getAllStaff')->withoutMiddleware('auth.admin');
-                Route::get('/detail', 'getStaff')->withoutMiddleware('auth.admin');
-            });
     });

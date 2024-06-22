@@ -130,10 +130,6 @@ class UserController extends Controller {
                 return $item;
             });
 
-            $account['image'] = config('app.url')
-                . 'storage/users/images/'
-                . auth()->user()->image;
-
             return $this->successfulResponseJSON([
                 'profile' => $user,
                 'account' => $account
@@ -200,14 +196,6 @@ class UserController extends Controller {
 
                     if (strtolower($job) == 'is_marketing') {
                         $users = StaffMarketingView::orderBy('staff_id', 'DESC')->get();
-
-                        foreach ($users as $index => $user) {
-                            $image = config('app.url')
-                                . 'storage/users/images/'
-                                . $user['image'];
-                            $user['image'] = $image;
-                            $users[$index] = $user;
-                        }
                     }
                 } else {
                     $filter = [
@@ -251,20 +239,16 @@ class UserController extends Controller {
                 Storage::delete($pathOldImage);
             }
 
+            $imgUrl = config('app.url') . 'storage/users/images/' . $fileName;
+
             User::where('id', auth()->user()->id)
                 ->update([
-                    'image' => $fileName,
+                    'image' => $imgUrl,
                 ]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Foto profile berhasil diperbaharui.',
-                'data' => [
-                    'image' => config('app.url')
-                        . 'storage/users/images/'
-                        . $fileName,
-                ],
-            ], 200);
+            return $this->successfulResponseJSON([
+                'image' => $imgUrl
+            ], 'Foto profil berhasil diperbarui');
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
@@ -291,6 +275,24 @@ class UserController extends Controller {
                 'status' => 'fail',
                 'message' => 'User dengan id ' . $userId . ' tidak ditemukan'
             ], 400);
+        } catch (\Exception $e) {
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function getStatistik() {
+        try {
+            $countMahasiswa = UserView::where('is_mhs', true)->get()->count();
+            $countDosen = UserView::where('is_dosen', true)->get()->count();
+            $countStaff = UserView::where('is_staff', true)->get()->count();
+            $countAdmin = UserView::where('is_admin', true)->get()->count();
+
+            return $this->successfulResponseJSON([
+                'total_akun_mahasiswa' => $countMahasiswa,
+                'total_akun_dosen' => $countDosen,
+                'total_akun_staff' => $countStaff,
+                'total_akun_admin' => $countAdmin,
+            ]);
         } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }

@@ -1,6 +1,8 @@
+<p>
 @php
     $apiBaseURL = config('app.url') . 'api';
 @endphp
+</p>
 
 <div class="alert alert-info">
     <span class="fw-bold fs-6">Cara Penggunaan:</span>
