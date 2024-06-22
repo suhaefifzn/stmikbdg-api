@@ -234,7 +234,7 @@ class UserController extends Controller {
             // cek old image
             $oldImage = auth()->user()->image;
 
-            if ($oldImage !== 'college_student.png') {
+            if ($oldImage !== config('app.url') . 'storage/users/images/college_student.png') {
                 $pathOldImage = 'public/users/images/' . auth()->user()->image;
                 Storage::delete($pathOldImage);
             }
