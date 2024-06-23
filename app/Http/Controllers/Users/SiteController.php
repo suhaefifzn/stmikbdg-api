@@ -26,6 +26,7 @@ class SiteController extends Controller
             $siteId = $request->query('site_id');
 
             if ($siteId) {
+                $site = Site::where('id', (int) $siteId)->first();
                 $tempSiteUsers = UserSitesView::where('site_id', $siteId)
                     ->whereNot('user_id', auth()->user()->id)
                     ->get();
@@ -38,6 +39,7 @@ class SiteController extends Controller
                 }
 
                 return $this->successfulResponseJSON([
+                    'site_detail' => $site,
                     'site_users' => array_values($siteUsers),
                 ]);
             }
@@ -111,6 +113,9 @@ class SiteController extends Controller
                 'is_dosen' => 'required|boolean',
                 'is_doswal' => 'required|boolean',
                 'is_prodi' => 'required|boolean',
+                'is_wk' => 'required|boolean',
+                'is_staff' => 'required|boolean',
+                'is_secretary' => 'required|boolean',
             ]);
 
             $validatedURL = filter_var($request->url, FILTER_VALIDATE_URL);

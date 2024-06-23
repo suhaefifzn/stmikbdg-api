@@ -285,7 +285,10 @@ class UserController extends Controller {
             $countMahasiswa = UserView::where('is_mhs', true)->get()->count();
             $countDosen = UserView::where('is_dosen', true)->get()->count();
             $countStaff = UserView::where('is_staff', true)->get()->count();
-            $countAdmin = UserView::where('is_admin', true)->get()->count();
+            $countAdmin = UserView::where('is_admin', true)
+                ->whereNot('id', auth()->user()->id)
+                ->get()
+                ->count();
 
             return $this->successfulResponseJSON([
                 'total_akun_mahasiswa' => $countMahasiswa,

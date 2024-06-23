@@ -56,6 +56,7 @@ Route::prefix('/sso')
                 Route::post('/add', 'add');
                 Route::put('/update', 'update');
                 Route::delete('/delete', 'delete');
+                Route::get('/sites/list', 'getSites');
             });
 
         Route::controller(SiteController::class)

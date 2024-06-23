@@ -35,7 +35,7 @@ class AdminController extends Controller
                 DB::beginTransaction();
 
                 $insertToUsers = User::create([
-                    'kd_user' => 'ADM-' . strtoupper($request->kd_user),
+                    'kd_user' => 'ADM-ADM' . strtoupper($request->kd_user),
                     'email' => $request->email,
                     'password' => $request->password,
                     'is_admin' => true,
@@ -78,6 +78,7 @@ class AdminController extends Controller
     public function getAll() {
         try {
             $allAdmins = UserView::where('is_admin', true)
+                ->whereNot('id', auth()->user()->id)
                 ->orderBy('id', 'DESC')
                 ->get();
 
@@ -158,7 +159,7 @@ class AdminController extends Controller
             $updateToUsers = User::where('id', $request->user_id)
                 ->update([
                     'email' => $request->email,
-                    'kd_user' => 'ADM-' . strtoupper($request->kd_user)
+                    'kd_user' => 'ADM-ADM' . strtoupper($request->kd_user)
                 ]);
 
             if ($updateToUsers) {
@@ -189,6 +190,20 @@ class AdminController extends Controller
             return $this->failedResponseJSON('Akun admin gagal diperbarui');
         } catch (\Exception $e) {
             DB::rollBack();
+            return ErrorHandler::handle($e);
+        }
+    }
+
+    public function getSites() {
+        try {
+            $sites = Site::orderBy('id', 'DESC')
+                ->select('id', 'name', 'url')
+                ->get();
+
+            return $this->successfulResponseJSON([
+                'list_sites' => $sites
+            ]);
+        } catch (\Exception $e) {
             return ErrorHandler::handle($e);
         }
     }
