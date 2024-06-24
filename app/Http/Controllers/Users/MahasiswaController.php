@@ -28,7 +28,7 @@ class MahasiswaController extends Controller
         try {
             $request->validate([
                 'kd_user' => 'required|string', // nim
-                'email' => 'required|email|unique:users',
+                'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:8|max:64|regex:/^\S*$/u'
             ]);
 
@@ -40,6 +40,15 @@ class MahasiswaController extends Controller
             $mhs = MahasiswaView::where('nim', $request->kd_user)
                 ->select('mhs_id', 'nim')
                 ->first();
+
+            /**
+             * Cek ketersediaan akun
+             */
+            $account = UserView::where('kd_user', ('MHS-' . $request->kd_user))->first();
+
+            if ($account) {
+                return $this->failedResponseJSON('Akun mahasiswa dengan NIM ' . $request->kd_user . ' telah tersedia', 400);
+            }
 
             if ($mhs) {
                 $data = $request->all();
@@ -87,7 +96,7 @@ class MahasiswaController extends Controller
 
             return $this->failedResponseJSON('Data mahasiswa tidak ditemukan', 404);
         } catch (\Exception $e) {
-            DB::rollBack($e);
+            DB::rollBack();
             return ErrorHandler::handle($e);
         }
     }
@@ -117,6 +126,17 @@ class MahasiswaController extends Controller
             $mhs = MahasiswaView::where('nim', $request->kd_user)
                 ->select('mhs_id', 'nim')
                 ->first();
+
+            /**
+             * Cek ketersediaan akun
+             */
+            $user = UserView::where('kd_user', ('MHS-' . $request->kd_user))
+                ->whereNot('kd_user', $account['kd_user'])
+                ->first();
+
+            if ($user) {
+                return $this->failedResponseJSON('Akun mahasiswa dengan NIM ' . $request->kd_user . ' telah tersedia', 400);
+            }
 
             if ($mhs and $account) {
                 $data = $request->all();

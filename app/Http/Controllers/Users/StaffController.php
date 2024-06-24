@@ -15,6 +15,8 @@ use App\Models\Users\User;
 
 // ? Models - Views
 use App\Models\Users\AllStaffView;
+use App\Models\Users\Site;
+use App\Models\Users\UserSite;
 use App\Models\Users\UserSitesView;
 use App\Models\Users\UserView;
 
@@ -58,7 +60,22 @@ class StaffController extends Controller
 
                 $insertAccount = User::create($account);
 
-                if ($insertAccount) {
+                $karyawanSites = Site::where('is_staff', true)
+                    ->select('id')
+                    ->get();
+
+                $siteAccess = array_map(function ($item) use  ($insertAccount) {
+                    $item['user_id'] = $insertAccount->id;
+                    $item['site_id'] = $item['id'];
+
+                    unset($item['id']);
+
+                    return $item;
+                }, $karyawanSites->toArray());
+
+                $insertSiteAccess = UserSite::insert($siteAccess);
+
+                if ($insertAccount and $insertSiteAccess) {
                     $updateStaff = Staff::where('staff_id', $insertStaff->staff_id)
                         ->update([
                             'user_id' => $insertAccount->id

@@ -46,7 +46,7 @@ class DosenController extends Controller
         try {
             $request->validate([
                 'kd_user' => 'required|string', // kd_dosen
-                'email' => 'required|email|unique:users',
+                'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:8|max:64|regex:/^\S*$/u',
                 'is_doswal' => 'nullable|boolean',
                 'is_prodi' => 'nullable|boolean',
@@ -66,6 +66,16 @@ class DosenController extends Controller
             if ($dosen) {
                 $data = $request->all();
                 $data['kd_user'] = 'DSN-' . trim($request->kd_user);
+
+                /**
+                 * cek account
+                 */
+                $account = UserView::where('kd_user', $data['kd_user'])->first();
+
+                if ($account) {
+                    return $this->failedResponseJSON('Akun dosen dengan kode ' . $request->kd_user . ' telah tersedia', 400);
+                }
+
                 $data['image'] = config('app.url') . 'storage/users/images/college_student.png'; // default awal
                 $data['is_dosen'] = true; // default
                 $data['is_doswal'] = $request->is_doswal ?? false;
@@ -81,8 +91,7 @@ class DosenController extends Controller
                     $request->validate([
                         'is_akademik' => 'required|boolean',
                         'is_marketing' => 'required|boolean',
-                        'is_baak' => 'required|boolean',
-                        'is_secretary' => 'required|boolean'
+                        'is_baak' => 'required|boolean'
                     ]);
 
                     $staff = [
@@ -91,8 +100,7 @@ class DosenController extends Controller
                         'email' => $request->email,
                         'is_akademik' => $request->is_akademik,
                         'is_marketing' => $request->is_marketing,
-                        'is_baak' => $request->is_baak,
-                        'is_secretary' => $request->is_secretary
+                        'is_baak' => $request->is_baak
                     ];
 
                     $dosenSites = Site::where('is_dosen', true)
@@ -187,7 +195,16 @@ class DosenController extends Controller
 
             if ($dosen and $account) {
                 $data = $request->all();
-                $data['kd_user'] = 'DSN-' . trim($request->kd_user);
+                $data['kd_user'] = 'DSN-' . strtoupper(trim($request->kd_user));
+
+                $checkKode = UserView::where('kd_user', $data['kd_user'])
+                    ->whereNot('kd_user', $account['kd_user'])
+                    ->first();
+
+                if ($checkKode) {
+                    return $this->failedResponseJSON('Akun dosen dengan kode ' . $data['kd_user'] . ' telah tersedia', 400);
+                }
+
                 $data['is_doswal'] = $request->is_doswal ?? false;
                 $data['is_prodi'] = $request->is_prodi ?? false;
                 $data['is_staff'] = $request->is_staff ?? false;
@@ -197,8 +214,7 @@ class DosenController extends Controller
                     $request->validate([
                         'is_akademik' => 'required|boolean',
                         'is_marketing' => 'required|boolean',
-                        'is_baak' => 'required|boolean',
-                        'is_secretary' => 'required|boolean'
+                        'is_baak' => 'required|boolean'
                     ]);
 
                     $staff = [
@@ -207,8 +223,7 @@ class DosenController extends Controller
                         'email' => $request->email,
                         'is_akademik' => $request->is_akademik,
                         'is_marketing' => $request->is_marketing,
-                        'is_baak' => $request->is_baak,
-                        'is_secretary' => $request->is_secretary
+                        'is_baak' => $request->is_baak
                     ];
 
                     if ($checkStaff) {
@@ -257,11 +272,13 @@ class DosenController extends Controller
                     }
                 }
 
+                unset($data['user_id']);
+                unset($data['is_akademik']);
+                unset($data['is_marketing']);
+                unset($data['is_baak']);
+
                 $update = User::where('id', $request->user_id)
-                    ->update([
-                        'kd_user' => $request->kd_user,
-                        'email' => $request->email
-                    ]);
+                    ->update($data);
 
                 if ($update) {
                     DB::commit();
@@ -300,6 +317,13 @@ class DosenController extends Controller
         try {
             $userId = $request->query('user_id');
             $user = UserView::where('id', (int) $userId) ->first();
+
+            if ($user['is_staff']) {
+                $staff = Staff::where('user_id', $user['id'])->first();
+                $user['is_akademik'] = $staff['is_akademik'];
+                $user['is_marketing'] = $staff['is_marketing'];
+                $user['is_baak'] = $staff['is_baak'];
+            }
 
             if ($user) {
                 $siteAccess = UserSitesView::where('user_id', (int) $userId)->get();
