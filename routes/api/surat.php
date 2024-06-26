@@ -7,6 +7,12 @@ use App\Http\Controllers\Surat\KategoriController as KategoriSuratController;
 use App\Http\Controllers\Surat\SuratKeluarController;
 use App\Http\Controllers\Surat\SuratMasukController;
 use App\Http\Controllers\Surat\MainController;
+use App\Http\Controllers\Users\StaffController;
+
+/**
+ * Sementara - karena sudah digunakan pada sistemnya
+ */
+Route::get('/users/staff/detail', [StaffController::class, 'getDetailByUserId'])->middleware('auth.staff.secretary');
 
 Route::prefix('/surat')
     ->middleware('auth.jwt')
